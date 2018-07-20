@@ -52,6 +52,7 @@ final class ArtistTableViewController: UITableViewController {
 
 	func setArtists(_ artists: [(String, MPMediaItem, MPMediaItemCollection)]) {
 		self.artists = artists
+		navigationItem.title = "\(artists.count) Artists"
 		tableView.reloadData()
 	}
 

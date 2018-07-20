@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14306.4" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="74z-xz-uu3">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14306.4" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="j1A-Se-TgZ">
     <device id="retina3_5" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
@@ -66,10 +66,29 @@
                             <outlet property="delegate" destination="74z-xz-uu3" id="pEi-Qc-U8D"/>
                         </connections>
                     </tableView>
+                    <navigationItem key="navigationItem" id="3FQ-Mw-XOn"/>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="ruf-AN-6QD" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1431" y="224"/>
+            <point key="canvasLocation" x="2162" y="224"/>
+        </scene>
+        <!--Navigation Controller-->
+        <scene sceneID="bcz-1O-b6i">
+            <objects>
+                <navigationController automaticallyAdjustsScrollViewInsets="NO" id="j1A-Se-TgZ" sceneMemberID="viewController">
+                    <toolbarItems/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" largeTitles="YES" id="vfM-wd-cHo">
+                        <rect key="frame" x="0.0" y="20" width="320" height="96"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <nil name="viewControllers"/>
+                    <connections>
+                        <segue destination="74z-xz-uu3" kind="relationship" relationship="rootViewController" id="Oam-PS-GOb"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="eEz-es-Ky3" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1430.625" y="223.75"/>
         </scene>
     </scenes>
 </document>
