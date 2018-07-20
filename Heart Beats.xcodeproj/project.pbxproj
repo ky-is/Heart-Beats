@@ -8,20 +8,24 @@
 
 /* Begin PBXBuildFile section */
 		24649C7220F92ED300822FAC /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24649C7120F92ED300822FAC /* AppDelegate.swift */; };
-		24649C7420F92ED300822FAC /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24649C7320F92ED300822FAC /* ViewController.swift */; };
 		24649C7720F92ED300822FAC /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 24649C7520F92ED300822FAC /* Main.storyboard */; };
 		24649C7920F92ED600822FAC /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 24649C7820F92ED600822FAC /* Assets.xcassets */; };
 		24649C7C20F92ED600822FAC /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 24649C7A20F92ED600822FAC /* LaunchScreen.storyboard */; };
+		24BF29CB2101B6AD00CD67B5 /* ArtistTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24BF29CA2101B6AD00CD67B5 /* ArtistTableViewController.swift */; };
+		24BF29CD2101B7B000CD67B5 /* ArtistTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24BF29CC2101B7B000CD67B5 /* ArtistTableViewCell.swift */; };
+		24BF29CF2101BFAB00CD67B5 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24BF29CE2101BFAB00CD67B5 /* Extensions.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		24649C6E20F92ED300822FAC /* Heart Beats.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Heart Beats.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		24649C7120F92ED300822FAC /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		24649C7320F92ED300822FAC /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		24649C7620F92ED300822FAC /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		24649C7820F92ED600822FAC /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		24649C7B20F92ED600822FAC /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		24649C7D20F92ED600822FAC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		24BF29CA2101B6AD00CD67B5 /* ArtistTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArtistTableViewController.swift; sourceTree = "<group>"; };
+		24BF29CC2101B7B000CD67B5 /* ArtistTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArtistTableViewCell.swift; sourceTree = "<group>"; };
+		24BF29CE2101BFAB00CD67B5 /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -55,11 +59,13 @@
 			isa = PBXGroup;
 			children = (
 				24649C7120F92ED300822FAC /* AppDelegate.swift */,
-				24649C7320F92ED300822FAC /* ViewController.swift */,
+				24BF29CA2101B6AD00CD67B5 /* ArtistTableViewController.swift */,
+				24BF29CC2101B7B000CD67B5 /* ArtistTableViewCell.swift */,
 				24649C7520F92ED300822FAC /* Main.storyboard */,
 				24649C7820F92ED600822FAC /* Assets.xcassets */,
 				24649C7A20F92ED600822FAC /* LaunchScreen.storyboard */,
 				24649C7D20F92ED600822FAC /* Info.plist */,
+				24BF29CE2101BFAB00CD67B5 /* Extensions.swift */,
 			);
 			path = "Heart Beats";
 			sourceTree = "<group>";
@@ -135,8 +141,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				24649C7420F92ED300822FAC /* ViewController.swift in Sources */,
+				24BF29CF2101BFAB00CD67B5 /* Extensions.swift in Sources */,
+				24BF29CB2101B6AD00CD67B5 /* ArtistTableViewController.swift in Sources */,
 				24649C7220F92ED300822FAC /* AppDelegate.swift in Sources */,
+				24BF29CD2101B7B000CD67B5 /* ArtistTableViewCell.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
