@@ -50,8 +50,8 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
 				}
 				artists.append((artist, representative, MPMediaItemCollection(items: songs)))
 			}
-			artists = artists.filter { $0.2.count > 9 }
-			artists.sort { $0.0 < $1.0 }
+			artists = artists.filter { $0.2.count > 9 || favorited.contains($0.0) }
+			artists.sort { $0.0.withoutThe() < $1.0.withoutThe() }
 			DispatchQueue.main.async {
 				artistTableViewController.setArtists(artists)
 			}

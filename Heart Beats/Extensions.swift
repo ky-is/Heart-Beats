@@ -16,10 +16,14 @@ extension Collection {
 
 }
 
-public extension String {
+extension String {
 
 	func plural(_ amount: Int) -> String {
 		return amount == 1 ? self : "\(self)s"
+	}
+
+	func withoutThe() -> String {
+		return lowercased().starts(with: "the ") ? String(dropFirst(4)) : self
 	}
 
 }
