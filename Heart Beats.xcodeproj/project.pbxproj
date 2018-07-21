@@ -61,6 +61,55 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		242A00812103CC960072B26B /* Artists */ = {
+			isa = PBXGroup;
+			children = (
+				24BF29CA2101B6AD00CD67B5 /* ArtistTableViewController.swift */,
+				24BF29CC2101B7B000CD67B5 /* ArtistTableViewCell.swift */,
+				24D2A27F2102F55D00C95E79 /* HeaderTableViewCell.swift */,
+				242A00852103CCE20072B26B /* Songs */,
+			);
+			path = Artists;
+			sourceTree = "<group>";
+		};
+		242A00822103CCA30072B26B /* Settings */ = {
+			isa = PBXGroup;
+			children = (
+				242A007721039CA20072B26B /* SettingsTableViewController.swift */,
+				242A00842103CCD90072B26B /* Combine */,
+			);
+			path = Settings;
+			sourceTree = "<group>";
+		};
+		242A00832103CCAE0072B26B /* Helpers */ = {
+			isa = PBXGroup;
+			children = (
+				242A007F2103BFBB0072B26B /* Artists.swift */,
+				24BF29CE2101BFAB00CD67B5 /* Extensions.swift */,
+				24D2A2812103009500C95E79 /* IAP.swift */,
+				24D2A27D2102D84700C95E79 /* Zephyr.swift */,
+			);
+			path = Helpers;
+			sourceTree = "<group>";
+		};
+		242A00842103CCD90072B26B /* Combine */ = {
+			isa = PBXGroup;
+			children = (
+				242A00792103AE810072B26B /* CombineTableViewController.swift */,
+				242A007B2103B37B0072B26B /* AddCombineTableViewController.swift */,
+			);
+			path = Combine;
+			sourceTree = "<group>";
+		};
+		242A00852103CCE20072B26B /* Songs */ = {
+			isa = PBXGroup;
+			children = (
+				242A0073210330230072B26B /* SongTableViewController.swift */,
+				242A0075210330A90072B26B /* SongTableViewCell.swift */,
+			);
+			path = Songs;
+			sourceTree = "<group>";
+		};
 		24649C6520F92ED300822FAC = {
 			isa = PBXGroup;
 			children = (
@@ -81,24 +130,15 @@
 		24649C7020F92ED300822FAC /* Heart Beats */ = {
 			isa = PBXGroup;
 			children = (
-				24D2A28321030B4B00C95E79 /* Heart Beats.entitlements */,
 				24649C7120F92ED300822FAC /* AppDelegate.swift */,
-				24BF29CA2101B6AD00CD67B5 /* ArtistTableViewController.swift */,
-				24BF29CC2101B7B000CD67B5 /* ArtistTableViewCell.swift */,
-				24D2A27F2102F55D00C95E79 /* HeaderTableViewCell.swift */,
-				242A0073210330230072B26B /* SongTableViewController.swift */,
-				242A0075210330A90072B26B /* SongTableViewCell.swift */,
-				242A007721039CA20072B26B /* SettingsTableViewController.swift */,
-				242A00792103AE810072B26B /* CombineTableViewController.swift */,
-				242A007B2103B37B0072B26B /* AddCombineTableViewController.swift */,
+				242A00812103CC960072B26B /* Artists */,
+				242A00822103CCA30072B26B /* Settings */,
+				242A00832103CCAE0072B26B /* Helpers */,
 				24649C7520F92ED300822FAC /* Main.storyboard */,
 				24649C7820F92ED600822FAC /* Assets.xcassets */,
 				24649C7A20F92ED600822FAC /* LaunchScreen.storyboard */,
 				24649C7D20F92ED600822FAC /* Info.plist */,
-				242A007F2103BFBB0072B26B /* Artists.swift */,
-				24BF29CE2101BFAB00CD67B5 /* Extensions.swift */,
-				24D2A2812103009500C95E79 /* IAP.swift */,
-				24D2A27D2102D84700C95E79 /* Zephyr.swift */,
+				24D2A28321030B4B00C95E79 /* Heart Beats.entitlements */,
 			);
 			path = "Heart Beats";
 			sourceTree = "<group>";
