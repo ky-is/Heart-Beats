@@ -6,7 +6,7 @@
 //  Copyright © 2018 Kyle Coburn. All rights reserved.
 //
 
-import Foundation
+import UIKit
 
 extension Collection {
 
@@ -46,6 +46,29 @@ extension UserDefaults {
 		set(value) {
 			set(value, forKey: #keyPath(favorited))
 		}
+	}
+
+	@objc dynamic var purchased: Bool {
+		get {
+			return bool(forKey: #keyPath(purchased))
+		}
+		set(value) {
+			set(value, forKey: #keyPath(purchased))
+		}
+	}
+
+}
+
+extension UIViewController {
+
+	func alert(_ title: String, message: String, cancel: String, customAction: UIAlertAction? = nil, cancelAction: UIAlertAction? = nil) {
+		let alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
+		let cancelAction = cancelAction ?? UIAlertAction(title: cancel, style: customAction == nil ? .cancel : .default, handler: nil)
+		alertController.addAction(cancelAction)
+		if let customAction = customAction {
+			alertController.addAction(customAction)
+		}
+		present(alertController, animated: true, completion: nil)
 	}
 
 }

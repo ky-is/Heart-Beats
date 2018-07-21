@@ -19,7 +19,10 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
 	var window: UIWindow?
 
 	func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-		Zephyr.sync(defaults: [ #keyPath(UserDefaults.played): [], #keyPath(UserDefaults.favorited): [] ])
+		IAP.shared.start()
+
+		Zephyr.sync(defaults: [ #keyPath(UserDefaults.played): [], #keyPath(UserDefaults.favorited): [], #keyPath(UserDefaults.purchased): false ])
+		Zephyr.shared.userDefaults.addObserver(self, forKeyPath: #keyPath(UserDefaults.purchased), options: [.new], context: nil)
 
 		handleAuthorization(status: MPMediaLibrary.authorizationStatus())
 		return true
@@ -58,6 +61,12 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
 			DispatchQueue.main.async {
 				artistTableViewController.setArtists(artists)
 			}
+		}
+	}
+
+	override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
+		if !IAP.unlocked && UserDefaults.standard.purchased {
+			IAP.shared.restore()
 		}
 	}
 

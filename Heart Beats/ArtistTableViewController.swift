@@ -108,13 +108,19 @@ extension ArtistTableViewController {
 		let artistName = artist.0
 		var played = Zephyr.shared.userDefaults.played
 		if !played.contains(artistName) {
-			played.append(artistName)
-			Zephyr.shared.userDefaults.played = played
 			var favorited = Zephyr.shared.userDefaults.favorited
 			if favorited.count < 3 {
 				favorited.append(artistName)
 				Zephyr.shared.userDefaults.favorited = favorited
+			} else if !IAP.unlocked {
+				let purchaseAction = UIAlertAction(title: "Unlock", style: .cancel) { action in
+					IAP.shared.purchase(from: self)
+				}
+				alert("Unlock required", message: "In order to play more artists, you'll need to purchase the full application. Or, keep using your existing favorites free, forever!", cancel: "Not now", customAction: purchaseAction)
+				return
 			}
+			played.append(artistName)
+			Zephyr.shared.userDefaults.played = played
 		}
 
 		let player = MPMusicPlayerController.systemMusicPlayer
