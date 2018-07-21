@@ -15,3 +15,11 @@ extension Collection {
 	}
 
 }
+
+public extension String {
+	
+	func plural(_ amount: Int) -> String {
+		return amount == 1 ? self : "\(self)s"
+	}
+	
+}

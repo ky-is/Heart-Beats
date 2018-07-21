@@ -15,12 +15,19 @@ private let cellHeight = 64 //TODO cell
 
 final class ArtistTableViewController: UITableViewController {
 
+	@IBOutlet weak var backgroundView: UIView!
+
 	var artists = [(String, MPMediaItem, MPMediaItemCollection)]()
 
 	required init?(coder aDecoder: NSCoder) {
 		super.init(coder: aDecoder)
 
 		artistTableViewController = self
+	}
+	
+	override func viewDidLoad() {
+		tableView.backgroundView = backgroundView
+		tableView.tableFooterView = UIView(frame: .zero)
 	}
 
 	override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -52,7 +59,8 @@ final class ArtistTableViewController: UITableViewController {
 
 	func setArtists(_ artists: [(String, MPMediaItem, MPMediaItemCollection)]) {
 		self.artists = artists
-		navigationItem.title = "\(artists.count) Artists"
+		navigationItem.title = "\(artists.count) \("Artist".plural(artists.count))"
+		backgroundView.isHidden = artists.count > 0
 		tableView.reloadData()
 	}
 
