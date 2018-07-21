@@ -105,6 +105,18 @@ extension ArtistTableViewController {
 
 	override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
 		let artist = displayArtists[indexPath.section][indexPath.item]
+		let artistName = artist.0
+		var played = Zephyr.shared.userDefaults.played
+		if !played.contains(artistName) {
+			played.append(artistName)
+			Zephyr.shared.userDefaults.played = played
+			var favorited = Zephyr.shared.userDefaults.favorited
+			if favorited.count < 3 {
+				favorited.append(artistName)
+				Zephyr.shared.userDefaults.favorited = favorited
+			}
+		}
+
 		let player = MPMusicPlayerController.systemMusicPlayer
 		player.setQueue(with: artist.2)
 		player.shuffleMode = MPMusicShuffleMode.songs
