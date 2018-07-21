@@ -18,6 +18,7 @@ final class Artists: NSObject {
 
 	static func observe() {
 		Zephyr.shared.userDefaults.addObserver(shared, forKeyPath: #keyPath(UserDefaults.combined), options: [.new], context: nil)
+		Zephyr.shared.userDefaults.addObserver(shared, forKeyPath: #keyPath(UserDefaults.minimum), options: [.new], context: nil)
 
 //SAMPLE stress test
 //		var combined = Zephyr.shared.userDefaults.combined
@@ -46,7 +47,7 @@ final class Artists: NSObject {
 		updateQueue.addOperation(updateBlock())
 	}
 
-	func updateBlock() -> BlockOperation {
+	private func updateBlock() -> BlockOperation {
 		let blockOperation = BlockOperation()
 		blockOperation.addExecutionBlock { [weak blockOperation, unowned self] in
 			guard let collections = MPMediaQuery.artists().collections else {
@@ -94,14 +95,17 @@ final class Artists: NSObject {
 				return
 			}
 			var artistsArray = artists.values.map { ($0.0, $0.1, MPMediaItemCollection(items: $0.2)) }
-			let cutoff = max(5, maxCount / 3)
+			var cutoff = Zephyr.shared.userDefaults.minimum
+			if cutoff <= 0 {
+				cutoff = max(5, maxCount / 3)
+			}
 			artistsArray = artistsArray.filter { $0.2.count > cutoff || favorited.contains($0.0) }
 			artistsArray.sort { $0.0.withoutThe() < $1.0.withoutThe() }
 			DispatchQueue.main.async {
 				guard !(blockOperation?.isCancelled ?? true) else {
 					return
 				}
-				artistTableViewController?.setArtists(artistsArray)
+				artistTableViewController?.setArtists(artistsArray, maxCount, cutoff)
 			}
 		}
 		return blockOperation

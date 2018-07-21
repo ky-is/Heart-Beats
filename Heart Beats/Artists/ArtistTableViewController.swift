@@ -16,6 +16,8 @@ private let artworkSize = CGSize(width: cellHeight, height: cellHeight)
 final class ArtistTableViewController: UITableViewController {
 
 	@IBOutlet weak var backgroundView: UIView!
+	@IBOutlet weak var stepperView: GMStepper!
+	@IBOutlet weak var toolbarItem: UIBarButtonItem!
 
 	var artists = [(String, MPMediaItem, MPMediaItemCollection)]()
 	var displayArtists = [[(String, MPMediaItem, MPMediaItemCollection)]]()
@@ -35,12 +37,26 @@ final class ArtistTableViewController: UITableViewController {
 	override func viewDidLoad() {
 		tableView.backgroundView = backgroundView
 		tableView.tableFooterView = UIView(frame: .zero)
+
+		toolbarItem.customView = stepperView
 	}
 
-	func setArtists(_ artists: [(String, MPMediaItem, MPMediaItemCollection)]) {
+	override func viewWillAppear(_ animated: Bool) {
+		navigationController?.setToolbarHidden(false, animated: animated)
+	}
+
+	override func viewWillDisappear(_ animated: Bool) {
+		navigationController?.setToolbarHidden(true, animated: animated)
+	}
+
+	func setArtists(_ artists: [(String, MPMediaItem, MPMediaItemCollection)], _ maxCount: Int, _ current: Int) {
 		self.artists = artists
 		navigationItem.title = "\(artists.count) \("Artist".plural(artists.count))"
 		backgroundView.isHidden = artists.count > 0
+		if stepperView.value <= 2 {
+			stepperView.value = Double(current)
+		}
+		stepperView.maximumValue = Double(maxCount)
 
 		updateFavorites()
 	}
@@ -98,6 +114,10 @@ final class ArtistTableViewController: UITableViewController {
 				}
 			}
 		}
+	}
+
+	@IBAction func onMinimumSongs(_ sender: GMStepper) {
+		Zephyr.shared.userDefaults.minimum = Int(sender.value)
 	}
 
 }

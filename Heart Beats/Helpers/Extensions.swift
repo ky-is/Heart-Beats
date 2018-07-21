@@ -65,6 +65,15 @@ extension UserDefaults {
 		}
 	}
 
+	@objc dynamic var minimum: Int {
+		get {
+			return integer(forKey: #keyPath(minimum))
+		}
+		set(value) {
+			set(value, forKey: #keyPath(minimum))
+		}
+	}
+
 	@objc dynamic var combined: [[String]] {
 		get {
 			return array(forKey: #keyPath(combined)) as? [[String]] ?? []
