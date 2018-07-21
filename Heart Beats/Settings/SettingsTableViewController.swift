@@ -15,8 +15,22 @@ final class SettingsTableViewController: UITableViewController {
 
 	override func viewDidLoad() {
 		if IAP.unlocked {
-			restoreCell.isHidden = true
+			unlockedPurchase()
 		}
+		Zephyr.shared.userDefaults.addObserver(self, forKeyPath: #keyPath(UserDefaults.purchased), options: [.new], context: nil)
+	}
+
+	deinit {
+		Zephyr.shared.userDefaults.removeObserver(self, forKeyPath: #keyPath(UserDefaults.purchased))
+	}
+
+	override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
+		unlockedPurchase()
+	}
+
+	private func unlockedPurchase() {
+		restoreCell.accessoryType = .checkmark
+		restoreCell.textLabel?.text = "Unlocked purchase"
 	}
 
 }
