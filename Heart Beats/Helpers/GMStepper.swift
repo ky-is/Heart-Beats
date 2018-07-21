@@ -244,7 +244,6 @@ import UIKit
 		}
 	}
 
-
 	@objc public var items : [String] = [] {
 		didSet {
 			let isInteger = floor(value) == value
@@ -516,6 +515,5 @@ extension GMStepper {
 			timerFireCount = 0
 		}
 	}
-
 
 }

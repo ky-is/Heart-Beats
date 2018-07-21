@@ -49,7 +49,7 @@ extension CombineTableViewController {
 	}
 
 	override func tableView(_ tableView: UITableView, titleForFooterInSection section: Int) -> String? {
-		return "Allows you to combine an artist with multiple names in your library into one playlist."
+		return "Allows you to combine artists with multiple names in your library into a single playlist."
 	}
 
 	override func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
