@@ -24,15 +24,15 @@ final class ArtistTableViewController: UITableViewController {
 
 		artistTableViewController = self
 	}
-	
+
 	override func viewDidLoad() {
 		tableView.backgroundView = backgroundView
 		tableView.tableFooterView = UIView(frame: .zero)
 	}
 
 	override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return artists.count
-    }
+		return artists.count
+	}
 
 	override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
 		let cell = tableView.dequeueReusableCell(withIdentifier: reuseIdentifier, for: indexPath) as! ArtistTableViewCell
@@ -47,8 +47,8 @@ final class ArtistTableViewController: UITableViewController {
 				}
 			}
 		}
-        return cell
-    }
+		return cell
+	}
 
 	override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
 		let player = MPMusicPlayerController.systemMusicPlayer

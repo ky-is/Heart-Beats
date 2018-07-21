@@ -22,7 +22,7 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
 		handleAuthorization(status: MPMediaLibrary.authorizationStatus())
 		return true
 	}
-	
+
 	private func handleAuthorization(status: MPMediaLibraryAuthorizationStatus) {
 		switch status {
 		case .notDetermined:
