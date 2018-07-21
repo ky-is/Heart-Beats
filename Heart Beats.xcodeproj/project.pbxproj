@@ -13,6 +13,7 @@
 		242A007A2103AE810072B26B /* CombineTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 242A00792103AE810072B26B /* CombineTableViewController.swift */; };
 		242A007C2103B37B0072B26B /* AddCombineTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 242A007B2103B37B0072B26B /* AddCombineTableViewController.swift */; };
 		242A00802103BFBB0072B26B /* Artists.swift in Sources */ = {isa = PBXBuildFile; fileRef = 242A007F2103BFBB0072B26B /* Artists.swift */; };
+		242A008E2103CF780072B26B /* GMStepper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 242A008D2103CF780072B26B /* GMStepper.swift */; };
 		24649C7220F92ED300822FAC /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24649C7120F92ED300822FAC /* AppDelegate.swift */; };
 		24649C7720F92ED300822FAC /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 24649C7520F92ED300822FAC /* Main.storyboard */; };
 		24649C7920F92ED600822FAC /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 24649C7820F92ED600822FAC /* Assets.xcassets */; };
@@ -33,6 +34,7 @@
 		242A00792103AE810072B26B /* CombineTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CombineTableViewController.swift; sourceTree = "<group>"; };
 		242A007B2103B37B0072B26B /* AddCombineTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddCombineTableViewController.swift; sourceTree = "<group>"; };
 		242A007F2103BFBB0072B26B /* Artists.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Artists.swift; sourceTree = "<group>"; };
+		242A008D2103CF780072B26B /* GMStepper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GMStepper.swift; sourceTree = "<group>"; };
 		24649C6E20F92ED300822FAC /* Heart Beats.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Heart Beats.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		24649C7120F92ED300822FAC /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		24649C7620F92ED300822FAC /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -88,6 +90,7 @@
 				24BF29CE2101BFAB00CD67B5 /* Extensions.swift */,
 				24D2A2812103009500C95E79 /* IAP.swift */,
 				24D2A27D2102D84700C95E79 /* Zephyr.swift */,
+				242A008D2103CF780072B26B /* GMStepper.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -243,6 +246,7 @@
 				242A0076210330A90072B26B /* SongTableViewCell.swift in Sources */,
 				24D2A2802102F55D00C95E79 /* HeaderTableViewCell.swift in Sources */,
 				24BF29CD2101B7B000CD67B5 /* ArtistTableViewCell.swift in Sources */,
+				242A008E2103CF780072B26B /* GMStepper.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
