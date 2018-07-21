@@ -8,6 +8,14 @@
 
 import UIKit
 
+extension Bundle {
+
+	var version: String {
+		return infoDictionary!["CFBundleShortVersionString"] as! String
+	}
+
+}
+
 extension Collection {
 
 	subscript (safe index: Index) -> Element? {

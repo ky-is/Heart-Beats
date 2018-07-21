@@ -116,7 +116,7 @@
                                     <outlet property="countLabel" destination="WDZ-17-7M3" id="YrT-Rb-f2b"/>
                                     <outlet property="iconImageView" destination="i0R-XY-kHM" id="fjx-GF-v1P"/>
                                     <outlet property="nameLabel" destination="qPv-Q2-NS5" id="yEE-vl-be7"/>
-                                    <segue destination="aTq-eY-3rc" kind="presentation" identifier="" id="zM1-gd-7Ju">
+                                    <segue destination="aTq-eY-3rc" kind="presentation" identifier="SONGS_PEEK" id="zM1-gd-7Ju">
                                         <segue key="commit" destination="aTq-eY-3rc" kind="presentation" identifier="SONGS_COMMIT" id="mFi-Xg-TEy"/>
                                         <segue key="preview" destination="aTq-eY-3rc" identifier="SONGS_PREVIEW" id="5oc-QP-Ybe"/>
                                     </segue>
@@ -128,7 +128,13 @@
                             <outlet property="delegate" destination="74z-xz-uu3" id="pEi-Qc-U8D"/>
                         </connections>
                     </tableView>
-                    <navigationItem key="navigationItem" id="3FQ-Mw-XOn"/>
+                    <navigationItem key="navigationItem" id="3FQ-Mw-XOn">
+                        <barButtonItem key="rightBarButtonItem" systemItem="compose" id="BzY-gV-DmL">
+                            <connections>
+                                <segue destination="1ax-Na-1tv" kind="show" id="vBl-k6-LyN"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
                     <connections>
                         <outlet property="backgroundView" destination="Fc1-Nt-BAc" id="ofO-8p-ilT"/>
                     </connections>
@@ -156,6 +162,89 @@
                 </view>
             </objects>
             <point key="canvasLocation" x="2198" y="79"/>
+        </scene>
+        <!--Settings-->
+        <scene sceneID="v9v-bC-uJ2">
+            <objects>
+                <tableViewController title="Settings" id="1ax-Na-1tv" customClass="SettingsTableViewController" customModule="Heart_Beats" customModuleProvider="target" sceneMemberID="viewController">
+                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="static" style="grouped" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="18" sectionFooterHeight="18" id="tNh-lr-5fB">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
+                        <sections>
+                            <tableViewSection headerTitle="Artists" id="vzp-wU-YOp">
+                                <cells>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" accessoryType="disclosureIndicator" indentationWidth="10" reuseIdentifier="SETTINGS_COMBINE" textLabel="DmX-vj-9x5" style="IBUITableViewCellStyleDefault" id="TJ4-Wz-HbT">
+                                        <rect key="frame" x="0.0" y="55.5" width="320" height="44"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="TJ4-Wz-HbT" id="bn5-uR-ZMf">
+                                            <rect key="frame" x="0.0" y="0.0" width="286" height="43.5"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" insetsLayoutMarginsFromSafeArea="NO" text="Combine artist names" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" id="DmX-vj-9x5">
+                                                    <rect key="frame" x="16" y="0.0" width="269" height="43.5"/>
+                                                    <autoresizingMask key="autoresizingMask"/>
+                                                    <fontDescription key="fontDescription" style="UICTFontTextStyleTitle3"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                            </subviews>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
+                                </cells>
+                            </tableViewSection>
+                            <tableViewSection headerTitle="Heart Beats" footerTitle="v1.0 by Kyle Coburn" id="NpI-f8-D4A">
+                                <cells>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" accessoryType="disclosureIndicator" indentationWidth="10" reuseIdentifier="SETTINGS_RATE" textLabel="nS8-Ik-NWS" style="IBUITableViewCellStyleDefault" id="Gdh-6x-lhf">
+                                        <rect key="frame" x="0.0" y="163" width="320" height="44"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="Gdh-6x-lhf" id="ZSm-6u-z9A">
+                                            <rect key="frame" x="0.0" y="0.0" width="286" height="43.5"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" insetsLayoutMarginsFromSafeArea="NO" text="Rate App" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" id="nS8-Ik-NWS">
+                                                    <rect key="frame" x="16" y="0.0" width="269" height="43.5"/>
+                                                    <autoresizingMask key="autoresizingMask"/>
+                                                    <fontDescription key="fontDescription" style="UICTFontTextStyleTitle3"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                            </subviews>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" accessoryType="disclosureIndicator" indentationWidth="10" reuseIdentifier="SETTINGS_RESTORE" textLabel="eMp-p7-q3Q" style="IBUITableViewCellStyleDefault" id="B8j-ml-deh">
+                                        <rect key="frame" x="0.0" y="207" width="320" height="44"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="B8j-ml-deh" id="ieo-cO-Yjj">
+                                            <rect key="frame" x="0.0" y="0.0" width="286" height="43.5"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" insetsLayoutMarginsFromSafeArea="NO" text="Restore Purchase" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" id="eMp-p7-q3Q">
+                                                    <rect key="frame" x="16" y="0.0" width="269" height="43.5"/>
+                                                    <autoresizingMask key="autoresizingMask"/>
+                                                    <fontDescription key="fontDescription" style="UICTFontTextStyleTitle3"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                            </subviews>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
+                                </cells>
+                            </tableViewSection>
+                        </sections>
+                        <connections>
+                            <outlet property="dataSource" destination="1ax-Na-1tv" id="ayV-N1-Fda"/>
+                            <outlet property="delegate" destination="1ax-Na-1tv" id="sB8-nR-7mk"/>
+                        </connections>
+                    </tableView>
+                    <connections>
+                        <outlet property="rateCell" destination="Gdh-6x-lhf" id="e2A-2V-8L3"/>
+                        <outlet property="restoreCell" destination="B8j-ml-deh" id="ScM-4Q-7VF"/>
+                    </connections>
+                </tableViewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="8yi-Ul-5HR" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="2964" y="79"/>
         </scene>
         <!--Song Table View Controller-->
         <scene sceneID="5fW-hs-Gm3">

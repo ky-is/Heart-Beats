@@ -189,7 +189,7 @@ extension ArtistTableViewController {
 extension ArtistTableViewController {
 
 	override func shouldPerformSegue(withIdentifier identifier: String, sender: Any?) -> Bool {
-		return identifier != ""
+		return identifier != "SONGS_PEEK"
 	}
 
 	override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
