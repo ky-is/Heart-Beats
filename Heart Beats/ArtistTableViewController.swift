@@ -123,11 +123,21 @@ extension ArtistTableViewController {
 			Zephyr.shared.userDefaults.played = played
 		}
 
-		let player = MPMusicPlayerController.systemMusicPlayer
-		player.setQueue(with: artist.2)
-		player.shuffleMode = MPMusicShuffleMode.songs
-		player.prepareToPlay()
-		UIApplication.shared.open(URL(string: "audio-player-event:")!, options: [:], completionHandler: nil)
+		let buildAlert = UIAlertController(title: "Building \(artistName) playlist...", message: "", preferredStyle: .alert)
+		present(buildAlert, animated: true)
+
+		DispatchQueue.global(qos: .userInitiated).async {
+			let player = MPMusicPlayerController.systemMusicPlayer
+			player.setQueue(with: artist.2)
+			player.shuffleMode = MPMusicShuffleMode.songs
+			player.prepareToPlay()
+
+			DispatchQueue.main.async {
+				UIApplication.shared.open(URL(string: "audio-player-event:")!, options: [:]) { success in
+					buildAlert.dismiss(animated: true)
+				}
+			}
+		}
 	}
 
 }
