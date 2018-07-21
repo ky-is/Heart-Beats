@@ -19,6 +19,8 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
 	var window: UIWindow?
 
 	func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+		Zephyr.sync(defaults: [ #keyPath(UserDefaults.played): [], #keyPath(UserDefaults.favorited): [] ])
+
 		handleAuthorization(status: MPMediaLibrary.authorizationStatus())
 		return true
 	}
@@ -35,6 +37,7 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
 			guard let collections = MPMediaQuery.artists().collections else {
 				return print("Unable to load music")
 			}
+			let favorited = Zephyr.shared.userDefaults.favorited
 			var artists = [ (String, MPMediaItem, MPMediaItemCollection) ]()
 			for collection in collections {
 				guard let representative = collection.representativeItem, let artist = representative.artist ?? representative.albumArtist else {

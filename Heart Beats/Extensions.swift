@@ -27,3 +27,25 @@ extension String {
 	}
 
 }
+
+extension UserDefaults {
+
+	@objc dynamic var played: [String] {
+		get {
+			return array(forKey: #keyPath(played)) as? [String] ?? []
+		}
+		set(value) {
+			set(value, forKey: #keyPath(played))
+		}
+	}
+
+	@objc dynamic var favorited: [String] {
+		get {
+			return array(forKey: #keyPath(favorited)) as? [String] ?? []
+		}
+		set(value) {
+			set(value, forKey: #keyPath(favorited))
+		}
+	}
+
+}

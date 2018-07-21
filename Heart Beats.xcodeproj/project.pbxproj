@@ -15,6 +15,7 @@
 		24BF29CD2101B7B000CD67B5 /* ArtistTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24BF29CC2101B7B000CD67B5 /* ArtistTableViewCell.swift */; };
 		24BF29CF2101BFAB00CD67B5 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24BF29CE2101BFAB00CD67B5 /* Extensions.swift */; };
 		24D2A27E2102D84700C95E79 /* Zephyr.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24D2A27D2102D84700C95E79 /* Zephyr.swift */; };
+		24D2A2802102F55D00C95E79 /* HeaderTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24D2A27F2102F55D00C95E79 /* HeaderTableViewCell.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -28,6 +29,7 @@
 		24BF29CC2101B7B000CD67B5 /* ArtistTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArtistTableViewCell.swift; sourceTree = "<group>"; };
 		24BF29CE2101BFAB00CD67B5 /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
 		24D2A27D2102D84700C95E79 /* Zephyr.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Zephyr.swift; sourceTree = "<group>"; };
+		24D2A27F2102F55D00C95E79 /* HeaderTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeaderTableViewCell.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -63,6 +65,7 @@
 				24649C7120F92ED300822FAC /* AppDelegate.swift */,
 				24BF29CA2101B6AD00CD67B5 /* ArtistTableViewController.swift */,
 				24BF29CC2101B7B000CD67B5 /* ArtistTableViewCell.swift */,
+				24D2A27F2102F55D00C95E79 /* HeaderTableViewCell.swift */,
 				24649C7520F92ED300822FAC /* Main.storyboard */,
 				24649C7820F92ED600822FAC /* Assets.xcassets */,
 				24649C7A20F92ED600822FAC /* LaunchScreen.storyboard */,
@@ -148,6 +151,7 @@
 				24BF29CF2101BFAB00CD67B5 /* Extensions.swift in Sources */,
 				24BF29CB2101B6AD00CD67B5 /* ArtistTableViewController.swift in Sources */,
 				24649C7220F92ED300822FAC /* AppDelegate.swift in Sources */,
+				24D2A2802102F55D00C95E79 /* HeaderTableViewCell.swift in Sources */,
 				24BF29CD2101B7B000CD67B5 /* ArtistTableViewCell.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

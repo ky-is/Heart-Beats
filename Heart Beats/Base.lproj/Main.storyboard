@@ -14,14 +14,57 @@
         <scene sceneID="uhe-Ci-y6Z">
             <objects>
                 <tableViewController id="74z-xz-uu3" customClass="ArtistTableViewController" customModule="Heart_Beats" customModuleProvider="target" sceneMemberID="viewController">
-                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" rowHeight="-1" estimatedRowHeight="80" sectionHeaderHeight="28" sectionFooterHeight="28" id="l0l-5z-sdO">
+                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" rowHeight="-1" estimatedRowHeight="80" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" id="l0l-5z-sdO">
                         <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <inset key="separatorInset" minX="92" minY="0.0" maxX="0.0" maxY="0.0"/>
                         <prototypes>
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" reuseIdentifier="HEADER" id="8dg-zt-VMn" customClass="HeaderTableViewCell" customModule="Heart_Beats" customModuleProvider="target">
+                                <rect key="frame" x="0.0" y="28" width="320" height="44"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="8dg-zt-VMn" id="CnB-eg-vhV">
+                                    <rect key="frame" x="0.0" y="0.0" width="320" height="43.5"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                    <subviews>
+                                        <visualEffectView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="j7q-ln-iHS">
+                                            <rect key="frame" x="0.0" y="0.0" width="320" height="43.5"/>
+                                            <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" id="YtA-8l-lcH">
+                                                <rect key="frame" x="0.0" y="0.0" width="320" height="43.5"/>
+                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                <subviews>
+                                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Header" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="wdZ-mJ-PxA">
+                                                        <rect key="frame" x="16" y="8" width="296" height="27.5"/>
+                                                        <fontDescription key="fontDescription" style="UICTFontTextStyleHeadline"/>
+                                                        <nil key="textColor"/>
+                                                        <nil key="highlightedColor"/>
+                                                    </label>
+                                                </subviews>
+                                                <constraints>
+                                                    <constraint firstItem="wdZ-mJ-PxA" firstAttribute="top" secondItem="YtA-8l-lcH" secondAttribute="topMargin" id="TZA-tX-HBi"/>
+                                                    <constraint firstAttribute="trailingMargin" secondItem="wdZ-mJ-PxA" secondAttribute="trailing" id="rBB-R7-K2A"/>
+                                                    <constraint firstAttribute="bottomMargin" secondItem="wdZ-mJ-PxA" secondAttribute="bottom" id="tVw-PR-tmg"/>
+                                                </constraints>
+                                            </view>
+                                            <blurEffect style="extraLight"/>
+                                        </visualEffectView>
+                                    </subviews>
+                                    <constraints>
+                                        <constraint firstAttribute="bottom" secondItem="j7q-ln-iHS" secondAttribute="bottom" id="GK7-iG-q4J"/>
+                                        <constraint firstAttribute="trailing" secondItem="j7q-ln-iHS" secondAttribute="trailing" id="ZW3-47-H3h"/>
+                                        <constraint firstItem="j7q-ln-iHS" firstAttribute="top" secondItem="CnB-eg-vhV" secondAttribute="top" id="lmj-gA-2NF"/>
+                                        <constraint firstItem="j7q-ln-iHS" firstAttribute="leading" secondItem="CnB-eg-vhV" secondAttribute="leading" id="vTh-iy-zgZ"/>
+                                    </constraints>
+                                </tableViewCellContentView>
+                                <constraints>
+                                    <constraint firstItem="wdZ-mJ-PxA" firstAttribute="leading" secondItem="8dg-zt-VMn" secondAttribute="leadingMargin" id="guV-Fx-yYZ"/>
+                                </constraints>
+                                <connections>
+                                    <outlet property="nameLabel" destination="wdZ-mJ-PxA" id="gHk-hr-MTB"/>
+                                </connections>
+                            </tableViewCell>
                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="ARTIST" rowHeight="80" id="vCp-5a-6iV" customClass="ArtistTableViewCell" customModule="Heart_Beats" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="28" width="320" height="80"/>
+                                <rect key="frame" x="0.0" y="72" width="320" height="80"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="vCp-5a-6iV" id="0gM-d0-ou4">
                                     <rect key="frame" x="0.0" y="0.0" width="320" height="79.5"/>
