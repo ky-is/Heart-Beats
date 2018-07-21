@@ -60,58 +60,11 @@ final class ArtistTableViewController: UITableViewController {
 		updateFavorites()
 	}
 
-}
-
-//MARK: TableView
-
-extension ArtistTableViewController {
-
-	override func numberOfSections(in tableView: UITableView) -> Int {
-		return displayArtists.count
+	private func artistAt(indexPath: IndexPath) -> (String, MPMediaItem, MPMediaItemCollection) {
+		return displayArtists[indexPath.section][indexPath.item]
 	}
 
-	override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-		return displayArtists[section].count
-	}
-
-	override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-		return showFavorites() ? UITableViewAutomaticDimension : 0
-	}
-
-	override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-		let cell = tableView.dequeueReusableCell(withIdentifier: "HEADER") as! HeaderTableViewCell
-		cell.nameLabel.text = section == 0 ? "Favorites" : "Others"
-		return cell
-	}
-
-	override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-		let cell = tableView.dequeueReusableCell(withIdentifier: "ARTIST", for: indexPath) as! ArtistTableViewCell
-		let artist = displayArtists[indexPath.section][indexPath.item]
-		let artistName = artist.0
-		cell.nameLabel.text = artistName
-		cell.countLabel.text = artist.2.count.description
-		if let artwork = artist.1.artwork {
-			DispatchQueue.global(qos: .userInitiated).async {
-				let image = artwork.image(at: artworkSize) ?? artwork.image(at: artwork.bounds.size)
-				DispatchQueue.main.async {
-					if cell.nameLabel.text == artistName {
-						cell.iconImageView.image = image
-					}
-				}
-			}
-		}
-		return cell
-	}
-
-	func purchaseAlert(message: String) {
-		let purchaseAction = UIAlertAction(title: "Unlock", style: .cancel) { action in
-			IAP.shared.purchase(from: self)
-		}
-		alert("Unlock required", message: "\(message) Or, keep playing your existing favorites free, forever!", cancel: "Not now", customAction: purchaseAction)
-	}
-
-	override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-		let artist = displayArtists[indexPath.section][indexPath.item]
+	func play(artist: (String, MPMediaItem, MPMediaItemCollection)) {
 		let artistName = artist.0
 		var played = Zephyr.shared.userDefaults.played
 		if !played.contains(artistName) {
@@ -145,6 +98,61 @@ extension ArtistTableViewController {
 
 }
 
+//MARK: TableView
+
+extension ArtistTableViewController {
+
+	override func numberOfSections(in tableView: UITableView) -> Int {
+		return displayArtists.count
+	}
+
+	override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+		return displayArtists[section].count
+	}
+
+	override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+		return showFavorites() ? UITableViewAutomaticDimension : 0
+	}
+
+	override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+		let cell = tableView.dequeueReusableCell(withIdentifier: "HEADER") as! HeaderTableViewCell
+		cell.nameLabel.text = section == 0 ? "Favorites" : "Others"
+		return cell
+	}
+
+	override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+		let cell = tableView.dequeueReusableCell(withIdentifier: "ARTIST", for: indexPath) as! ArtistTableViewCell
+		let artist = artistAt(indexPath: indexPath)
+		let artistName = artist.0
+		cell.nameLabel.text = artistName
+		cell.countLabel.text = artist.2.count.description
+		if let artwork = artist.1.artwork {
+			DispatchQueue.global(qos: .userInitiated).async {
+				let image = artwork.image(at: artworkSize) ?? artwork.image(at: artwork.bounds.size)
+				DispatchQueue.main.async {
+					if cell.nameLabel.text == artistName {
+						cell.iconImageView.image = image
+					}
+				}
+			}
+		}
+		return cell
+	}
+
+	func purchaseAlert(message: String) {
+		let purchaseAction = UIAlertAction(title: "Unlock", style: .cancel) { action in
+			IAP.shared.purchase(from: self)
+		}
+		alert("Unlock required", message: "\(message) Or, keep playing your existing favorites free, forever!", cancel: "Not now", customAction: purchaseAction)
+	}
+
+	override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+		let artist = artistAt(indexPath: indexPath)
+		play(artist: artist)
+	}
+
+}
+
 //MARK: Swipe
 
 extension ArtistTableViewController {
@@ -155,7 +163,8 @@ extension ArtistTableViewController {
 		let favoriteAction = UIContextualAction(style: addToFavorites ? .normal : .destructive, title: title) { (action, view, handler) in
 			if !IAP.unlocked {
 				self.purchaseAlert(message: "In order to manage your favorites, you'll need to purchase the full application.")
-			} else if let artist = self.displayArtists[safe: indexPath.section]?[safe: indexPath.item] {
+			} else {
+				let artist = self.artistAt(indexPath: indexPath)
 				let artistName = artist.0
 				var favorites = Zephyr.shared.userDefaults.favorited
 				if favorites.contains(artistName) {
@@ -171,6 +180,26 @@ extension ArtistTableViewController {
 			favoriteAction.backgroundColor = UIColor(red: 1.0, green: 0.85, blue: 0.0, alpha: 1)
 		}
 		return UISwipeActionsConfiguration(actions: [ favoriteAction ])
+	}
+
+}
+
+//MARK: Peek
+
+extension ArtistTableViewController {
+
+	override func shouldPerformSegue(withIdentifier identifier: String, sender: Any?) -> Bool {
+		return identifier != ""
+	}
+
+	override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+		if segue.identifier == "SONGS_PREVIEW" {
+			let destinationController = segue.destination as! UINavigationController
+			if let cell = sender as? UITableViewCell, let indexPath = tableView.indexPath(for: cell), let songController = destinationController.topViewController as? SongTableViewController {
+				let artist = artistAt(indexPath: indexPath)
+				songController.setArtist(artist)
+			}
+		}
 	}
 
 }
