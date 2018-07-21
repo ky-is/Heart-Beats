@@ -103,6 +103,13 @@ extension ArtistTableViewController {
 		return cell
 	}
 
+	func purchaseAlert(message: String) {
+		let purchaseAction = UIAlertAction(title: "Unlock", style: .cancel) { action in
+			IAP.shared.purchase(from: self)
+		}
+		alert("Unlock required", message: "\(message) Or, keep playing your existing favorites free, forever!", cancel: "Not now", customAction: purchaseAction)
+	}
+
 	override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
 		let artist = displayArtists[indexPath.section][indexPath.item]
 		let artistName = artist.0
@@ -113,11 +120,7 @@ extension ArtistTableViewController {
 				favorited.append(artistName)
 				Zephyr.shared.userDefaults.favorited = favorited
 			} else if !IAP.unlocked {
-				let purchaseAction = UIAlertAction(title: "Unlock", style: .cancel) { action in
-					IAP.shared.purchase(from: self)
-				}
-				alert("Unlock required", message: "In order to play more artists, you'll need to purchase the full application. Or, keep using your existing favorites free, forever!", cancel: "Not now", customAction: purchaseAction)
-				return
+				return purchaseAlert(message: "In order to play more artists, you'll need to purchase the full application.")
 			}
 			played.append(artistName)
 			Zephyr.shared.userDefaults.played = played
@@ -138,6 +141,36 @@ extension ArtistTableViewController {
 				}
 			}
 		}
+	}
+
+}
+
+//MARK: Swipe
+
+extension ArtistTableViewController {
+
+	override func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+		let addToFavorites = !showFavorites() || indexPath.section == 1
+		let title = addToFavorites ? "⭐️" : "☆"
+		let favoriteAction = UIContextualAction(style: addToFavorites ? .normal : .destructive, title: title) { (action, view, handler) in
+			if !IAP.unlocked {
+				self.purchaseAlert(message: "In order to manage your favorites, you'll need to purchase the full application.")
+			} else if let artist = self.displayArtists[safe: indexPath.section]?[safe: indexPath.item] {
+				let artistName = artist.0
+				var favorites = Zephyr.shared.userDefaults.favorited
+				if favorites.contains(artistName) {
+					favorites = favorites.filter { $0 != artistName}
+				} else {
+					favorites.append(artistName)
+				}
+				Zephyr.shared.userDefaults.favorited = favorites
+			}
+			handler(true)
+		}
+		if addToFavorites {
+			favoriteAction.backgroundColor = UIColor(red: 1.0, green: 0.85, blue: 0.0, alpha: 1)
+		}
+		return UISwipeActionsConfiguration(actions: [ favoriteAction ])
 	}
 
 }
