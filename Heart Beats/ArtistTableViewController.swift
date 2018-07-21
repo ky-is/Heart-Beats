@@ -75,7 +75,7 @@ extension ArtistTableViewController {
 	}
 
 	override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-		return showFavorites() ? UITableView.automaticDimension : 0
+		return showFavorites() ? UITableViewAutomaticDimension : 0
 	}
 
 	override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {

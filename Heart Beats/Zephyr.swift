@@ -63,7 +63,7 @@ public final class Zephyr: NSObject {
 	override init() {
 		super.init()
 		NotificationCenter.default.addObserver(self, selector: #selector(keysDidChangeOnCloud(notification:)), name: NSUbiquitousKeyValueStore.didChangeExternallyNotification, object: nil)
-		NotificationCenter.default.addObserver(self, selector: #selector(willEnterForeground(notification:)), name: UIApplication.willEnterForegroundNotification, object: nil)
+		NotificationCenter.default.addObserver(self, selector: #selector(willEnterForeground(notification:)), name: NSNotification.Name.UIApplicationWillEnterForeground, object: nil)
 		NSUbiquitousKeyValueStore.default.synchronize()
 	}
 
