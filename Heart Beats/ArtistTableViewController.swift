@@ -38,6 +38,7 @@ final class ArtistTableViewController: UITableViewController {
 		let cell = tableView.dequeueReusableCell(withIdentifier: reuseIdentifier, for: indexPath) as! ArtistTableViewCell
 		let artist = artists[indexPath.item]
 		cell.nameLabel.text = artist.0
+		cell.countLabel.text = artist.2.count.description
 		DispatchQueue.global(qos: .userInitiated).async {
 			let image = artist.1.artwork?.image(at: CGSize(width: cellHeight, height: cellHeight))
 			DispatchQueue.main.async {

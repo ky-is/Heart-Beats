@@ -27,36 +27,49 @@
                                     <rect key="frame" x="0.0" y="0.0" width="320" height="79.5"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
-                                        <stackView opaque="NO" contentMode="scaleToFill" alignment="center" spacingType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="V59-mA-7Pf">
-                                            <rect key="frame" x="16" y="0.0" width="171.5" height="79.5"/>
+                                        <stackView opaque="NO" contentMode="scaleToFill" distribution="equalSpacing" alignment="center" spacingType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="V59-mA-7Pf">
+                                            <rect key="frame" x="16" y="0.0" width="288" height="79.5"/>
                                             <subviews>
-                                                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="i0R-XY-kHM">
-                                                    <rect key="frame" x="0.0" y="8" width="64" height="63.5"/>
+                                                <stackView opaque="NO" contentMode="scaleToFill" alignment="center" spacingType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="9HR-CS-Stk">
+                                                    <rect key="frame" x="0.0" y="0.0" width="171.5" height="79.5"/>
+                                                    <subviews>
+                                                        <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="i0R-XY-kHM">
+                                                            <rect key="frame" x="0.0" y="8" width="64" height="63.5"/>
+                                                            <constraints>
+                                                                <constraint firstAttribute="width" constant="64" id="78s-sh-pUn"/>
+                                                                <constraint firstAttribute="height" priority="750" constant="64" id="WUw-yH-oUf"/>
+                                                            </constraints>
+                                                        </imageView>
+                                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" horizontalCompressionResistancePriority="250" text="Artist name" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumScaleFactor="0.90000000000000002" adjustsLetterSpacingToFitWidth="YES" adjustsFontForContentSizeCategory="YES" translatesAutoresizingMaskIntoConstraints="NO" id="qPv-Q2-NS5">
+                                                            <rect key="frame" x="72" y="28" width="99.5" height="24"/>
+                                                            <fontDescription key="fontDescription" style="UICTFontTextStyleTitle2"/>
+                                                            <nil key="textColor"/>
+                                                            <nil key="highlightedColor"/>
+                                                        </label>
+                                                    </subviews>
                                                     <constraints>
-                                                        <constraint firstAttribute="width" constant="64" id="78s-sh-pUn"/>
-                                                        <constraint firstAttribute="height" priority="750" constant="64" id="WUw-yH-oUf"/>
+                                                        <constraint firstAttribute="bottom" secondItem="i0R-XY-kHM" secondAttribute="bottom" constant="8" id="ITh-La-CLw"/>
+                                                        <constraint firstItem="i0R-XY-kHM" firstAttribute="top" secondItem="9HR-CS-Stk" secondAttribute="top" constant="8" id="zZy-iS-BBI"/>
                                                     </constraints>
-                                                </imageView>
-                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Artist name" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumScaleFactor="0.75" adjustsLetterSpacingToFitWidth="YES" adjustsFontForContentSizeCategory="YES" translatesAutoresizingMaskIntoConstraints="NO" id="qPv-Q2-NS5">
-                                                    <rect key="frame" x="72" y="28" width="99.5" height="24"/>
-                                                    <fontDescription key="fontDescription" style="UICTFontTextStyleTitle2"/>
-                                                    <nil key="textColor"/>
+                                                </stackView>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="42" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="WDZ-17-7M3">
+                                                    <rect key="frame" x="267.5" y="29.5" width="20.5" height="20.5"/>
+                                                    <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
+                                                    <color key="textColor" white="0.66666666666666663" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                             </subviews>
-                                            <constraints>
-                                                <constraint firstItem="i0R-XY-kHM" firstAttribute="top" secondItem="V59-mA-7Pf" secondAttribute="top" constant="8" id="5ck-YO-mg3"/>
-                                                <constraint firstAttribute="bottom" secondItem="i0R-XY-kHM" secondAttribute="bottom" constant="8" id="mlr-oJ-vZq"/>
-                                            </constraints>
                                         </stackView>
                                     </subviews>
                                     <constraints>
                                         <constraint firstItem="V59-mA-7Pf" firstAttribute="top" secondItem="0gM-d0-ou4" secondAttribute="top" id="BZf-kY-rr6"/>
+                                        <constraint firstAttribute="trailingMargin" secondItem="V59-mA-7Pf" secondAttribute="trailing" id="LnF-kf-cXd"/>
                                         <constraint firstAttribute="bottom" secondItem="V59-mA-7Pf" secondAttribute="bottom" id="Nzc-aD-Cym"/>
                                         <constraint firstItem="V59-mA-7Pf" firstAttribute="leading" secondItem="0gM-d0-ou4" secondAttribute="leadingMargin" id="Yck-qg-Rqv"/>
                                     </constraints>
                                 </tableViewCellContentView>
                                 <connections>
+                                    <outlet property="countLabel" destination="WDZ-17-7M3" id="YrT-Rb-f2b"/>
                                     <outlet property="iconImageView" destination="i0R-XY-kHM" id="fjx-GF-v1P"/>
                                     <outlet property="nameLabel" destination="qPv-Q2-NS5" id="yEE-vl-be7"/>
                                 </connections>
@@ -106,6 +119,9 @@
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
                     <nil name="viewControllers"/>
+                    <toolbar key="toolbar" opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="QpV-C5-luq">
+                        <autoresizingMask key="autoresizingMask"/>
+                    </toolbar>
                     <connections>
                         <segue destination="74z-xz-uu3" kind="relationship" relationship="rootViewController" id="Oam-PS-GOb"/>
                     </connections>
