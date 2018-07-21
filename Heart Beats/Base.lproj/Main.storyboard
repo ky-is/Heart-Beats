@@ -190,6 +190,9 @@
                                                 </label>
                                             </subviews>
                                         </tableViewCellContentView>
+                                        <connections>
+                                            <segue destination="CFx-PC-aC6" kind="show" id="ysR-ay-k2t"/>
+                                        </connections>
                                     </tableViewCell>
                                 </cells>
                             </tableViewSection>
@@ -245,6 +248,148 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="8yi-Ul-5HR" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="2964" y="79"/>
+        </scene>
+        <!--Combine Artists-->
+        <scene sceneID="azJ-id-wkK">
+            <objects>
+                <tableViewController title="Combine Artists" id="CFx-PC-aC6" customClass="CombineTableViewController" customModule="Heart_Beats" customModuleProvider="target" sceneMemberID="viewController">
+                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="grouped" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="18" sectionFooterHeight="18" id="Oew-8U-0Xh">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
+                        <prototypes>
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" reuseIdentifier="COMBINE" textLabel="lYn-TJ-ucj" style="IBUITableViewCellStyleDefault" id="qlX-Jm-rVc">
+                                <rect key="frame" x="0.0" y="55.5" width="320" height="44"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="qlX-Jm-rVc" id="ugQ-xH-vNw">
+                                    <rect key="frame" x="0.0" y="0.0" width="320" height="43.5"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                    <subviews>
+                                        <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" insetsLayoutMarginsFromSafeArea="NO" text="Shins  ←  The Shins" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" id="lYn-TJ-ucj">
+                                            <rect key="frame" x="16" y="0.0" width="288" height="43.5"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
+                                            <nil key="textColor"/>
+                                            <nil key="highlightedColor"/>
+                                        </label>
+                                    </subviews>
+                                </tableViewCellContentView>
+                            </tableViewCell>
+                        </prototypes>
+                        <connections>
+                            <outlet property="dataSource" destination="CFx-PC-aC6" id="KT3-3o-x6y"/>
+                            <outlet property="delegate" destination="CFx-PC-aC6" id="hsO-hL-ulv"/>
+                        </connections>
+                    </tableView>
+                    <toolbarItems>
+                        <barButtonItem style="plain" systemItem="flexibleSpace" id="5Zw-51-80x"/>
+                        <barButtonItem title="Item" systemItem="add" id="A4I-Ir-DAg">
+                            <connections>
+                                <segue destination="Dgh-rX-aJU" kind="popoverPresentation" popoverAnchorBarButtonItem="A4I-Ir-DAg" id="5CP-ZF-05p">
+                                    <popoverArrowDirection key="popoverArrowDirection" up="YES" down="YES" left="YES" right="YES"/>
+                                </segue>
+                            </connections>
+                        </barButtonItem>
+                        <barButtonItem style="plain" systemItem="flexibleSpace" id="IMQ-PR-zCc"/>
+                    </toolbarItems>
+                    <simulatedToolbarMetrics key="simulatedBottomBarMetrics"/>
+                </tableViewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="rFC-7z-jyR" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="3754" y="79"/>
+        </scene>
+        <!--Add Artist Combination-->
+        <scene sceneID="kvP-lt-HT5">
+            <objects>
+                <tableViewController id="IpX-Yy-QEo" customClass="AddCombineTableViewController" customModule="Heart_Beats" customModuleProvider="target" sceneMemberID="viewController">
+                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" bounces="NO" bouncesZoom="NO" dataMode="static" style="grouped" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="18" sectionFooterHeight="18" id="17s-dD-HSO">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
+                        <sections>
+                            <tableViewSection headerTitle="Combine into" id="gFv-0p-R6K">
+                                <cells>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" id="Uti-jv-SuJ">
+                                        <rect key="frame" x="0.0" y="55.5" width="320" height="44"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="Uti-jv-SuJ" id="QDb-ag-R3j">
+                                            <rect key="frame" x="0.0" y="0.0" width="320" height="43.5"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <pickerView contentMode="scaleToFill" restorationIdentifier="INTO" translatesAutoresizingMaskIntoConstraints="NO" id="V5g-Lr-SLs">
+                                                    <rect key="frame" x="0.0" y="-20" width="320" height="83.5"/>
+                                                    <connections>
+                                                        <outlet property="dataSource" destination="IpX-Yy-QEo" id="ber-3L-3c6"/>
+                                                        <outlet property="delegate" destination="IpX-Yy-QEo" id="BEj-wD-Byy"/>
+                                                    </connections>
+                                                </pickerView>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstItem="V5g-Lr-SLs" firstAttribute="top" secondItem="QDb-ag-R3j" secondAttribute="top" constant="-20" id="Meh-jf-UpX"/>
+                                                <constraint firstAttribute="bottom" secondItem="V5g-Lr-SLs" secondAttribute="bottom" constant="-20" id="hXx-cL-60s"/>
+                                                <constraint firstAttribute="trailing" secondItem="V5g-Lr-SLs" secondAttribute="trailing" id="i1H-Xg-Vyx"/>
+                                                <constraint firstItem="V5g-Lr-SLs" firstAttribute="leading" secondItem="QDb-ag-R3j" secondAttribute="leading" id="nfK-2P-O93"/>
+                                            </constraints>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
+                                </cells>
+                            </tableViewSection>
+                            <tableViewSection headerTitle="Combine From" id="vMX-to-MHE">
+                                <cells>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" id="QHg-Ae-hy5">
+                                        <rect key="frame" x="0.0" y="155.5" width="320" height="44"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="QHg-Ae-hy5" id="KMv-bE-xxi">
+                                            <rect key="frame" x="0.0" y="0.0" width="320" height="43.5"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <pickerView contentMode="scaleToFill" restorationIdentifier="FROM" translatesAutoresizingMaskIntoConstraints="NO" id="GvG-G0-jsX">
+                                                    <rect key="frame" x="0.0" y="-20" width="320" height="83.5"/>
+                                                    <connections>
+                                                        <outlet property="dataSource" destination="IpX-Yy-QEo" id="5VO-O3-F77"/>
+                                                        <outlet property="delegate" destination="IpX-Yy-QEo" id="XEn-6D-RA1"/>
+                                                    </connections>
+                                                </pickerView>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstItem="GvG-G0-jsX" firstAttribute="top" secondItem="KMv-bE-xxi" secondAttribute="top" constant="-20" id="E1j-DZ-hea"/>
+                                                <constraint firstAttribute="bottom" secondItem="GvG-G0-jsX" secondAttribute="bottom" constant="-20" id="ONX-2V-fNf"/>
+                                                <constraint firstItem="GvG-G0-jsX" firstAttribute="leading" secondItem="KMv-bE-xxi" secondAttribute="leading" id="gM6-rC-To0"/>
+                                                <constraint firstAttribute="trailing" secondItem="GvG-G0-jsX" secondAttribute="trailing" id="uEx-Wb-ibD"/>
+                                            </constraints>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
+                                </cells>
+                            </tableViewSection>
+                        </sections>
+                        <connections>
+                            <outlet property="dataSource" destination="IpX-Yy-QEo" id="8MG-ng-cti"/>
+                            <outlet property="delegate" destination="IpX-Yy-QEo" id="d7k-ck-dpZ"/>
+                        </connections>
+                    </tableView>
+                    <toolbarItems>
+                        <barButtonItem systemItem="cancel" id="qD7-Iz-V8k">
+                            <connections>
+                                <action selector="onCancel:" destination="IpX-Yy-QEo" id="Utg-vK-gyZ"/>
+                            </connections>
+                        </barButtonItem>
+                        <barButtonItem style="plain" systemItem="flexibleSpace" id="tPc-mC-EsR"/>
+                        <barButtonItem style="done" systemItem="save" id="Zqr-iZ-pkm">
+                            <connections>
+                                <action selector="onSave:" destination="IpX-Yy-QEo" id="jVF-i7-02n"/>
+                            </connections>
+                        </barButtonItem>
+                    </toolbarItems>
+                    <navigationItem key="navigationItem" title="Add Artist Combination" id="Cnc-hu-tH7"/>
+                    <simulatedToolbarMetrics key="simulatedBottomBarMetrics"/>
+                    <connections>
+                        <outlet property="fromPicker" destination="GvG-G0-jsX" id="Hsy-fY-foO"/>
+                        <outlet property="intoPicker" destination="V5g-Lr-SLs" id="eR6-rZ-MaY"/>
+                    </connections>
+                </tableViewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="vgx-ly-ntK" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="5160" y="79"/>
         </scene>
         <!--Song Table View Controller-->
         <scene sceneID="5fW-hs-Gm3">
@@ -366,6 +511,28 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="92Y-4Y-v9R" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="2198" y="844"/>
+        </scene>
+        <!--Navigation Controller-->
+        <scene sceneID="6PV-dj-aqB">
+            <objects>
+                <navigationController automaticallyAdjustsScrollViewInsets="NO" toolbarHidden="NO" id="Dgh-rX-aJU" sceneMemberID="viewController">
+                    <toolbarItems/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="Dhq-91-L4H">
+                        <rect key="frame" x="0.0" y="20" width="320" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <nil name="viewControllers"/>
+                    <toolbar key="toolbar" opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="zoX-PC-aSB">
+                        <rect key="frame" x="0.0" y="436" width="320" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </toolbar>
+                    <connections>
+                        <segue destination="IpX-Yy-QEo" kind="relationship" relationship="rootViewController" id="iiZ-PW-j3w"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="KpF-Ms-LAn" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="4522.5" y="78.75"/>
         </scene>
     </scenes>
     <inferredMetricsTieBreakers>

@@ -65,6 +65,15 @@ extension UserDefaults {
 		}
 	}
 
+	@objc dynamic var combined: [[String]] {
+		get {
+			return array(forKey: #keyPath(combined)) as? [[String]] ?? []
+		}
+		set(value) {
+			set(value, forKey: #keyPath(combined))
+		}
+	}
+
 }
 
 extension UIViewController {

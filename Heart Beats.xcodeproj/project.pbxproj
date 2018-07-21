@@ -10,6 +10,8 @@
 		242A0074210330230072B26B /* SongTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 242A0073210330230072B26B /* SongTableViewController.swift */; };
 		242A0076210330A90072B26B /* SongTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 242A0075210330A90072B26B /* SongTableViewCell.swift */; };
 		242A007821039CA20072B26B /* SettingsTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 242A007721039CA20072B26B /* SettingsTableViewController.swift */; };
+		242A007A2103AE810072B26B /* CombineTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 242A00792103AE810072B26B /* CombineTableViewController.swift */; };
+		242A007C2103B37B0072B26B /* AddCombineTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 242A007B2103B37B0072B26B /* AddCombineTableViewController.swift */; };
 		24649C7220F92ED300822FAC /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24649C7120F92ED300822FAC /* AppDelegate.swift */; };
 		24649C7720F92ED300822FAC /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 24649C7520F92ED300822FAC /* Main.storyboard */; };
 		24649C7920F92ED600822FAC /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 24649C7820F92ED600822FAC /* Assets.xcassets */; };
@@ -27,6 +29,8 @@
 		242A0073210330230072B26B /* SongTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SongTableViewController.swift; sourceTree = "<group>"; };
 		242A0075210330A90072B26B /* SongTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SongTableViewCell.swift; sourceTree = "<group>"; };
 		242A007721039CA20072B26B /* SettingsTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsTableViewController.swift; sourceTree = "<group>"; };
+		242A00792103AE810072B26B /* CombineTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CombineTableViewController.swift; sourceTree = "<group>"; };
+		242A007B2103B37B0072B26B /* AddCombineTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddCombineTableViewController.swift; sourceTree = "<group>"; };
 		24649C6E20F92ED300822FAC /* Heart Beats.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Heart Beats.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		24649C7120F92ED300822FAC /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		24649C7620F92ED300822FAC /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -83,6 +87,8 @@
 				242A0073210330230072B26B /* SongTableViewController.swift */,
 				242A0075210330A90072B26B /* SongTableViewCell.swift */,
 				242A007721039CA20072B26B /* SettingsTableViewController.swift */,
+				242A00792103AE810072B26B /* CombineTableViewController.swift */,
+				242A007B2103B37B0072B26B /* AddCombineTableViewController.swift */,
 				24649C7520F92ED300822FAC /* Main.storyboard */,
 				24649C7820F92ED600822FAC /* Assets.xcassets */,
 				24649C7A20F92ED600822FAC /* LaunchScreen.storyboard */,
@@ -182,11 +188,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				24D2A2822103009500C95E79 /* IAP.swift in Sources */,
+				242A007A2103AE810072B26B /* CombineTableViewController.swift in Sources */,
 				24D2A27E2102D84700C95E79 /* Zephyr.swift in Sources */,
 				242A0074210330230072B26B /* SongTableViewController.swift in Sources */,
 				24BF29CF2101BFAB00CD67B5 /* Extensions.swift in Sources */,
 				24BF29CB2101B6AD00CD67B5 /* ArtistTableViewController.swift in Sources */,
 				24649C7220F92ED300822FAC /* AppDelegate.swift in Sources */,
+				242A007C2103B37B0072B26B /* AddCombineTableViewController.swift in Sources */,
 				242A007821039CA20072B26B /* SettingsTableViewController.swift in Sources */,
 				242A0076210330A90072B26B /* SongTableViewCell.swift in Sources */,
 				24D2A2802102F55D00C95E79 /* HeaderTableViewCell.swift in Sources */,
