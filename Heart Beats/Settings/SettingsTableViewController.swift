@@ -30,7 +30,7 @@ final class SettingsTableViewController: UITableViewController {
 
 	private func unlockedPurchase() {
 		restoreCell.accessoryType = .checkmark
-		restoreCell.textLabel?.text = "Unlocked purchase"
+		restoreCell.textLabel?.text = "🗝 Unlocked purchase"
 	}
 
 }
