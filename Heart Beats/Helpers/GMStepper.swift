@@ -73,15 +73,6 @@ import UIKit
 		}
 	}
 
-	/// Text color of the buttons. Defaults to white.
-	@objc @IBInspectable public var buttonsTextColor: UIColor = UIColor.white {
-		didSet {
-			for button in [leftButton, rightButton] {
-				button.setTitleColor(buttonsTextColor, for: .normal)
-			}
-		}
-	}
-
 	/// Background color of the buttons. Defaults to dark blue.
 	@objc @IBInspectable public var buttonsBackgroundColor: UIColor = UIColor(red:0.21, green:0.5, blue:0.74, alpha:1) {
 		didSet {
@@ -92,8 +83,8 @@ import UIKit
 		}
 	}
 
-	/// Font of the buttons. Defaults to AvenirNext-Bold, 20.0 points in size.
-	@objc public var buttonsFont = UIFont(name: "AvenirNext-Bold", size: 20.0)! {
+	/// Font of the buttons.
+	@objc public var buttonsFont = UIFont.systemFont(ofSize: 32, weight: .medium) {
 		didSet {
 			for button in [leftButton, rightButton] {
 				button.titleLabel?.font = buttonsFont
@@ -115,8 +106,8 @@ import UIKit
 		}
 	}
 
-	/// Font of the middle label. Defaults to AvenirNext-Bold, 25.0 points in size.
-	@objc public var labelFont = UIFont(name: "AvenirNext-Bold", size: 25.0)! {
+	/// Font of the middle label.
+	@objc public var labelFont = UIFont.systemFont(ofSize: 24, weight: .semibold) {
 		didSet {
 			label.font = labelFont
 		}
@@ -176,9 +167,8 @@ import UIKit
 	let limitHitAnimationDuration = TimeInterval(0.1)
 
 	lazy var leftButton: UIButton = {
-		let button = UIButton()
+		let button = UIButton(type: .system)
 		button.setTitle(self.leftButtonText, for: .normal)
-		button.setTitleColor(self.buttonsTextColor, for: .normal)
 		button.backgroundColor = self.buttonsBackgroundColor
 		button.titleLabel?.font = self.buttonsFont
 		button.addTarget(self, action: #selector(GMStepper.leftButtonTouchDown), for: .touchDown)
@@ -189,9 +179,8 @@ import UIKit
 	}()
 
 	lazy var rightButton: UIButton = {
-		let button = UIButton()
+		let button = UIButton(type: .system)
 		button.setTitle(self.rightButtonText, for: .normal)
-		button.setTitleColor(self.buttonsTextColor, for: .normal)
 		button.backgroundColor = self.buttonsBackgroundColor
 		button.titleLabel?.font = self.buttonsFont
 		button.addTarget(self, action: #selector(GMStepper.rightButtonTouchDown), for: .touchDown)
