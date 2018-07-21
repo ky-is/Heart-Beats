@@ -40,7 +40,7 @@ final class SongTableViewController: UITableViewController {
 	}
 
 	func play() {
-		artistTableViewController.play(artist: self.artist)
+		artistTableViewController?.play(artist: self.artist)
 	}
 
 }

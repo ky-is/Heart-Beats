@@ -41,7 +41,7 @@ extension AddCombineTableViewController: UIPickerViewDataSource {
 	}
 
 	func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
-		return allArtists.count + 1
+		return Artists.shared.allNames.count + 1
 	}
 
 }
@@ -49,11 +49,11 @@ extension AddCombineTableViewController: UIPickerViewDataSource {
 extension AddCombineTableViewController: UIPickerViewDelegate {
 
 	func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
-		return row == 0 ? "" : allArtists[row - 1]
+		return row == 0 ? "" : Artists.shared.allNames[row - 1]
 	}
 
 	func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
-		let artistName = row != 0 ? allArtists[row - 1] : nil
+		let artistName = row != 0 ? Artists.shared.allNames[row - 1] : nil
 		switch pickerView.restorationIdentifier {
 		case "INTO":
 			into = artistName

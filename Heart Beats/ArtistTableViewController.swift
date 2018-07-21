@@ -28,6 +28,10 @@ final class ArtistTableViewController: UITableViewController {
 		Zephyr.shared.userDefaults.addObserver(self, forKeyPath: #keyPath(UserDefaults.favorited), options: [.new], context: nil)
 	}
 
+	deinit {
+		Zephyr.shared.userDefaults.removeObserver(self, forKeyPath: #keyPath(UserDefaults.favorited))
+	}
+
 	override func viewDidLoad() {
 		tableView.backgroundView = backgroundView
 		tableView.tableFooterView = UIView(frame: .zero)

@@ -16,6 +16,10 @@ final class CombineTableViewController: UITableViewController {
 		Zephyr.shared.userDefaults.addObserver(self, forKeyPath: #keyPath(UserDefaults.combined), options: [.new], context: nil)
 	}
 
+	deinit {
+		Zephyr.shared.userDefaults.removeObserver(self, forKeyPath: #keyPath(UserDefaults.combined))
+	}
+
 	override func viewWillAppear(_ animated: Bool) {
 		navigationController?.setToolbarHidden(false, animated: animated)
 	}
@@ -25,10 +29,6 @@ final class CombineTableViewController: UITableViewController {
 	}
 
 	override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
-		updateCombined()
-	}
-
-	private func updateCombined() {
 		combined = Zephyr.shared.userDefaults.combined
 		tableView.reloadData()
 	}
@@ -52,8 +52,21 @@ extension CombineTableViewController {
 		return "Allows you to combine an artist with multiple names in your library into one playlist."
 	}
 
-	override func tableView(_ tableView: UITableView, moveRowAt fromIndexPath: IndexPath, to: IndexPath) {
-		//TODO
+	override func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+		let deleteAction = UIContextualAction(style: .destructive, title: "Delete") { (action, view, handler) in
+			tableView.performBatchUpdates({
+				tableView.deleteRows(at: [ indexPath ], with: .automatic)
+				self.combined.remove(at: indexPath.item)
+			}, completion: { finished in
+				if finished {
+					Zephyr.shared.userDefaults.combined = self.combined
+				}
+				handler(true)
+
+			})
+		}
+		return UISwipeActionsConfiguration(actions: [ deleteAction ])
+
 	}
 
 }
