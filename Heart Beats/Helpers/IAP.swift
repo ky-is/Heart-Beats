@@ -67,7 +67,7 @@ extension IAP: SKProductsRequestDelegate {
 		for responseProduct in response.products {
 			product = responseProduct
 		}
-		if !UserDefaults.standard.purchased {
+		if !IAP.unlocked && Zephyr.shared.userDefaults.purchased {
 			restore()
 		}
 	}
@@ -80,43 +80,67 @@ extension IAP: SKProductsRequestDelegate {
 
 extension IAP: SKPaymentTransactionObserver {
 
-	private func finishTransaction(_ transaction: SKPaymentTransaction, success: Bool) {
-		SKPaymentQueue.default().finishTransaction(transaction)
-		if success {
-			UserDefaults.standard.set(9001, forKey: "U")
-			IAP.unlocked = true
-			UserDefaults.standard.purchased = true
+	private func mainController() -> UIViewController {
+		return UIApplication.shared.keyWindow!.rootViewController!
+	}
+
+	private func validate(_ transaction: SKPaymentTransaction) {
+		guard let receiptURL = Bundle.main.appStoreReceiptURL else {
+			return mainController().alert("Receipt not available", message: "Please try your purchase again.", cancel: "OK")
 		}
+		guard let receipt = try? Data(contentsOf: receiptURL) else {
+			return mainController().alert("Invalid receipt", message: "Please try your purchase again.", cancel: "OK")
+		}
+		let receiptString = receipt.base64EncodedString()
+
+		var request = URLRequest(url: URL(string: "https://ky.is/scripts/validate_ios.php")!)
+		request.httpMethod = "POST"
+		request.httpBody = receiptString.data(using: .ascii)
+		let task = URLSession.shared.dataTask(with: request) { (data, response, error) in
+			DispatchQueue.main.async {
+				guard error == nil else {
+					return self.mainController().alert("Validation error", message: error!.localizedDescription, cancel: "OK")
+				}
+				guard let body = String(data: data!, encoding: .utf8) else {
+					return self.mainController().alert("Invalid server response", message: "Please try again later.", cancel: "OK")
+				}
+				guard body == "0" else {
+					return self.mainController().alert("Invalid receipt", message: "\(body). Please try again later.", cancel: "OK")
+				}
+				UserDefaults.standard.set(9001, forKey: "U")
+				IAP.unlocked = true
+				Zephyr.shared.userDefaults.purchased = true
+				self.finish(transaction, success: true)
+			}
+		}
+		task.resume()
+	}
+
+	private func finish(_ transaction: SKPaymentTransaction, success: Bool) {
+		SKPaymentQueue.default().finishTransaction(transaction)
 		purchaseCallback?(success)
 		purchaseCallback = nil
 	}
 
 	func paymentQueue(_ queue: SKPaymentQueue, updatedTransactions transactions: [SKPaymentTransaction]) {
 		for transaction in transactions {
-			let title: String, message: String
 			switch transaction.transactionState {
 			case .purchased:
-				title = "Purchase complete!"
-				message = ""
-				finishTransaction(transaction, success: true)
+				validate(transaction)
 			case .failed:
 				if let error = transaction.error as NSError?, error.code == SKError.paymentCancelled.rawValue {
 					continue
 				}
-				title = "Unable to purchase"
-				message = transaction.error?.localizedDescription ?? ""
-				finishTransaction(transaction, success: false)
+				finish(transaction, success: false)
+				mainController().alert("Unable to purchase", message: transaction.error?.localizedDescription ?? "", cancel: "OK")
 			case .restored:
-				title = "Purchase restored!"
-				message = ""
-				finishTransaction(transaction, success: true)
+				validate(transaction)
 			case .purchasing:
 				continue
 			case .deferred:
 				continue
 			}
 			purchaseCallback = nil
-			UIApplication.shared.keyWindow?.rootViewController?.alert(title, message: message, cancel: "OK")
 		}
 	}
 

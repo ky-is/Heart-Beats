@@ -58,6 +58,9 @@ extension SettingsTableViewController {
 			let url = URL(string: "itms-apps://itunes.apple.com/app/id\(appId)?action=write-review")!
 			UIApplication.shared.open(url, options: [:])
 		case "SETTINGS_RESTORE":
+			guard !IAP.unlocked else {
+				break
+			}
 			IAP.shared.restore() { success in
 				self.tableView.performBatchUpdates({
 					self.restoreCell.isHidden = true
