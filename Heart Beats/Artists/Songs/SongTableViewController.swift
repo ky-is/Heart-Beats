@@ -26,7 +26,7 @@ final class SongTableViewController: UITableViewController {
 
 	public func setArtist(_ artist: [Any]) {
 		self.artist = artist
-		songs = (artist[2] as! MPMediaItemCollection).items
+		songs = (artist[1] as! MPMediaItemCollection).items
 		navigationItem.title = artist.first as? String
 	}
 

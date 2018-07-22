@@ -13,6 +13,8 @@ import MediaPlayer
 private let cellHeight = 64 //TODO cell
 private let artworkSize = CGSize(width: cellHeight, height: cellHeight)
 
+var artworks = [String: UIImage]()
+
 final class Artists: NSObject {
 
 	public var allNames = [String]()
@@ -115,7 +117,7 @@ final class Artists: NSObject {
 			if cutoff <= 0 {
 				cutoff = max(5, maxCount / 3)
 			}
-			let artistsArray = artists.values.filter({ $0.2.count > cutoff || favorited.contains($0.0) }).sorted(by: { $0.0.withoutThe() < $1.0.withoutThe() }).map({ [ $0.0, self.artwork(for: $0.1) ?? 0, MPMediaItemCollection(items: $0.2) ] })
+			let artistsArray = artists.values.filter({ $0.2.count > cutoff || favorited.contains($0.0) }).sorted(by: { $0.0.withoutThe() < $1.0.withoutThe() }).map({ [ $0.0, MPMediaItemCollection(items: $0.2) ] })
 			DispatchQueue.main.async {
 				guard !(blockOperation?.isCancelled ?? true) else {
 					return
@@ -123,16 +125,23 @@ final class Artists: NSObject {
 				artistTableViewController?.setArtists(artistsArray, maxCount, cutoff)
 				self.setTitle(enabled: true)
 			}
-			UserDefaults.standard.cachedArtists = artistsArray.map { [ $0[0], 0, ($0[2] as! MPMediaItemCollection).count ] }
+			UserDefaults.standard.cachedArtists = artistsArray.map { [ $0[0], ($0[1] as! MPMediaItemCollection).count ] }
+			for (name, artist) in artists {
+				guard let artwork = artist.1.artwork else {
+					continue
+				}
+				if artworks[name] == nil {
+					let image = artwork.image(at: artworkSize) ?? artwork.image(at: artwork.bounds.size)
+					artworks[name] = image
+					if let image = image {
+						DispatchQueue.main.async {
+							artistTableViewController?.available(artist: name, image: image)
+						}
+					}
+				}
+			}
 		}
 		return blockOperation
-	}
-
-	private func artwork(for item: MPMediaItem) -> UIImage? {
-		guard let artwork = item.artwork else {
-			return nil
-		}
-		return artwork.image(at: artworkSize) ?? artwork.image(at: artwork.bounds.size)
 	}
 
 	override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {

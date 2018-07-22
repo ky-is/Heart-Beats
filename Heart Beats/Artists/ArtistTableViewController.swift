@@ -107,7 +107,7 @@ final class ArtistTableViewController: UITableViewController {
 
 		DispatchQueue.global(qos: .userInteractive).async {
 			let player = MPMusicPlayerController.systemMusicPlayer
-			player.setQueue(with: artist[2] as! MPMediaItemCollection)
+			player.setQueue(with: artist[1] as! MPMediaItemCollection)
 			player.shuffleMode = MPMusicShuffleMode.songs
 			player.prepareToPlay()
 
@@ -121,6 +121,18 @@ final class ArtistTableViewController: UITableViewController {
 
 	@IBAction func onMinimumSongs(_ sender: GMStepper) {
 		Zephyr.shared.userDefaults.minimum = Int(sender.value)
+	}
+
+	func available(artist name: String, image: UIImage) {
+		for cell in tableView.visibleCells {
+			guard let cell = cell as? ArtistTableViewCell else {
+				continue
+			}
+			if cell.nameLabel.text == name {
+				cell.iconImageView.image = image
+				return
+			}
+		}
 	}
 
 }
@@ -150,11 +162,12 @@ extension ArtistTableViewController {
 	override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
 		let cell = tableView.dequeueReusableCell(withIdentifier: "ARTIST", for: indexPath) as! ArtistTableViewCell
 		let artist = artistAt(indexPath: indexPath)
-		cell.nameLabel.text = artist.first as? String
-		cell.iconImageView.image = artist[1] as? UIImage ?? placeholder
-		if let count = artist[2] as? Int {
+		let name = artist.first as! String
+		cell.nameLabel.text = name
+		cell.iconImageView.image = artworks[name] ?? placeholder
+		if let count = artist[1] as? Int {
 			cell.countLabel.text = count.description
-		} else if let collection = artist[2] as? MPMediaItemCollection {
+		} else if let collection = artist[1] as? MPMediaItemCollection {
 			cell.countLabel.text = collection.count.description
 		}
 		return cell
@@ -169,7 +182,7 @@ extension ArtistTableViewController {
 
 	override func tableView(_ tableView: UITableView, willSelectRowAt indexPath: IndexPath) -> IndexPath? {
 		let artist = artistAt(indexPath: indexPath)
-		return artist[2] is MPMediaItemCollection ? indexPath : nil
+		return artist[1] is MPMediaItemCollection ? indexPath : nil
 	}
 
 	override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {

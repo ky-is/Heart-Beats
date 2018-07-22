@@ -334,7 +334,7 @@
                     </tableView>
                     <toolbarItems>
                         <barButtonItem style="plain" systemItem="flexibleSpace" id="5Zw-51-80x"/>
-                        <barButtonItem title="Item" systemItem="add" id="A4I-Ir-DAg">
+                        <barButtonItem systemItem="add" id="A4I-Ir-DAg">
                             <connections>
                                 <segue destination="Dgh-rX-aJU" kind="popoverPresentation" popoverAnchorBarButtonItem="A4I-Ir-DAg" id="5CP-ZF-05p">
                                     <popoverArrowDirection key="popoverArrowDirection" up="YES" down="YES" left="YES" right="YES"/>
