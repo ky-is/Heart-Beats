@@ -161,9 +161,6 @@
                         <userDefinedRuntimeAttribute type="color" keyPath="buttonsBackgroundColor">
                             <color key="value" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         </userDefinedRuntimeAttribute>
-                        <userDefinedRuntimeAttribute type="color" keyPath="buttonsTextColor">
-                            <color key="value" white="0.33333333333333331" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                        </userDefinedRuntimeAttribute>
                         <userDefinedRuntimeAttribute type="color" keyPath="labelBackgroundColor">
                             <color key="value" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         </userDefinedRuntimeAttribute>

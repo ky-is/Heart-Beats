@@ -99,7 +99,7 @@ final class ArtistTableViewController: UITableViewController {
 			Zephyr.shared.userDefaults.played = played
 		}
 
-		let buildAlert = UIAlertController(title: "Building \(artistName) playlist...\n🎶🎵🎶🎵🎶", message: "", preferredStyle: .alert)
+		let buildAlert = UIAlertController(title: "Queueing \(artistName) playlist...\n🎶🎵🎶🎵🎶", message: "", preferredStyle: .alert)
 		present(buildAlert, animated: true)
 
 		DispatchQueue.global(qos: .userInitiated).async {

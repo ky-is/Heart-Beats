@@ -43,7 +43,7 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
 	}
 
 	override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
-		if !IAP.unlocked && UserDefaults.standard.purchased {
+		if !IAP.unlocked && Zephyr.shared.userDefaults.purchased {
 			IAP.shared.restore()
 		}
 	}

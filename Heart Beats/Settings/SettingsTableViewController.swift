@@ -30,7 +30,7 @@ final class SettingsTableViewController: UITableViewController {
 
 	private func unlockedPurchase() {
 		restoreCell.accessoryType = .checkmark
-		restoreCell.textLabel?.text = "🗝 Purchase Unlocked"
+		restoreCell.textLabel?.text = "🗝 Purchase Unlocked!"
 	}
 
 }
@@ -43,7 +43,13 @@ extension SettingsTableViewController {
 	}
 
 	override func tableView(_ tableView: UITableView, willSelectRowAt indexPath: IndexPath) -> IndexPath? {
-		return tableView.cellForRow(at: indexPath)?.reuseIdentifier != nil ? indexPath : nil
+		guard let identifier = tableView.cellForRow(at: indexPath)?.reuseIdentifier else {
+			return nil
+		}
+		if identifier == "SETTINGS_RESTORE" && IAP.unlocked {
+			return nil
+		}
+		return indexPath
 	}
 
 	override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
@@ -58,9 +64,6 @@ extension SettingsTableViewController {
 			let url = URL(string: "itms-apps://itunes.apple.com/app/id\(appId)?action=write-review")!
 			UIApplication.shared.open(url, options: [:])
 		case "SETTINGS_RESTORE":
-			guard !IAP.unlocked else {
-				break
-			}
 			IAP.shared.restore() { success in
 				self.tableView.performBatchUpdates({
 					self.restoreCell.isHidden = true
