@@ -83,6 +83,16 @@ extension UserDefaults {
 		}
 	}
 
+	@objc dynamic var cachedArtists: [[Any]]? {
+		get {
+			return array(forKey: #keyPath(cachedArtists)) as? [[Any]]
+		}
+		set(value) {
+			set(value, forKey: #keyPath(cachedArtists))
+		}
+	}
+
+
 }
 
 extension UIViewController {

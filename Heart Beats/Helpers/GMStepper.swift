@@ -21,7 +21,7 @@ import UIKit
 			// If we have items, we will display them as steps
 			//
 
-			if isInteger && stepValue == 1.0 && items.count > 0 {
+			if isInteger && stepValue == 1.0 && !items.isEmpty {
 				label.text = items[Int(value)]
 			}
 			else if showIntegerIfDoubleIsInteger && isInteger {
@@ -241,7 +241,7 @@ import UIKit
 			// If we have items, we will display them as steps
 			//
 
-			if isInteger && stepValue == 1.0 && items.count > 0 {
+			if isInteger && stepValue == 1.0 && !items.isEmpty {
 
 				var value = Int(self.value)
 

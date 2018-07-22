@@ -10,6 +10,9 @@ import Foundation
 
 import MediaPlayer
 
+private let cellHeight = 64 //TODO cell
+private let artworkSize = CGSize(width: cellHeight, height: cellHeight)
+
 final class Artists: NSObject {
 
 	public var allNames = [String]()
@@ -23,7 +26,7 @@ final class Artists: NSObject {
 //SAMPLE stress test
 //		var combined = Zephyr.shared.userDefaults.combined
 //		Timer.scheduledTimer(withTimeInterval: 0.5, repeats: true) { timer in
-//			if combined.count > 0 {
+//			if !combined.isEmpty {
 //				combined.removeAll()
 //			} else {
 //				combined.append(["Aimer", "Belle & Sebastian"])
@@ -108,13 +111,11 @@ final class Artists: NSObject {
 			guard !(blockOperation?.isCancelled ?? true) else {
 				return
 			}
-			var artistsArray = artists.values.map { ($0.0, $0.1, MPMediaItemCollection(items: $0.2)) }
 			var cutoff = Zephyr.shared.userDefaults.minimum
 			if cutoff <= 0 {
 				cutoff = max(5, maxCount / 3)
 			}
-			artistsArray = artistsArray.filter { $0.2.count > cutoff || favorited.contains($0.0) }
-			artistsArray.sort { $0.0.withoutThe() < $1.0.withoutThe() }
+			let artistsArray = artists.values.filter({ $0.2.count > cutoff || favorited.contains($0.0) }).sorted(by: { $0.0.withoutThe() < $1.0.withoutThe() }).map({ [ $0.0, self.artwork(for: $0.1) ?? 0, MPMediaItemCollection(items: $0.2) ] })
 			DispatchQueue.main.async {
 				guard !(blockOperation?.isCancelled ?? true) else {
 					return
@@ -122,8 +123,16 @@ final class Artists: NSObject {
 				artistTableViewController?.setArtists(artistsArray, maxCount, cutoff)
 				self.setTitle(enabled: true)
 			}
+			UserDefaults.standard.cachedArtists = artistsArray.map { [ $0[0], 0, ($0[2] as! MPMediaItemCollection).count ] }
 		}
 		return blockOperation
+	}
+
+	private func artwork(for item: MPMediaItem) -> UIImage? {
+		guard let artwork = item.artwork else {
+			return nil
+		}
+		return artwork.image(at: artworkSize) ?? artwork.image(at: artwork.bounds.size)
 	}
 
 	override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
