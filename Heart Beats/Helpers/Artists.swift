@@ -47,7 +47,21 @@ final class Artists: NSObject {
 		updateQueue.addOperation(updateBlock())
 	}
 
+	private func setTitle(enabled: Bool) {
+		if let navigationBar = artistTableViewController?.navigationController?.navigationBar {
+			let attributes = [ NSAttributedStringKey.foregroundColor: enabled ? UIColor.darkText : UIColor.lightGray ]
+			navigationBar.titleTextAttributes = attributes
+			navigationBar.largeTitleTextAttributes = attributes
+
+			let transition = CATransition()
+			transition.type = kCATransitionFade
+			transition.duration = 0.15
+			navigationBar.layer.add(transition, forKey: "foregroundColor")
+		}
+	}
+
 	private func updateBlock() -> BlockOperation {
+		setTitle(enabled: false)
 		let blockOperation = BlockOperation()
 		blockOperation.addExecutionBlock { [weak blockOperation, unowned self] in
 			guard let collections = MPMediaQuery.artists().collections else {
@@ -106,6 +120,7 @@ final class Artists: NSObject {
 					return
 				}
 				artistTableViewController?.setArtists(artistsArray, maxCount, cutoff)
+				self.setTitle(enabled: true)
 			}
 		}
 		return blockOperation
