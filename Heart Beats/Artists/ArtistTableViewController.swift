@@ -29,10 +29,12 @@ final class ArtistTableViewController: UITableViewController {
 		artistTableViewController = self
 
 		Zephyr.shared.userDefaults.addObserver(self, forKeyPath: #keyPath(UserDefaults.favorited), options: [.new], context: nil)
+		Zephyr.shared.userDefaults.addObserver(self, forKeyPath: #keyPath(UserDefaults.minimum), options: [.new], context: nil)
 	}
 
 	deinit {
 		Zephyr.shared.userDefaults.removeObserver(self, forKeyPath: #keyPath(UserDefaults.favorited))
+		Zephyr.shared.userDefaults.removeObserver(self, forKeyPath: #keyPath(UserDefaults.minimum))
 	}
 
 	override func viewDidLoad() {
@@ -83,7 +85,11 @@ final class ArtistTableViewController: UITableViewController {
 	}
 
 	override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
-		updateFavorites()
+		if keyPath == #keyPath(UserDefaults.minimum) {
+			stepperView.value = Double(Zephyr.shared.userDefaults.minimum)
+		} else {
+			updateFavorites()
+		}
 	}
 
 	private func artistAt(indexPath: IndexPath) -> Artist {
