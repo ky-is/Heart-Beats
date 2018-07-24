@@ -113,7 +113,7 @@ final class Artists: NSObject {
 				cutoff = max(5, maxCount / 3)
 			}
 			let artistsArray = artists.values
-				.filter({ $0.2.count > cutoff || favorited.contains($0.0) })
+				.filter({ $0.2.count >= cutoff || favorited.contains($0.0) })
 				.sorted(by: { $0.0.forSorting() < $1.0.forSorting() })
 				.map({ Artist(name: $0.0, songs: MPMediaItemCollection(items: $0.2), songCount: $0.2.count, artwork: $0.1.artwork) })
 			DispatchQueue.main.async {

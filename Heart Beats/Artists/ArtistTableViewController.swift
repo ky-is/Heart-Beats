@@ -158,7 +158,7 @@ extension ArtistTableViewController {
 
 	override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
 		let cell = tableView.dequeueReusableCell(withIdentifier: "HEADER") as! HeaderTableViewCell
-		cell.nameLabel.text = section == 0 ? "Favorites" : "Others"
+		cell.nameLabel.text = section == 0 ? "Favorites" : "Uncategorized"
 		return cell
 	}
 
