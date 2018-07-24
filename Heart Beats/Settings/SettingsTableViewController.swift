@@ -14,9 +14,10 @@ final class SettingsTableViewController: UITableViewController {
 	@IBOutlet weak var restoreCell: UITableViewCell!
 
 	override func viewDidLoad() {
-		if IAP.unlocked {
-			unlockedPurchase()
-		}
+		restoreCell.isHidden = true //TODO iap
+//		if IAP.unlocked {
+//			unlockedPurchase()
+//		}
 		Zephyr.shared.userDefaults.addObserver(self, forKeyPath: #keyPath(UserDefaults.purchased), options: [.new], context: nil)
 	}
 
