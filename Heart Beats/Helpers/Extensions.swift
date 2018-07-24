@@ -93,6 +93,13 @@ extension UserDefaults {
 		}
 	}
 
+}
+
+extension UIImage {
+
+	var zero: UIImage {
+		return UIImage()
+	}
 
 }
 

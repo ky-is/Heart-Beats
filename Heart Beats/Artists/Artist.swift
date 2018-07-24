@@ -15,5 +15,6 @@ struct Artist {
 	let name: String
 	let songs: MPMediaItemCollection?
 	let songCount: Int
+	let artwork: MPMediaItemArtwork?
 
 }

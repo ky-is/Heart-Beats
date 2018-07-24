@@ -10,11 +10,6 @@ import Foundation
 
 import MediaPlayer
 
-private let cellHeight = 64 //TODO cell
-private let artworkSize = CGSize(width: cellHeight, height: cellHeight)
-
-var artworks = [String: UIImage]()
-
 final class Artists: NSObject {
 
 	public var allNames = [String]()
@@ -120,7 +115,7 @@ final class Artists: NSObject {
 			let artistsArray = artists.values
 				.filter({ $0.2.count > cutoff || favorited.contains($0.0) })
 				.sorted(by: { $0.0.forSorting() < $1.0.forSorting() })
-				.map({ Artist(name: $0.0, songs: MPMediaItemCollection(items: $0.2), songCount: $0.2.count ) })
+				.map({ Artist(name: $0.0, songs: MPMediaItemCollection(items: $0.2), songCount: $0.2.count, artwork: $0.1.artwork) })
 			DispatchQueue.main.async {
 				guard !(blockOperation?.isCancelled ?? true) else {
 					return
@@ -129,20 +124,6 @@ final class Artists: NSObject {
 				self.setTitle(enabled: true)
 			}
 			UserDefaults.standard.cachedArtists = artistsArray.map { [ $0.name, $0.songCount ] }
-			for (name, artist) in artists {
-				guard let artwork = artist.1.artwork else {
-					continue
-				}
-				if artworks[name] == nil {
-					let image = artwork.image(at: artworkSize) ?? artwork.image(at: artwork.bounds.size)
-					artworks[name] = image
-					if let image = image {
-						DispatchQueue.main.async {
-							artistTableViewController?.available(artist: name, image: image)
-						}
-					}
-				}
-			}
 		}
 		return blockOperation
 	}

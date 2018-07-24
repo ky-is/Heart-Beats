@@ -16,10 +16,12 @@ final class ArtistTableViewController: UITableViewController {
 	@IBOutlet weak var stepperView: GMStepper!
 	@IBOutlet weak var toolbarItem: UIBarButtonItem!
 
-	var artists = [Artist]()
-	var displayArtists = [[Artist]]()
+	private var artists = [Artist]()
+	private var displayArtists = [[Artist]]()
+	private var cachedArtworkIcons = NSCache<NSString, UIImage>()
 
 	private let placeholder = UIImage(imageLiteralResourceName: "note")
+	private var cachedSize: CGSize?
 
 	required init?(coder aDecoder: NSCoder) {
 		super.init(coder: aDecoder)
@@ -40,7 +42,7 @@ final class ArtistTableViewController: UITableViewController {
 		toolbarItem.customView = stepperView
 
 		if let cached = UserDefaults.standard.cachedArtists {
-			let artists = cached.map { Artist(name: $0[0] as! String, songs: nil, songCount: $0[1] as! Int) }
+			let artists = cached.map { Artist(name: $0[0] as! String, songs: nil, songCount: $0[1] as! Int, artwork: nil) }
 			setArtists(artists, 99, Zephyr.shared.userDefaults.minimum)
 		}
 	}
@@ -165,8 +167,27 @@ extension ArtistTableViewController {
 		let artist = artistAt(indexPath: indexPath)
 		let name = artist.name
 		cell.nameLabel.text = name
-		cell.iconImageView.image = artworks[name] ?? placeholder
 		cell.countLabel.text = artist.songCount.description
+		if let cachedIcon = cachedArtworkIcons.object(forKey: name as NSString) {
+			cell.iconImageView.image = cachedIcon
+		} else if let artwork = artist.artwork {
+			if cachedSize == nil {
+				cachedSize = cell.iconImageView.bounds.size
+			}
+			DispatchQueue.global(qos: .userInitiated).async {
+				let image = artwork.image(at: self.cachedSize!) ?? artwork.image(at: artwork.bounds.size)
+				self.cachedArtworkIcons.setObject(image ?? self.placeholder, forKey: name as NSString)
+				if let image = image {
+					DispatchQueue.main.async {
+						if cell.nameLabel.text == name {
+							artistTableViewController?.available(artist: name, image: image)
+						}
+					}
+				}
+			}
+		} else {
+			cell.iconImageView.image = placeholder
+		}
 		return cell
 	}
 
