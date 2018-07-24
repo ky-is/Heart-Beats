@@ -117,7 +117,10 @@ final class Artists: NSObject {
 			if cutoff <= 0 {
 				cutoff = max(5, maxCount / 3)
 			}
-			let artistsArray = artists.values.filter({ $0.2.count > cutoff || favorited.contains($0.0) }).sorted(by: { $0.0.withoutThe() < $1.0.withoutThe() }).map({ [ $0.0, MPMediaItemCollection(items: $0.2) ] })
+			let artistsArray = artists.values
+				.filter({ $0.2.count > cutoff || favorited.contains($0.0) })
+				.sorted(by: { $0.0.withoutThe() < $1.0.withoutThe() })
+				.map({ Artist(name: $0.0, songs: MPMediaItemCollection(items: $0.2), songCount: $0.2.count ) })
 			DispatchQueue.main.async {
 				guard !(blockOperation?.isCancelled ?? true) else {
 					return
@@ -125,7 +128,7 @@ final class Artists: NSObject {
 				artistTableViewController?.setArtists(artistsArray, maxCount, cutoff)
 				self.setTitle(enabled: true)
 			}
-			UserDefaults.standard.cachedArtists = artistsArray.map { [ $0[0], ($0[1] as! MPMediaItemCollection).count ] }
+			UserDefaults.standard.cachedArtists = artistsArray.map { [ $0.name, $0.songCount ] }
 			for (name, artist) in artists {
 				guard let artwork = artist.1.artwork else {
 					continue

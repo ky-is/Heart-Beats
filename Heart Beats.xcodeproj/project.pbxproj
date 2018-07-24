@@ -18,6 +18,7 @@
 		24649C7720F92ED300822FAC /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 24649C7520F92ED300822FAC /* Main.storyboard */; };
 		24649C7920F92ED600822FAC /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 24649C7820F92ED600822FAC /* Assets.xcassets */; };
 		24649C7C20F92ED600822FAC /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 24649C7A20F92ED600822FAC /* LaunchScreen.storyboard */; };
+		24932EFA2106E15D00DC3EE5 /* Artist.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24932EF92106E15D00DC3EE5 /* Artist.swift */; };
 		24BF29CB2101B6AD00CD67B5 /* ArtistTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24BF29CA2101B6AD00CD67B5 /* ArtistTableViewController.swift */; };
 		24BF29CD2101B7B000CD67B5 /* ArtistTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24BF29CC2101B7B000CD67B5 /* ArtistTableViewCell.swift */; };
 		24BF29CF2101BFAB00CD67B5 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24BF29CE2101BFAB00CD67B5 /* Extensions.swift */; };
@@ -41,6 +42,7 @@
 		24649C7820F92ED600822FAC /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		24649C7B20F92ED600822FAC /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		24649C7D20F92ED600822FAC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		24932EF92106E15D00DC3EE5 /* Artist.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Artist.swift; sourceTree = "<group>"; };
 		24BF29CA2101B6AD00CD67B5 /* ArtistTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArtistTableViewController.swift; sourceTree = "<group>"; };
 		24BF29CC2101B7B000CD67B5 /* ArtistTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArtistTableViewCell.swift; sourceTree = "<group>"; };
 		24BF29CE2101BFAB00CD67B5 /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
@@ -66,6 +68,7 @@
 		242A00812103CC960072B26B /* Artists */ = {
 			isa = PBXGroup;
 			children = (
+				24932EF92106E15D00DC3EE5 /* Artist.swift */,
 				24BF29CA2101B6AD00CD67B5 /* ArtistTableViewController.swift */,
 				24BF29CC2101B7B000CD67B5 /* ArtistTableViewCell.swift */,
 				24D2A27F2102F55D00C95E79 /* HeaderTableViewCell.swift */,
@@ -236,6 +239,7 @@
 				24D2A2822103009500C95E79 /* IAP.swift in Sources */,
 				242A007A2103AE810072B26B /* CombineTableViewController.swift in Sources */,
 				24D2A27E2102D84700C95E79 /* Zephyr.swift in Sources */,
+				24932EFA2106E15D00DC3EE5 /* Artist.swift in Sources */,
 				242A00802103BFBB0072B26B /* Artists.swift in Sources */,
 				242A0074210330230072B26B /* SongTableViewController.swift in Sources */,
 				24BF29CF2101BFAB00CD67B5 /* Extensions.swift in Sources */,

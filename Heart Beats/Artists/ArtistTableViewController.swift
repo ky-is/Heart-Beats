@@ -16,8 +16,8 @@ final class ArtistTableViewController: UITableViewController {
 	@IBOutlet weak var stepperView: GMStepper!
 	@IBOutlet weak var toolbarItem: UIBarButtonItem!
 
-	var artists = [[Any]]()
-	var displayArtists = [[[Any]]]()
+	var artists = [Artist]()
+	var displayArtists = [[Artist]]()
 
 	private let placeholder = UIImage(imageLiteralResourceName: "note")
 
@@ -40,7 +40,8 @@ final class ArtistTableViewController: UITableViewController {
 		toolbarItem.customView = stepperView
 
 		if let cached = UserDefaults.standard.cachedArtists {
-			setArtists(cached, 99, Zephyr.shared.userDefaults.minimum)
+			let artists = cached.map { Artist(name: $0[0] as! String, songs: nil, songCount: $0[1] as! Int) }
+			setArtists(artists, 99, Zephyr.shared.userDefaults.minimum)
 		}
 	}
 
@@ -52,7 +53,7 @@ final class ArtistTableViewController: UITableViewController {
 		navigationController?.setToolbarHidden(true, animated: animated)
 	}
 
-	func setArtists(_ artists: [[Any]], _ maxCount: Int, _ current: Int) {
+	func setArtists(_ artists: [Artist], _ maxCount: Int, _ current: Int) {
 		self.artists = artists
 		navigationItem.title = "\(artists.count) \("Artist".plural(artists.count))"
 		backgroundView.isHidden = !artists.isEmpty
@@ -66,9 +67,9 @@ final class ArtistTableViewController: UITableViewController {
 
 	private func updateFavorites() {
 		let favorites = Zephyr.shared.userDefaults.favorited
-		let favoriteArtists = artists.filter { favorites.contains($0.first as! String) }
+		let favoriteArtists = artists.filter { favorites.contains($0.name) }
 		if !favoriteArtists.isEmpty {
-			displayArtists = [ favoriteArtists, artists.filter { !favorites.contains($0.first as! String) } ]
+			displayArtists = [ favoriteArtists, artists.filter { !favorites.contains($0.name) } ]
 		} else {
 			displayArtists = [ artists ]
 		}
@@ -83,12 +84,12 @@ final class ArtistTableViewController: UITableViewController {
 		updateFavorites()
 	}
 
-	private func artistAt(indexPath: IndexPath) -> [Any] {
+	private func artistAt(indexPath: IndexPath) -> Artist {
 		return displayArtists[indexPath.section][indexPath.item]
 	}
 
-	func play(artist: [Any]) {
-		let artistName = artist.first as! String
+	func play(artist: Artist) {
+		let artistName = artist.name
 		var played = Zephyr.shared.userDefaults.played
 		if !played.contains(artistName) {
 			var favorited = Zephyr.shared.userDefaults.favorited
@@ -107,7 +108,7 @@ final class ArtistTableViewController: UITableViewController {
 
 		DispatchQueue.global(qos: .userInteractive).async {
 			let player = MPMusicPlayerController.systemMusicPlayer
-			player.setQueue(with: artist[1] as! MPMediaItemCollection)
+			player.setQueue(with: artist.songs!)
 			player.shuffleMode = MPMusicShuffleMode.songs
 			player.prepareToPlay()
 
@@ -162,14 +163,10 @@ extension ArtistTableViewController {
 	override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
 		let cell = tableView.dequeueReusableCell(withIdentifier: "ARTIST", for: indexPath) as! ArtistTableViewCell
 		let artist = artistAt(indexPath: indexPath)
-		let name = artist.first as! String
+		let name = artist.name
 		cell.nameLabel.text = name
 		cell.iconImageView.image = artworks[name] ?? placeholder
-		if let count = artist[1] as? Int {
-			cell.countLabel.text = count.description
-		} else if let collection = artist[1] as? MPMediaItemCollection {
-			cell.countLabel.text = collection.count.description
-		}
+		cell.countLabel.text = artist.songCount.description
 		return cell
 	}
 
@@ -182,7 +179,7 @@ extension ArtistTableViewController {
 
 	override func tableView(_ tableView: UITableView, willSelectRowAt indexPath: IndexPath) -> IndexPath? {
 		let artist = artistAt(indexPath: indexPath)
-		return artist[1] is MPMediaItemCollection ? indexPath : nil
+		return artist.songs != nil ? indexPath : nil
 	}
 
 	override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
@@ -204,7 +201,7 @@ extension ArtistTableViewController {
 				self.purchaseAlert(message: "In order to manage your favorites, you'll need to purchase the full application.")
 			} else {
 				let artist = self.artistAt(indexPath: indexPath)
-				let artistName = artist.first as! String
+				let artistName = artist.name
 				var favorites = Zephyr.shared.userDefaults.favorited
 				if favorites.contains(artistName) {
 					favorites = favorites.filter { $0 != artistName}

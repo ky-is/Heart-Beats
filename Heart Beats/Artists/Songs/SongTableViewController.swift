@@ -12,7 +12,7 @@ import MediaPlayer
 
 final class SongTableViewController: UITableViewController {
 
-	public var artist: [Any]!
+	public var artist: Artist!
 
 	private var songs = [MPMediaItem]()
 
@@ -24,10 +24,10 @@ final class SongTableViewController: UITableViewController {
 		durationFormatter.zeroFormattingBehavior = .pad
 	}
 
-	public func setArtist(_ artist: [Any]) {
+	public func setArtist(_ artist: Artist) {
 		self.artist = artist
-		songs = (artist[1] as! MPMediaItemCollection).items
-		navigationItem.title = artist.first as? String
+		songs = artist.songs!.items
+		navigationItem.title = artist.name
 	}
 
 	@IBAction func onDone(_ sender: UIBarButtonItem) {
