@@ -59,7 +59,7 @@ final class ArtistTableViewController: UITableViewController {
 
 	func setArtists(_ artists: [Artist], _ maxCount: Int, _ current: Int) {
 		self.artists = artists
-		navigationItem.title = "\(artists.count) \("Artist".plural(artists.count))"
+		navigationItem.title = "\(artists.count) \("Artist".plural(artists.count))" //SAMPLE
 		backgroundView.isHidden = !artists.isEmpty
 		if stepperView.value <= 2 {
 			stepperView.value = Double(current)

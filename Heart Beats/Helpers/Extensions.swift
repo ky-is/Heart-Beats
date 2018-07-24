@@ -39,6 +39,8 @@ extension String {
 
 extension UserDefaults {
 
+	// Synced
+
 	@objc dynamic var played: [String] {
 		get {
 			return array(forKey: #keyPath(played)) as? [String] ?? []
@@ -83,6 +85,8 @@ extension UserDefaults {
 			set(value, forKey: #keyPath(combined))
 		}
 	}
+
+	// Local
 
 	@objc dynamic var cachedArtists: [[Any]]? {
 		get {
