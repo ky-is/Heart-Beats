@@ -30,8 +30,9 @@ extension String {
 		return amount == 1 ? self : "\(self)s"
 	}
 
-	func withoutThe() -> String {
-		return lowercased().starts(with: "the ") ? String(dropFirst(4)) : self
+	func forSorting() -> String {
+		let result = lowercased()
+		return result.starts(with: "the ") ? String(result.dropFirst(4)) : result
 	}
 
 }
