@@ -14,10 +14,11 @@ final class ArtistTableViewController: UITableViewController {
 
 	@IBOutlet weak var backgroundView: UIView!
 	@IBOutlet weak var backgroundLabel: UILabel!
-	@IBOutlet weak var backgroundSettingsButton: UIButton!
+	@IBOutlet weak var backgroundActionButton: UIButton!
 
 	@IBOutlet weak var stepperView: GMStepper!
 	@IBOutlet weak var toolbarItem: UIBarButtonItem!
+	@IBOutlet weak var settingsBarButton: UIBarButtonItem!
 
 	private var artists = [Artist]()
 	private var displayArtists = [[Artist]]()
@@ -49,6 +50,8 @@ final class ArtistTableViewController: UITableViewController {
 		if MPMediaLibrary.authorizationStatus() == .authorized, let cached = UserDefaults.standard.cachedArtists {
 			let artists = cached.map { Artist(name: $0[0] as! String, songs: nil, songCount: $0[1] as! Int, artwork: nil) }
 			setArtists(artists, 99, Zephyr.shared.userDefaults.minimum)
+		} else {
+			navigationItem.setRightBarButton(nil, animated: false)
 		}
 	}
 
@@ -63,7 +66,7 @@ final class ArtistTableViewController: UITableViewController {
 	func setUnavailable(status: MPMediaLibraryAuthorizationStatus) {
 		backgroundView.isHidden = false
 		navigationItem.title = "Music Unavailable"
-		backgroundSettingsButton.isHidden = false
+		backgroundActionButton.setTitle("Open Settings", for: .normal)
 
 		let detail: String
 		switch status {
@@ -76,9 +79,11 @@ final class ArtistTableViewController: UITableViewController {
 	}
 
 	func setArtists(_ artists: [Artist], _ maxCount: Int, _ current: Int) {
+		let showingArtists = !artists.isEmpty
 		self.artists = artists
+		navigationItem.setRightBarButton(showingArtists ? settingsBarButton : nil, animated: true)
 		navigationItem.title = "\(artists.count) \("Artist".plural(artists.count))" //SAMPLE
-		backgroundView.isHidden = !artists.isEmpty
+		backgroundView.isHidden = showingArtists
 		if stepperView.value <= 2 {
 			stepperView.value = Double(current)
 		}
@@ -114,6 +119,15 @@ final class ArtistTableViewController: UITableViewController {
 		return displayArtists[indexPath.section][indexPath.item]
 	}
 
+	private func openMusicApp(completionHandler: ((Bool) -> ())? = nil) {
+		let url = URL(string: "audio-player-event:")!
+		if UIApplication.shared.canOpenURL(url) {
+			UIApplication.shared.open(url, completionHandler: completionHandler)
+		} else {
+			alert("Unable to open Music.app", message: "Please manually rate some songs in your iOS system music library and try again. Thank you!", cancel: "OK")
+		}
+	}
+
 	func play(artist: Artist) {
 		let artistName = artist.name
 		var played = Zephyr.shared.userDefaults.played
@@ -139,7 +153,7 @@ final class ArtistTableViewController: UITableViewController {
 			player.prepareToPlay()
 
 			DispatchQueue.main.async {
-				UIApplication.shared.open(URL(string: "audio-player-event:")!, options: [:]) { success in
+				self.openMusicApp() { success in
 					buildAlert.dismiss(animated: true)
 				}
 			}
@@ -150,9 +164,13 @@ final class ArtistTableViewController: UITableViewController {
 		Zephyr.shared.userDefaults.minimum = Int(sender.value)
 	}
 
-	@IBAction func onSettingsButton(_ sender: UIButton) {
-		let url = URL(string: UIApplicationOpenSettingsURLString)!
-		UIApplication.shared.open(url)
+	@IBAction func onBackgroundButton(_ sender: UIButton) {
+		if sender.title(for: .normal) == "Open Music" {
+			openMusicApp()
+		} else {
+			let url = URL(string: UIApplicationOpenSettingsURLString)!
+			UIApplication.shared.open(url)
+		}
 	}
 
 	func available(artist name: String, image: UIImage) {
