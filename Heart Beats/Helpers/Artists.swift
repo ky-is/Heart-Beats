@@ -82,7 +82,7 @@ final class Artists: NSObject {
 				}
 
 				for combining in combined {
-					if let index = combining.firstIndex(of: artist), index > 0 {
+					if let index = combining.index(of: artist), index > 0 {
 						artist = combining[0]
 						break
 					}

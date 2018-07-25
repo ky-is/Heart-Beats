@@ -35,7 +35,7 @@
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Header" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="wdZ-mJ-PxA">
-                                                        <rect key="frame" x="16" y="8" width="296" height="27"/>
+                                                        <rect key="frame" x="16" y="8" width="296" height="27.5"/>
                                                         <fontDescription key="fontDescription" style="UICTFontTextStyleHeadline"/>
                                                         <nil key="textColor"/>
                                                         <nil key="highlightedColor"/>
@@ -140,6 +140,8 @@
                     </navigationItem>
                     <simulatedToolbarMetrics key="simulatedBottomBarMetrics"/>
                     <connections>
+                        <outlet property="backgroundLabel" destination="sut-vC-DzQ" id="uJ2-67-SWJ"/>
+                        <outlet property="backgroundSettingsButton" destination="Qpb-Og-Bk1" id="Tvq-nR-40v"/>
                         <outlet property="backgroundView" destination="Fc1-Nt-BAc" id="ofO-8p-ilT"/>
                         <outlet property="stepperView" destination="Djf-aN-wNv" id="2t7-uR-Hv8"/>
                         <outlet property="toolbarItem" destination="LFs-RO-faa" id="ygM-uD-5NL"/>
@@ -191,22 +193,40 @@
                     </connections>
                 </view>
                 <view hidden="YES" contentMode="scaleToFill" id="Fc1-Nt-BAc">
-                    <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
+                    <rect key="frame" x="0.0" y="0.0" width="320" height="455"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                     <subviews>
-                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="You don't have enough 5-star songs from any artists. Go rate some songs to get started!" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="sut-vC-DzQ">
-                            <rect key="frame" x="16" y="0.0" width="288" height="44"/>
-                            <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
-                            <color key="textColor" white="0.66666666666666663" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                            <nil key="highlightedColor"/>
-                        </label>
+                        <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" alignment="center" spacingType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="1Ar-5v-Dds">
+                            <rect key="frame" x="16" y="128" width="288" height="256"/>
+                            <subviews>
+                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="You don't have enough 5-star songs from any artists. Go rate some songs to get started!" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="sut-vC-DzQ">
+                                    <rect key="frame" x="1" y="0.0" width="286" height="256"/>
+                                    <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
+                                    <color key="textColor" white="0.66666666666666663" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                    <nil key="highlightedColor"/>
+                                </label>
+                                <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Qpb-Og-Bk1">
+                                    <rect key="frame" x="87" y="0.0" width="114" height="44"/>
+                                    <constraints>
+                                        <constraint firstAttribute="height" constant="44" id="klt-XX-8v4"/>
+                                    </constraints>
+                                    <fontDescription key="fontDescription" style="UICTFontTextStyleHeadline"/>
+                                    <state key="normal" title="Open Settings"/>
+                                    <connections>
+                                        <action selector="onSettingsButton:" destination="74z-xz-uu3" eventType="touchUpInside" id="gJD-QG-jFj"/>
+                                    </connections>
+                                </button>
+                            </subviews>
+                            <constraints>
+                                <constraint firstAttribute="height" constant="256" id="UUs-id-Lu2"/>
+                            </constraints>
+                        </stackView>
                     </subviews>
                     <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                     <constraints>
-                        <constraint firstAttribute="bottomMargin" secondItem="sut-vC-DzQ" secondAttribute="bottom" id="468-KY-8py"/>
-                        <constraint firstAttribute="trailingMargin" secondItem="sut-vC-DzQ" secondAttribute="trailing" id="H9H-mp-piO"/>
-                        <constraint firstItem="sut-vC-DzQ" firstAttribute="top" secondItem="Fc1-Nt-BAc" secondAttribute="topMargin" id="rU7-UU-6L3"/>
-                        <constraint firstItem="sut-vC-DzQ" firstAttribute="leading" secondItem="Fc1-Nt-BAc" secondAttribute="leadingMargin" id="wf0-E5-fAF"/>
+                        <constraint firstItem="1Ar-5v-Dds" firstAttribute="top" secondItem="Fif-fC-SnN" secondAttribute="top" constant="128" id="L6Z-iy-iCV"/>
+                        <constraint firstItem="1Ar-5v-Dds" firstAttribute="leading" secondItem="Fc1-Nt-BAc" secondAttribute="leadingMargin" id="qUg-t4-GO5"/>
+                        <constraint firstAttribute="trailingMargin" secondItem="1Ar-5v-Dds" secondAttribute="trailing" id="xax-hp-MpZ"/>
                     </constraints>
                     <viewLayoutGuide key="safeArea" id="Fif-fC-SnN"/>
                 </view>

@@ -34,12 +34,10 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
 		switch status {
 		case .notDetermined:
 			MPMediaLibrary.requestAuthorization(handleAuthorization)
-		case .denied:
-			print("Denied!")
-		case .restricted:
-			print("Restricted!")
 		case .authorized:
-			Artists.shared.update()
+			DispatchQueue.main.async(execute: Artists.shared.update)
+		default:
+			artistTableViewController?.setUnavailable(status: status)
 		}
 	}
 

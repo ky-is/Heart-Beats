@@ -13,6 +13,9 @@ import MediaPlayer
 final class ArtistTableViewController: UITableViewController {
 
 	@IBOutlet weak var backgroundView: UIView!
+	@IBOutlet weak var backgroundLabel: UILabel!
+	@IBOutlet weak var backgroundSettingsButton: UIButton!
+
 	@IBOutlet weak var stepperView: GMStepper!
 	@IBOutlet weak var toolbarItem: UIBarButtonItem!
 
@@ -43,7 +46,7 @@ final class ArtistTableViewController: UITableViewController {
 
 		toolbarItem.customView = stepperView
 
-		if let cached = UserDefaults.standard.cachedArtists {
+		if MPMediaLibrary.authorizationStatus() == .authorized, let cached = UserDefaults.standard.cachedArtists {
 			let artists = cached.map { Artist(name: $0[0] as! String, songs: nil, songCount: $0[1] as! Int, artwork: nil) }
 			setArtists(artists, 99, Zephyr.shared.userDefaults.minimum)
 		}
@@ -55,6 +58,21 @@ final class ArtistTableViewController: UITableViewController {
 
 	override func viewWillDisappear(_ animated: Bool) {
 		navigationController?.setToolbarHidden(true, animated: animated)
+	}
+
+	func setUnavailable(status: MPMediaLibraryAuthorizationStatus) {
+		backgroundView.isHidden = false
+		navigationItem.title = "Music Unavailable"
+		backgroundSettingsButton.isHidden = false
+
+		let detail: String
+		switch status {
+		case .restricted:
+			detail = "change your library restrictions"
+		default:
+			detail = "change your permissions"
+		}
+		backgroundLabel.text = "Heart Beats requires access to your music library in order to create playlists based on your favorite artists.\n\nPlease \(detail) in the Settings app and try again. Thank you!"
 	}
 
 	func setArtists(_ artists: [Artist], _ maxCount: Int, _ current: Int) {
@@ -130,6 +148,11 @@ final class ArtistTableViewController: UITableViewController {
 
 	@IBAction func onMinimumSongs(_ sender: GMStepper) {
 		Zephyr.shared.userDefaults.minimum = Int(sender.value)
+	}
+
+	@IBAction func onSettingsButton(_ sender: UIButton) {
+		let url = URL(string: UIApplicationOpenSettingsURLString)!
+		UIApplication.shared.open(url)
 	}
 
 	func available(artist name: String, image: UIImage) {
