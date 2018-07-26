@@ -77,6 +77,9 @@ final class Artists: NSObject {
 					print("No artist", collection)
 					continue
 				}
+				if artist.lowercased() == "various artists" {
+					continue
+				}
 				if !names.contains(artist) {
 					names.append(artist)
 				}
