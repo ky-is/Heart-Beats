@@ -82,7 +82,7 @@ final class ArtistTableViewController: UITableViewController {
 		let showingArtists = !artists.isEmpty
 		self.artists = artists
 		navigationItem.setRightBarButton(showingArtists ? settingsBarButton : nil, animated: true)
-		navigationItem.title = "\(artists.count) \("Artist".plural(artists.count))" //SAMPLE
+		navigationItem.title = "\(SCREENSHOT_MODE ? 42 : artists.count) \("Artist".plural(artists.count))"
 		backgroundView.isHidden = showingArtists
 		if stepperView.value <= 2 {
 			stepperView.value = Double(current)
@@ -231,6 +231,24 @@ extension ArtistTableViewController {
 						}
 					}
 				}
+			}
+			if SCREENSHOT_MODE {
+				let blurEffect = UIBlurEffect(style: .regular)
+				let blurredEffectView = UIVisualEffectView(effect: blurEffect)
+				blurredEffectView.frame = cell.iconImageView.frame
+				blurredEffectView.frame.origin.x = 20
+				blurredEffectView.layer.cornerRadius = 4
+				blurredEffectView.clipsToBounds = true
+
+				let vibrantEffect = UIVibrancyEffect(blurEffect: UIBlurEffect(style: .prominent))
+				let vibrantEffectView = UIVisualEffectView(effect: vibrantEffect)
+				vibrantEffectView.frame = blurredEffectView.bounds
+				let imageView = UIImageView(frame: blurredEffectView.bounds)
+				imageView.image = UIImage(imageLiteralResourceName: "note-a")
+				vibrantEffectView.contentView.addSubview(imageView)
+
+				blurredEffectView.contentView.addSubview(vibrantEffectView)
+				cell.addSubview(blurredEffectView)
 			}
 		} else {
 			cell.iconImageView.image = placeholder

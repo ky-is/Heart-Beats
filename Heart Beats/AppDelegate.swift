@@ -10,6 +10,8 @@ import UIKit
 
 import MediaPlayer
 
+let SCREENSHOT_MODE = false
+
 var artistTableViewController: ArtistTableViewController?
 
 @UIApplicationMain
@@ -22,6 +24,12 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
 		IAP.shared.start()
 
 		Zephyr.sync(defaults: [ #keyPath(UserDefaults.played): [], #keyPath(UserDefaults.favorited): [], #keyPath(UserDefaults.combined): [], #keyPath(UserDefaults.purchased): false, #keyPath(UserDefaults.minimum): 0 ])
+
+		if SCREENSHOT_MODE {
+			Zephyr.shared.userDefaults.minimum = 19
+			Zephyr.shared.userDefaults.favorited = [ "CHVRCHΞS", "indigo la End", "Lost Frequencies", "The National", "Sigur Rós", "Stromae" ]
+		}
+
 		Zephyr.shared.userDefaults.addObserver(self, forKeyPath: #keyPath(UserDefaults.purchased), options: [.new], context: nil)
 
 		handleAuthorization(status: MPMediaLibrary.authorizationStatus())
