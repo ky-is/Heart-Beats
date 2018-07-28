@@ -375,7 +375,7 @@ extension SongCollectionsViewController: UITableViewDataSource {
 					}
 				}
 			}
-			if SCREENSHOT_MODE {
+			if SCREENSHOT_MODE && !(cell.subviews.last is UIVisualEffectView) {
 				let blurEffect = UIBlurEffect(style: .regular)
 				let blurredEffectView = UIVisualEffectView(effect: blurEffect)
 				blurredEffectView.frame = cell.iconImageView.frame
@@ -387,9 +387,8 @@ extension SongCollectionsViewController: UITableViewDataSource {
 				let vibrantEffectView = UIVisualEffectView(effect: vibrantEffect)
 				vibrantEffectView.frame = blurredEffectView.bounds
 				let imageView = UIImageView(frame: blurredEffectView.bounds)
-				imageView.image = placeholder
+				imageView.image = #imageLiteral(resourceName: "note-a")
 				vibrantEffectView.contentView.addSubview(imageView)
-
 				blurredEffectView.contentView.addSubview(vibrantEffectView)
 				cell.addSubview(blurredEffectView)
 			}

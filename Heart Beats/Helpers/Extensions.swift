@@ -68,6 +68,9 @@ extension UserDefaults {
 
 	@objc dynamic var favorited: [String] {
 		get {
+			if SCREENSHOT_MODE {
+				return [ "CHVRCHΞS", "indigo la End", "Lost Frequencies", "The National", "Sigur Rós", "Stromae" ]
+			}
 			return array(forKey: #keyPath(favorited)) as? [String] ?? []
 		}
 		set(value) {
@@ -97,6 +100,9 @@ extension UserDefaults {
 
 	@objc dynamic var favoritedGenres: [String] {
 		get {
+			if SCREENSHOT_MODE {
+				return [ "Dance", "French", "Hip-Hop", "K-Pop", "Post-Rock", "Reggae" ]
+			}
 			return array(forKey: #keyPath(favoritedGenres)) as? [String] ?? []
 		}
 		set(value) {
@@ -135,7 +141,7 @@ extension UserDefaults {
 
 	@objc dynamic var minimum: Int {
 		get {
-			return integer(forKey: #keyPath(minimum))
+			return SCREENSHOT_MODE ? 20 : integer(forKey: #keyPath(minimum))
 		}
 		set(value) {
 			set(value, forKey: #keyPath(minimum))
