@@ -128,7 +128,7 @@ final class SongCollectionsViewController: UIViewController {
 		let showGenres = Zephyr.shared.userDefaults.showGenres
 		let collectionLabel = showGenres ? "Genre" : "Artist"
 		let collections = showGenres ? genres : artists
-		navigationItem.title = "\(SCREENSHOT_MODE ? 42 : collections.count) \(collectionLabel.plural(collections.count))"
+		navigationItem.title = "\(SCREENSHOT_MODE ? (showGenres ? 21 : 42) : collections.count) \(collectionLabel.plural(collections.count))"
 		updateFavorites()
 	}
 
@@ -150,7 +150,7 @@ final class SongCollectionsViewController: UIViewController {
 
 	override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
 		if keyPath == #keyPath(UserDefaults.minimum) {
-			stepperButton.setTitle(Zephyr.shared.userDefaults.minimum.description, for: .normal)
+			stepperButton?.setTitle(Zephyr.shared.userDefaults.minimum.description, for: .normal)
 		} else {
 			updateFavorites()
 		}
@@ -379,7 +379,7 @@ extension SongCollectionsViewController: UITableViewDataSource {
 				let blurEffect = UIBlurEffect(style: .regular)
 				let blurredEffectView = UIVisualEffectView(effect: blurEffect)
 				blurredEffectView.frame = cell.iconImageView.frame
-				blurredEffectView.frame.origin.x = 20
+				blurredEffectView.frame.origin.x = UIDevice.current.userInterfaceIdiom == .pad ? 15 : 20
 				blurredEffectView.layer.cornerRadius = 4
 				blurredEffectView.clipsToBounds = true
 
