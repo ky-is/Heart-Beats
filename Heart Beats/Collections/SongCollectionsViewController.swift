@@ -22,6 +22,8 @@ final class SongCollectionsViewController: UIViewController {
 	@IBOutlet weak var stepperButton: CircleButton!
 	@IBOutlet weak var settingsBarButton: UIBarButtonItem!
 
+	var maximumSongs = 99
+
 	private var artists = [SongCollection]()
 	private var genres = [SongCollection]()
 
@@ -94,6 +96,8 @@ final class SongCollectionsViewController: UIViewController {
 		}
 		navigationItem.setRightBarButton(hasData ? settingsBarButton : nil, animated: true)
 		backgroundView.isHidden = hasData
+
+		maximumSongs = maxCount
 
 		stepperButton.isHidden = !hasData
 		if hasData {

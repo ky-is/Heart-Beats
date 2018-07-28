@@ -15,6 +15,9 @@ final class StepperViewController: UIViewController {
 	override func viewWillAppear(_ animated: Bool) {
 		super.viewWillAppear(animated)
 
+		if let maximum = songCollectionsViewController?.maximumSongs {
+			stepper.maximumValue = Double(min(99, maximum))
+		}
 		stepper.value = Double(Zephyr.shared.userDefaults.minimum)
 	}
 
