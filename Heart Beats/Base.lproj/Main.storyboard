@@ -629,7 +629,7 @@
                                 <constraints>
                                     <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="48" id="92o-zw-UAw"/>
                                 </constraints>
-                                <fontDescription key="fontDescription" type="boldSystem" pointSize="18"/>
+                                <fontDescription key="fontDescription" type="boldSystem" pointSize="19"/>
                                 <state key="normal" title="42"/>
                                 <connections>
                                     <action selector="onMinimumButton:" destination="w9K-AO-dKf" eventType="touchUpInside" id="QZW-Cy-L7n"/>

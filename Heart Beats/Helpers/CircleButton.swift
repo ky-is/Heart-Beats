@@ -10,7 +10,7 @@ import UIKit
 
 @IBDesignable final class CircleButton: UIButton {
 
-	let inset: CGFloat = 6
+	let inset: CGFloat = 7
 	let circleLayer = CALayer()
 
 	private func setup() {
