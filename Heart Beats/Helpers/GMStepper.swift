@@ -84,7 +84,7 @@ import UIKit
 	}
 
 	/// Font of the buttons.
-	@objc public var buttonsFont = UIFont.systemFont(ofSize: 32, weight: .medium) {
+	@objc public var buttonsFont = UIFont.systemFont(ofSize: 32, weight: .semibold) {
 		didSet {
 			for button in [leftButton, rightButton] {
 				button.titleLabel?.font = buttonsFont

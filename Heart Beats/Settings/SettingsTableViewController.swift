@@ -34,6 +34,12 @@ final class SettingsTableViewController: UITableViewController {
 		restoreCell.textLabel?.text = "🗝 Purchase Unlocked!"
 	}
 
+	override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+		let showGenres = segue.identifier == "COMBINE_GENRES"
+		let destination = segue.destination as! CombineTableViewController
+		destination.show(genres: showGenres)
+	}
+
 }
 
 extension SettingsTableViewController {

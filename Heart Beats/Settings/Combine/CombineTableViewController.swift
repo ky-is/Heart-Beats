@@ -10,14 +10,17 @@ import UIKit
 
 final class CombineTableViewController: UITableViewController {
 
-	var combined = Zephyr.shared.userDefaults.combined
+	var combined = [[String]]()
+	var showGenres = false
 
 	override func viewDidLoad() {
 		Zephyr.shared.userDefaults.addObserver(self, forKeyPath: #keyPath(UserDefaults.combined), options: [.new], context: nil)
+		Zephyr.shared.userDefaults.addObserver(self, forKeyPath: #keyPath(UserDefaults.combinedGenres), options: [.new], context: nil)
 	}
 
 	deinit {
 		Zephyr.shared.userDefaults.removeObserver(self, forKeyPath: #keyPath(UserDefaults.combined))
+		Zephyr.shared.userDefaults.removeObserver(self, forKeyPath: #keyPath(UserDefaults.combinedGenres))
 	}
 
 	override func viewWillAppear(_ animated: Bool) {
@@ -29,7 +32,13 @@ final class CombineTableViewController: UITableViewController {
 	}
 
 	override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
-		combined = Zephyr.shared.userDefaults.combined
+		show(genres: showGenres)
+	}
+
+	func show(genres: Bool) {
+		navigationItem.title = "Combine \(genres ? "Genres" : "Artists")"
+		showGenres = genres
+		combined = Zephyr.shared.userDefaults.getCombined(showGenres: genres)
 		tableView.reloadData()
 	}
 
@@ -59,7 +68,11 @@ extension CombineTableViewController {
 				self.combined.remove(at: indexPath.item)
 			}, completion: { finished in
 				if finished {
-					Zephyr.shared.userDefaults.combined = self.combined
+					if Zephyr.shared.userDefaults.showGenres {
+						Zephyr.shared.userDefaults.combinedGenres = self.combined
+					} else {
+						Zephyr.shared.userDefaults.combined = self.combined
+					}
 				}
 				handler(true)
 

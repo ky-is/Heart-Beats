@@ -39,7 +39,23 @@ extension String {
 
 extension UserDefaults {
 
-	// Synced
+	func getPlayed() -> [String] {
+		return showGenres ? playedGenres : played
+	}
+
+	func getFavorites() -> [String] {
+		return showGenres ? favoritedGenres : favorited
+	}
+
+	func getCombined() -> [[String]] {
+		return getCombined(showGenres: showGenres)
+	}
+
+	func getCombined(showGenres: Bool) -> [[String]] {
+		return showGenres ? combinedGenres : combined
+	}
+
+	// Artists
 
 	@objc dynamic var played: [String] {
 		get {
@@ -56,6 +72,55 @@ extension UserDefaults {
 		}
 		set(value) {
 			set(value, forKey: #keyPath(favorited))
+		}
+	}
+
+	@objc dynamic var combined: [[String]] {
+		get {
+			return array(forKey: #keyPath(combined)) as? [[String]] ?? []
+		}
+		set(value) {
+			set(value, forKey: #keyPath(combined))
+		}
+	}
+
+	// Genres
+
+	@objc dynamic var playedGenres: [String] {
+		get {
+			return array(forKey: #keyPath(playedGenres)) as? [String] ?? []
+		}
+		set(value) {
+			set(value, forKey: #keyPath(playedGenres))
+		}
+	}
+
+	@objc dynamic var favoritedGenres: [String] {
+		get {
+			return array(forKey: #keyPath(favoritedGenres)) as? [String] ?? []
+		}
+		set(value) {
+			set(value, forKey: #keyPath(favoritedGenres))
+		}
+	}
+
+	@objc dynamic var combinedGenres: [[String]] {
+		get {
+			return array(forKey: #keyPath(combinedGenres)) as? [[String]] ?? []
+		}
+		set(value) {
+			set(value, forKey: #keyPath(combinedGenres))
+		}
+	}
+
+	// Synced
+
+	@objc dynamic var showGenres: Bool {
+		get {
+			return bool(forKey: #keyPath(showGenres))
+		}
+		set(value) {
+			set(value, forKey: #keyPath(showGenres))
 		}
 	}
 
@@ -77,14 +142,6 @@ extension UserDefaults {
 		}
 	}
 
-	@objc dynamic var combined: [[String]] {
-		get {
-			return array(forKey: #keyPath(combined)) as? [[String]] ?? []
-		}
-		set(value) {
-			set(value, forKey: #keyPath(combined))
-		}
-	}
 
 	// Local
 
@@ -94,6 +151,15 @@ extension UserDefaults {
 		}
 		set(value) {
 			set(value, forKey: #keyPath(cachedArtists))
+		}
+	}
+
+	@objc dynamic var cachedGenres: [[Any]]? {
+		get {
+			return array(forKey: #keyPath(cachedGenres)) as? [[Any]]
+		}
+		set(value) {
+			set(value, forKey: #keyPath(cachedGenres))
 		}
 	}
 

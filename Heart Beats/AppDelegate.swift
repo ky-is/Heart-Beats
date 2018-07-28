@@ -12,7 +12,7 @@ import MediaPlayer
 
 let SCREENSHOT_MODE = false
 
-var artistTableViewController: ArtistTableViewController?
+var songCollectionsViewController: SongCollectionsViewController?
 
 @UIApplicationMain
 final class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -20,10 +20,10 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
 	var window: UIWindow?
 
 	func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey : Any]? = nil) -> Bool {
-		IAP.unlocked = true
+		IAP.unlocked = true //TODO
 		IAP.shared.start()
 
-		Zephyr.sync(defaults: [ #keyPath(UserDefaults.played): [], #keyPath(UserDefaults.favorited): [], #keyPath(UserDefaults.combined): [], #keyPath(UserDefaults.purchased): false, #keyPath(UserDefaults.minimum): 0 ])
+		Zephyr.sync(defaults: [ #keyPath(UserDefaults.showGenres): false, #keyPath(UserDefaults.played): [], #keyPath(UserDefaults.favorited): [], #keyPath(UserDefaults.combined): [], #keyPath(UserDefaults.playedGenres): [], #keyPath(UserDefaults.favoritedGenres): [], #keyPath(UserDefaults.combinedGenres): [], #keyPath(UserDefaults.purchased): false, #keyPath(UserDefaults.minimum): 0 ])
 
 		if SCREENSHOT_MODE {
 			Zephyr.shared.userDefaults.minimum = 19
@@ -34,7 +34,7 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
 
 		handleAuthorization(status: MPMediaLibrary.authorizationStatus())
 
-		Artists.observe()
+		SongCollections.observe()
 		return true
 	}
 
@@ -43,9 +43,9 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
 		case .notDetermined:
 			MPMediaLibrary.requestAuthorization(handleAuthorization)
 		case .authorized:
-			DispatchQueue.main.async(execute: Artists.shared.update)
+			DispatchQueue.main.async(execute: SongCollections.shared.update)
 		default:
-			artistTableViewController?.setUnavailable(status: status)
+			songCollectionsViewController?.setUnavailable(status: status)
 		}
 	}
 
@@ -53,6 +53,10 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
 		if !IAP.unlocked && Zephyr.shared.userDefaults.purchased {
 			IAP.shared.restore()
 		}
+	}
+
+	func applicationWillEnterForeground(_ application: UIApplication) {
+		SongCollections.shared.update()
 	}
 
 }

@@ -1,5 +1,5 @@
 //
-//  ArtistTableViewCell.swift
+//  SongCollectionTableViewCell.swift
 //  Heart Beats
 //
 //  Created by Kyle Coburn on 19/7/18.
@@ -8,7 +8,7 @@
 
 import UIKit
 
-final class ArtistTableViewCell: UITableViewCell {
+final class SongCollectionTableViewCell: UITableViewCell {
 
 	@IBOutlet weak var iconImageView: UIImageView!
 	@IBOutlet weak var nameLabel: UILabel!

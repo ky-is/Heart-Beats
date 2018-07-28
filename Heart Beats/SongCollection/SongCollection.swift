@@ -1,5 +1,5 @@
 //
-//  Artist.swift
+//  SongCollection.swift
 //  Heart Beats
 //
 //  Created by Kyle Coburn on 23/7/18.
@@ -10,7 +10,7 @@ import Foundation
 
 import MediaPlayer
 
-struct Artist {
+struct SongCollection {
 
 	let name: String
 	let songs: MPMediaItemCollection?

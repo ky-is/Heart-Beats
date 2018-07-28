@@ -23,7 +23,11 @@ final class AddCombineTableViewController: UITableViewController {
 		guard into != from else {
 			return alert("Invalid artists", message: "Cannot combine identical artist names. Please change one and try again.", cancel: "OK")
 		}
-		Zephyr.shared.userDefaults.combined.append([ into, from ])
+		if Zephyr.shared.userDefaults.showGenres {
+			Zephyr.shared.userDefaults.combinedGenres.append([ into, from ])
+		} else {
+			Zephyr.shared.userDefaults.combined.append([ into, from ])
+		}
 
 		onCancel(sender)
 	}
@@ -41,7 +45,7 @@ extension AddCombineTableViewController: UIPickerViewDataSource {
 	}
 
 	func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
-		return Artists.shared.allNames.count + 1
+		return SongCollections.shared.allNames.count + 1
 	}
 
 }
@@ -49,11 +53,11 @@ extension AddCombineTableViewController: UIPickerViewDataSource {
 extension AddCombineTableViewController: UIPickerViewDelegate {
 
 	func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
-		return row == 0 ? "" : Artists.shared.allNames[row - 1]
+		return row == 0 ? "" : SongCollections.shared.allNames[row - 1]
 	}
 
 	func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
-		let artistName = row != 0 ? Artists.shared.allNames[row - 1] : nil
+		let artistName = row != 0 ? SongCollections.shared.allNames[row - 1] : nil
 		switch pickerView.restorationIdentifier {
 		case "INTO":
 			into = artistName

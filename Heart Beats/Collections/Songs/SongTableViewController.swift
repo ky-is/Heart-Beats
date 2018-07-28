@@ -12,7 +12,7 @@ import MediaPlayer
 
 final class SongTableViewController: UITableViewController {
 
-	public var artist: Artist!
+	public var songCollection: SongCollection!
 
 	private var songs = [MPMediaItem]()
 
@@ -24,10 +24,10 @@ final class SongTableViewController: UITableViewController {
 		durationFormatter.zeroFormattingBehavior = .pad
 	}
 
-	public func setArtist(_ artist: Artist) {
-		self.artist = artist
-		songs = artist.songs!.items
-		navigationItem.title = artist.name
+	public func setArtist(_ songCollection: SongCollection) {
+		self.songCollection = songCollection
+		songs = songCollection.songs!.items
+		navigationItem.title = songCollection.name
 	}
 
 	@IBAction func onDone(_ sender: UIBarButtonItem) {
@@ -40,7 +40,7 @@ final class SongTableViewController: UITableViewController {
 	}
 
 	func play() {
-		artistTableViewController?.play(artist: self.artist)
+		songCollectionsViewController?.play(songCollection: self.songCollection)
 	}
 
 }
