@@ -21,17 +21,6 @@ final class SongCollections: NSObject {
 		Zephyr.shared.userDefaults.addObserver(shared, forKeyPath: #keyPath(UserDefaults.combinedGenres), options: [.new], context: nil)
 		Zephyr.shared.userDefaults.addObserver(shared, forKeyPath: #keyPath(UserDefaults.minimum), options: [.new], context: nil)
 		Zephyr.shared.userDefaults.addObserver(shared, forKeyPath: #keyPath(UserDefaults.showGenres), options: [.new], context: nil)
-
-//SAMPLE stress test
-//		var combined = Zephyr.shared.userDefaults.combined
-//		Timer.scheduledTimer(withTimeInterval: 0.5, repeats: true) { timer in
-//			if !combined.isEmpty {
-//				combined.removeAll()
-//			} else {
-//				combined.append(["Aimer", "Belle & Sebastian"])
-//			}
-//			Zephyr.shared.userDefaults.combined = combined
-//		}
 	}
 
 	let updateQueue: OperationQueue = {

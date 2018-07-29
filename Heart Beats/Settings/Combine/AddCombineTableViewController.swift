@@ -23,10 +23,11 @@ final class AddCombineTableViewController: UITableViewController {
 		guard into != from else {
 			return alert("Invalid artists", message: "Cannot combine identical artist names. Please change one and try again.", cancel: "OK")
 		}
+		let combine = [ into, from ]
 		if Zephyr.shared.userDefaults.showGenres {
-			Zephyr.shared.userDefaults.combinedGenres.append([ into, from ])
+			Zephyr.shared.userDefaults.combinedGenres.append(combine)
 		} else {
-			Zephyr.shared.userDefaults.combined.append([ into, from ])
+			Zephyr.shared.userDefaults.combined.append(combine)
 		}
 
 		onCancel(sender)

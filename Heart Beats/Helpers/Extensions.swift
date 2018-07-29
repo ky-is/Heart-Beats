@@ -101,7 +101,7 @@ extension UserDefaults {
 	@objc dynamic var favoritedGenres: [String] {
 		get {
 			if SCREENSHOT_MODE {
-				return [ "French", "Hip-Hop", "K-Pop", "Post-Rock", "Reggae" ]
+				return [ "Classical", "French", "Hip-Hop", "K-Pop", "Post-Rock", "Reggae" ]
 			}
 			return array(forKey: #keyPath(favoritedGenres)) as? [String] ?? []
 		}
