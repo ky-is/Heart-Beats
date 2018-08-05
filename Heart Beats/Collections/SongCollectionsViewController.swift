@@ -375,7 +375,7 @@ extension SongCollectionsViewController: UITableViewDataSource {
 					}
 				}
 			}
-			if SCREENSHOT_MODE && !(cell.subviews.last is UIVisualEffectView) {
+			if SCREENSHOT_MODE && SCREENSHOT_OBSCURED && !(cell.subviews.last is UIVisualEffectView) {
 				let blurEffect = UIBlurEffect(style: .regular)
 				let blurredEffectView = UIVisualEffectView(effect: blurEffect)
 				blurredEffectView.frame = cell.iconImageView.frame

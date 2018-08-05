@@ -11,6 +11,7 @@ import UIKit
 import MediaPlayer
 
 let SCREENSHOT_MODE = false
+let SCREENSHOT_OBSCURED = true
 
 var songCollectionsViewController: SongCollectionsViewController?
 
