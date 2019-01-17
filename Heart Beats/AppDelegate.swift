@@ -21,9 +21,6 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
 	var window: UIWindow?
 
 	func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey : Any]? = nil) -> Bool {
-		IAP.unlocked = true //TODO
-		IAP.shared.start()
-
 		Zephyr.sync(defaults: [ #keyPath(UserDefaults.showGenres): false, #keyPath(UserDefaults.played): [], #keyPath(UserDefaults.favorited): [], #keyPath(UserDefaults.combined): [], #keyPath(UserDefaults.playedGenres): [], #keyPath(UserDefaults.favoritedGenres): [], #keyPath(UserDefaults.combinedGenres): [], #keyPath(UserDefaults.purchased): false, #keyPath(UserDefaults.minimum): 0 ])
 		Zephyr.shared.userDefaults.addObserver(self, forKeyPath: #keyPath(UserDefaults.purchased), options: [.new], context: nil)
 
@@ -45,9 +42,6 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
 	}
 
 	override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
-		if !IAP.unlocked && Zephyr.shared.userDefaults.purchased {
-			IAP.shared.restore()
-		}
 	}
 
 	func applicationWillEnterForeground(_ application: UIApplication) {

@@ -26,8 +26,6 @@
 		24BF29CF2101BFAB00CD67B5 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24BF29CE2101BFAB00CD67B5 /* Extensions.swift */; };
 		24D2A27E2102D84700C95E79 /* Zephyr.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24D2A27D2102D84700C95E79 /* Zephyr.swift */; };
 		24D2A2802102F55D00C95E79 /* HeaderTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24D2A27F2102F55D00C95E79 /* HeaderTableViewCell.swift */; };
-		24D2A2822103009500C95E79 /* IAP.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24D2A2812103009500C95E79 /* IAP.swift */; };
-		24D2A28621030BB400C95E79 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 24D2A28521030BB400C95E79 /* StoreKit.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -52,7 +50,6 @@
 		24BF29CE2101BFAB00CD67B5 /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
 		24D2A27D2102D84700C95E79 /* Zephyr.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Zephyr.swift; sourceTree = "<group>"; };
 		24D2A27F2102F55D00C95E79 /* HeaderTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeaderTableViewCell.swift; sourceTree = "<group>"; };
-		24D2A2812103009500C95E79 /* IAP.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IAP.swift; sourceTree = "<group>"; };
 		24D2A28321030B4B00C95E79 /* Heart Beats.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "Heart Beats.entitlements"; sourceTree = "<group>"; };
 		24D2A28521030BB400C95E79 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
@@ -62,7 +59,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				24D2A28621030BB400C95E79 /* StoreKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -95,7 +91,6 @@
 			children = (
 				24A54729210B91C0000BDEAD /* CircleButton.swift */,
 				24BF29CE2101BFAB00CD67B5 /* Extensions.swift */,
-				24D2A2812103009500C95E79 /* IAP.swift */,
 				24D2A27D2102D84700C95E79 /* Zephyr.swift */,
 				242A008D2103CF780072B26B /* GMStepper.swift */,
 			);
@@ -250,7 +245,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				24D2A2822103009500C95E79 /* IAP.swift in Sources */,
 				242A007A2103AE810072B26B /* CombineTableViewController.swift in Sources */,
 				24D2A27E2102D84700C95E79 /* Zephyr.swift in Sources */,
 				24932EFA2106E15D00DC3EE5 /* SongCollection.swift in Sources */,

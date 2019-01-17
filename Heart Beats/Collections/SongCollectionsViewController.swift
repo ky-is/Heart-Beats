@@ -181,8 +181,6 @@ final class SongCollectionsViewController: UIViewController {
 				} else {
 					Zephyr.shared.userDefaults.favorited = favorites
 				}
-			} else if !IAP.unlocked {
-				return purchaseAlert(message: "In order to play more artists, you'll need to purchase the full application.")
 			}
 			if Zephyr.shared.userDefaults.showGenres {
 				Zephyr.shared.userDefaults.playedGenres.append(artistName)
@@ -219,14 +217,6 @@ final class SongCollectionsViewController: UIViewController {
 			}
 		}
 	}
-
-	func purchaseAlert(message: String) {
-		let purchaseAction = UIAlertAction(title: "Unlock", style: .cancel) { action in
-			IAP.shared.purchase(from: self)
-		}
-		alert("Unlock required", message: "\(message) Or, keep playing your existing favorites free, forever!", cancel: "Not now", customAction: purchaseAction)
-	}
-
 }
 
 extension SongCollectionsViewController: UIPopoverPresentationControllerDelegate {
@@ -315,22 +305,18 @@ extension SongCollectionsViewController: UITableViewDelegate {
 		let addToFavorites = !showFavorites() || indexPath.section == 1
 		let title = addToFavorites ? "⭐️" : "☆"
 		let favoriteAction = UIContextualAction(style: addToFavorites ? .normal : .destructive, title: title) { (action, view, handler) in
-			if !IAP.unlocked {
-				self.purchaseAlert(message: "In order to manage your favorites, you'll need to purchase the full application.")
+			let songCollection = self.songCollectionAt(indexPath: indexPath)
+			let songCollectionName = songCollection.name
+			var favorites = Zephyr.shared.userDefaults.getFavorites()
+			if favorites.contains(songCollectionName) {
+				favorites = favorites.filter { $0 != songCollectionName}
 			} else {
-				let songCollection = self.songCollectionAt(indexPath: indexPath)
-				let songCollectionName = songCollection.name
-				var favorites = Zephyr.shared.userDefaults.getFavorites()
-				if favorites.contains(songCollectionName) {
-					favorites = favorites.filter { $0 != songCollectionName}
-				} else {
-					favorites.append(songCollectionName)
-				}
-				if Zephyr.shared.userDefaults.showGenres {
-					Zephyr.shared.userDefaults.favoritedGenres = favorites
-				} else {
-					Zephyr.shared.userDefaults.favorited = favorites
-				}
+				favorites.append(songCollectionName)
+			}
+			if Zephyr.shared.userDefaults.showGenres {
+				Zephyr.shared.userDefaults.favoritedGenres = favorites
+			} else {
+				Zephyr.shared.userDefaults.favorited = favorites
 			}
 			handler(true)
 		}

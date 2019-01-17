@@ -15,9 +15,6 @@ final class SettingsTableViewController: UITableViewController {
 
 	override func viewDidLoad() {
 		restoreCell.isHidden = true //TODO iap
-//		if IAP.unlocked {
-//			unlockedPurchase()
-//		}
 		Zephyr.shared.userDefaults.addObserver(self, forKeyPath: #keyPath(UserDefaults.purchased), options: [.new], context: nil)
 	}
 
@@ -50,12 +47,9 @@ extension SettingsTableViewController {
 	}
 
 	override func tableView(_ tableView: UITableView, willSelectRowAt indexPath: IndexPath) -> IndexPath? {
-		guard let identifier = tableView.cellForRow(at: indexPath)?.reuseIdentifier else {
-			return nil
-		}
-		if identifier == "SETTINGS_RESTORE" && IAP.unlocked {
-			return nil
-		}
+//		guard let identifier = tableView.cellForRow(at: indexPath)?.reuseIdentifier else {
+//			return nil
+//		}
 		return indexPath
 	}
 
@@ -70,12 +64,6 @@ extension SettingsTableViewController {
 			let appId = "1415282075"
 			let url = URL(string: "itms-apps://itunes.apple.com/app/id\(appId)?action=write-review")!
 			UIApplication.shared.open(url, options: [:])
-		case "SETTINGS_RESTORE":
-			IAP.shared.restore() { success in
-				self.tableView.performBatchUpdates({
-					self.restoreCell.isHidden = true
-				}, completion: nil)
-			}
 		default:
 			print("ERR", "Unknown row action", indexPath)
 		}
