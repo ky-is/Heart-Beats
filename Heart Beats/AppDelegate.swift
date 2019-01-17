@@ -25,7 +25,6 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
 		IAP.shared.start()
 
 		Zephyr.sync(defaults: [ #keyPath(UserDefaults.showGenres): false, #keyPath(UserDefaults.played): [], #keyPath(UserDefaults.favorited): [], #keyPath(UserDefaults.combined): [], #keyPath(UserDefaults.playedGenres): [], #keyPath(UserDefaults.favoritedGenres): [], #keyPath(UserDefaults.combinedGenres): [], #keyPath(UserDefaults.purchased): false, #keyPath(UserDefaults.minimum): 0 ])
-
 		Zephyr.shared.userDefaults.addObserver(self, forKeyPath: #keyPath(UserDefaults.purchased), options: [.new], context: nil)
 
 		handleAuthorization(status: MPMediaLibrary.authorizationStatus())
