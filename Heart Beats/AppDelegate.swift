@@ -20,7 +20,7 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
 
 	var window: UIWindow?
 
-	func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey : Any]? = nil) -> Bool {
+	func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
 		Zephyr.sync(defaults: [ #keyPath(UserDefaults.showGenres): false, #keyPath(UserDefaults.played): [], #keyPath(UserDefaults.favorited): [], #keyPath(UserDefaults.combined): [], #keyPath(UserDefaults.playedGenres): [], #keyPath(UserDefaults.favoritedGenres): [], #keyPath(UserDefaults.combinedGenres): [], #keyPath(UserDefaults.purchased): false, #keyPath(UserDefaults.minimum): 0 ])
 		Zephyr.shared.userDefaults.addObserver(self, forKeyPath: #keyPath(UserDefaults.purchased), options: [.new], context: nil)
 

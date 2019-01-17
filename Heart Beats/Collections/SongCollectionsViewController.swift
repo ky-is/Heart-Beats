@@ -250,7 +250,7 @@ extension SongCollectionsViewController {
 		if sender.title(for: .normal) == "Open Music" {
 			openMusicApp()
 		} else {
-			let url = URL(string: UIApplicationOpenSettingsURLString)!
+			let url = URL(string: UIApplication.openSettingsURLString)!
 			UIApplication.shared.open(url)
 		}
 	}

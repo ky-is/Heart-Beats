@@ -40,12 +40,12 @@ final class SongCollections: NSObject {
 
 	private func setTitle(enabled: Bool) {
 		if let navigationBar = songCollectionsViewController?.navigationController?.navigationBar {
-			let attributes = [ NSAttributedStringKey.foregroundColor: enabled ? UIColor.darkText : UIColor.lightGray ]
+			let attributes = [ NSAttributedString.Key.foregroundColor: enabled ? UIColor.darkText : UIColor.lightGray ]
 			navigationBar.titleTextAttributes = attributes
 			navigationBar.largeTitleTextAttributes = attributes
 
 			let transition = CATransition()
-			transition.type = kCATransitionFade
+			transition.type = .fade
 			transition.duration = 0.15
 			navigationBar.layer.add(transition, forKey: "foregroundColor")
 		}

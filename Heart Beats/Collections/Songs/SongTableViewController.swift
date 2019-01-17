@@ -67,7 +67,7 @@ extension SongTableViewController {
 extension SongTableViewController {
 
 	override var previewActionItems: [UIPreviewActionItem] {
-		let preview = UIPreviewAction(title: "Play", style: UIPreviewActionStyle.default) { (action, controller) in
+		let preview = UIPreviewAction(title: "Play", style: .default) { (action, controller) in
 			self.play()
 		}
 		return [ preview ]
