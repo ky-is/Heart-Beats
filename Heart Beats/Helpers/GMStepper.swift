@@ -23,11 +23,10 @@ import UIKit
 
 			if isInteger && stepValue == 1.0 && !items.isEmpty {
 				label.text = items[Int(value)]
-			}
-			else if showIntegerIfDoubleIsInteger && isInteger {
-				label.text = String(stringInterpolationSegment: Int(value))
+			} else if showIntegerIfDoubleIsInteger && isInteger {
+				label.text = String(Int(value))
 			} else {
-				label.text = String(stringInterpolationSegment: value)
+				label.text = String(value)
 			}
 
 			if oldValue != value {
@@ -194,9 +193,9 @@ import UIKit
 		let label = UILabel()
 		label.textAlignment = .center
 		if self.showIntegerIfDoubleIsInteger && floor(self.value) == self.value {
-			label.text = String(stringInterpolationSegment: Int(self.value))
+			label.text = String(Int(self.value))
 		} else {
-			label.text = String(stringInterpolationSegment: self.value)
+			label.text = String(self.value)
 		}
 		label.textColor = self.labelTextColor
 		label.backgroundColor = self.labelBackgroundColor
@@ -248,8 +247,7 @@ import UIKit
 				if value >= items.count {
 					value = items.count - 1
 					self.value = Double(value)
-				}
-				else {
+				} else {
 					label.text = items[value]
 				}
 			}

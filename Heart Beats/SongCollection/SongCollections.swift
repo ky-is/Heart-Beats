@@ -99,7 +99,7 @@ final class SongCollections: NSObject {
 					}
 
 					for combining in combined {
-						if let index = combining.index(of: name), index > 0 {
+						if let index = combining.firstIndex(of: name), index > 0 {
 							name = combining[0]
 							checkName = name.lowercased()
 							break
