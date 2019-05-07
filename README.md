@@ -1,5 +1,5 @@
 # Heart Beats
 
-5-star playlists from your favorite artists at a tap.
+iOS app that creates 5-star playlists from the artists and genres in your music library at a tap.
 
-![App screenshot](https://user-images.githubusercontent.com/25833388/43172169-d46f6b7e-8f62-11e8-9f7c-b51390dae295.png)
+![App screenshot](https://user-images.githubusercontent.com/25833388/57262355-8ab6a200-7020-11e9-9ee6-50ef65d27da8.png)
