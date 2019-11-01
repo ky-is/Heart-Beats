@@ -105,17 +105,10 @@ final class SongCollections: NSObject {
 							break
 						}
 					}
-					var songs = [MPMediaItem]()
-					for item in collection.items {
-						guard item.rating >= 5 else {
-							continue
-						}
-						songs.append(item)
-					}
+					let songs = collection.items.filter { $0.rating >= 5 }
 					if songs.count > maxCount {
 						maxCount = songs.count
 					}
-
 					if collectionsByName[checkName] != nil {
 						collectionsByName[checkName]!.2.append(contentsOf: songs)
 					} else {
@@ -132,9 +125,9 @@ final class SongCollections: NSObject {
 				cutoff = max(5, maxCount / 3)
 			}
 			let collectionsArray = collectionsByName.values
-				.filter({ $0.2.count >= cutoff || favorited.contains($0.0) })
-				.sorted(by: { $0.0.forSorting() < $1.0.forSorting() })
-				.map({ SongCollection(name: $0.0, songs: MPMediaItemCollection(items: $0.2), songCount: $0.2.count, artwork: $0.1.artwork) })
+				.filter { $0.2.count >= cutoff || favorited.contains($0.0) }
+				.sorted { $0.0.forSorting() < $1.0.forSorting() }
+				.map { SongCollection(name: $0.0, songs: MPMediaItemCollection(items: $0.2), songCount: $0.2.count, artwork: $0.1.artwork) }
 			DispatchQueue.main.async {
 				guard !(blockOperation?.isCancelled ?? true) else {
 					return
