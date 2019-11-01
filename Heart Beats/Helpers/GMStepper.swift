@@ -326,18 +326,6 @@ import UIKit
 		NotificationCenter.default.removeObserver(self)
 	}
 
-	/// Useful closure for logging the timer interval. You can call this in the timer handler to test the autorepeat option. Not used in the current implementation.
-	//    lazy var printTimerGaps: () -> () = {
-	//        var prevTime: CFAbsoluteTime?
-	//
-	//        return { _ in
-	//            var now = CFAbsoluteTimeGetCurrent()
-	//            if let prevTime = prevTime {
-	//                print(now - prevTime)
-	//            }
-	//            prevTime = now
-	//        }
-	//    }()
 }
 
 // MARK: Pan Gesture

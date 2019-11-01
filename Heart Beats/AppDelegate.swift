@@ -1,11 +1,3 @@
-//
-//  AppDelegate.swift
-//  Heart Beats
-//
-//  Created by Kyle Coburn on 13/7/18.
-//  Copyright © 2018 Kyle Coburn. All rights reserved.
-//
-
 import UIKit
 
 import MediaPlayer
