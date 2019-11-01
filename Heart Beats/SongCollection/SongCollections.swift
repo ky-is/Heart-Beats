@@ -32,7 +32,7 @@ final class SongCollections: NSObject {
 
 	private func setTitle(enabled: Bool) {
 		if let navigationBar = songCollectionsViewController?.navigationController?.navigationBar {
-			let attributes = [ NSAttributedString.Key.foregroundColor: enabled ? UIColor.darkText : UIColor.lightGray ]
+			let attributes = !enabled ? [ NSAttributedString.Key.foregroundColor: UIColor.placeholderText ] : nil
 			navigationBar.titleTextAttributes = attributes
 			navigationBar.largeTitleTextAttributes = attributes
 

@@ -9,9 +9,6 @@ import UIKit
 		circleLayer.backgroundColor = tintColor.cgColor
 		circleLayer.opacity = 0.75
 		layer.addSublayer(circleLayer)
-
-//		titleLabel?.textColor = .white
-//		tintColor = .white
 	}
 
 	override func prepareForInterfaceBuilder() {

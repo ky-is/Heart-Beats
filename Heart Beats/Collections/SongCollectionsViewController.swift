@@ -52,7 +52,7 @@ final class SongCollectionsViewController: UIViewController {
 
 		let bottomInset = view.safeAreaInsets.bottom + tabBar.bounds.height
 		tableView.contentInset.bottom = bottomInset
-		tableView.scrollIndicatorInsets.bottom = bottomInset
+		tableView.verticalScrollIndicatorInsets.bottom = bottomInset
 
 //		tabBar.itemSpacing = 48
 //		tabBar.itemWidth = 128
@@ -188,7 +188,7 @@ final class SongCollectionsViewController: UIViewController {
 			let player = MPMusicPlayerController.systemMusicPlayer
 			player.setQueue(with: songCollection.songs!)
 			player.shuffleMode = MPMusicShuffleMode.songs
-			player.prepareToPlay()
+			player.play()
 
 			DispatchQueue.main.async {
 				self.openMusicApp() { success in

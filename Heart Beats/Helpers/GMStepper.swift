@@ -73,7 +73,7 @@ import UIKit
 	}
 
 	/// Background color of the buttons. Defaults to dark blue.
-	@objc @IBInspectable public var buttonsBackgroundColor: UIColor = UIColor(red:0.21, green:0.5, blue:0.74, alpha:1) {
+	@objc @IBInspectable public var buttonsBackgroundColor = UIColor(red:0.21, green:0.5, blue:0.74, alpha:1) {
 		didSet {
 			for button in [leftButton, rightButton] {
 				button.backgroundColor = buttonsBackgroundColor
@@ -91,15 +91,15 @@ import UIKit
 		}
 	}
 
-	/// Text color of the middle label. Defaults to white.
-	@objc @IBInspectable public var labelTextColor: UIColor = UIColor.white {
-		didSet {
-			label.textColor = labelTextColor
-		}
-	}
+	/// Text color of the middle label.
+//	@objc @IBInspectable public var labelTextColor = UIColor.label {
+//		didSet {
+//			label.textColor = labelTextColor
+//		}
+//	}
 
 	/// Text color of the middle label. Defaults to lighter blue.
-	@objc @IBInspectable public var labelBackgroundColor: UIColor = UIColor(red:0.26, green:0.6, blue:0.87, alpha:1) {
+	@objc @IBInspectable public var labelBackgroundColor = UIColor(red:0.26, green:0.6, blue:0.87, alpha:1) {
 		didSet {
 			label.backgroundColor = labelBackgroundColor
 		}
@@ -136,7 +136,7 @@ import UIKit
 	}
 
 	/// Color of the border of the stepper and middle label's layer. Defaults to clear color.
-	@objc @IBInspectable public var borderColor: UIColor = UIColor.clear {
+	@objc @IBInspectable public var borderColor = UIColor.clear {
 		didSet {
 			layer.borderColor = borderColor.cgColor
 			label.layer.borderColor = borderColor.cgColor
@@ -152,7 +152,7 @@ import UIKit
 	}
 
 	/// Color of the flashing animation on the buttons in case the value hit the limit.
-	@objc @IBInspectable public var limitHitAnimationColor: UIColor = UIColor(red:0.26, green:0.6, blue:0.87, alpha:1)
+	@objc @IBInspectable public var limitHitAnimationColor = UIColor(red:0.26, green:0.6, blue:0.87, alpha:1)
 
 	/**
 	Width of the sliding animation. When buttons clicked, the middle label does a slide animation towards to the clicked button. Defaults to 5.
@@ -197,11 +197,11 @@ import UIKit
 		} else {
 			label.text = String(self.value)
 		}
-		label.textColor = self.labelTextColor
+//		label.textColor = self.labelTextColor
 		label.backgroundColor = self.labelBackgroundColor
 		label.font = self.labelFont
-		label.layer.cornerRadius = self.labelCornerRadius
-		label.layer.masksToBounds = true
+//		label.layer.cornerRadius = self.labelCornerRadius
+//		label.layer.masksToBounds = true
 		label.isUserInteractionEnabled = true
 		let panRecognizer = UIPanGestureRecognizer(target: self, action: #selector(GMStepper.handlePan))
 		panRecognizer.maximumNumberOfTouches = 1
