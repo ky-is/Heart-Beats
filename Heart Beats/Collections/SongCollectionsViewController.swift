@@ -357,8 +357,9 @@ extension SongCollectionsViewController: UITableViewDataSource {
 				let blurEffect = UIBlurEffect(style: .regular)
 				let blurredEffectView = UIVisualEffectView(effect: blurEffect)
 				blurredEffectView.frame = cell.iconImageView.frame
-				blurredEffectView.frame.origin.x = UIDevice.current.userInterfaceIdiom == .pad ? 15 : 20
-				blurredEffectView.layer.cornerRadius = 4
+				blurredEffectView.frame.origin.x = UIDevice.current.userInterfaceIdiom == .pad ? 15 : 15
+				blurredEffectView.frame.origin.y += 0.25
+				blurredEffectView.layer.cornerRadius = CORNER_RADIUS
 				blurredEffectView.clipsToBounds = true
 
 				let vibrantEffect = UIVibrancyEffect(blurEffect: UIBlurEffect(style: .prominent))

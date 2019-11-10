@@ -32,7 +32,7 @@ final class SongCollections: NSObject {
 
 	private func setTitle(enabled: Bool) {
 		if let navigationBar = songCollectionsViewController?.navigationController?.navigationBar {
-			let attributes = !enabled ? [ NSAttributedString.Key.foregroundColor: UIColor.placeholderText ] : nil
+			let attributes = !SCREENSHOT_MODE && !enabled ? [ NSAttributedString.Key.foregroundColor: UIColor.placeholderText ] : nil
 			navigationBar.titleTextAttributes = attributes
 			navigationBar.largeTitleTextAttributes = attributes
 
@@ -124,7 +124,32 @@ final class SongCollections: NSObject {
 				guard !(blockOperation?.isCancelled ?? true) else {
 					return
 				}
+#if targetEnvironment(simulator)
+				if SCREENSHOT_MODE {
+					let samples = [
+						SongCollection(name: "Beach House", songs: nil, songCount: 50, artwork: nil),
+						SongCollection(name: "CHVRCHΞS", songs: nil, songCount: 23, artwork: nil),
+						SongCollection(name: "indigo la End", songs: nil, songCount: 37, artwork: nil),
+						SongCollection(name: "Lost Frequencies", songs: nil, songCount: 23, artwork: nil),
+						SongCollection(name: "The National", songs: nil, songCount: 61, artwork: nil),
+						SongCollection(name: "Sigur Rós", songs: nil, songCount: 30, artwork: nil),
+						SongCollection(name: "Stromae", songs: nil, songCount: 15, artwork: nil),
+						SongCollection(name: "The Album Leaf", songs: nil, songCount: 20, artwork: nil),
+						SongCollection(name: "Band of Horses", songs: nil, songCount: 20, artwork: nil),
+						SongCollection(name: "Belle & Sebastian", songs: nil, songCount: 51, artwork: nil),
+						SongCollection(name: "Bob Marley & The Wailers", songs: nil, songCount: 33, artwork: nil),
+						SongCollection(name: "Camera Obscura", songs: nil, songCount: 26, artwork: nil),
+						SongCollection(name: "Counting Crows", songs: nil, songCount: 22, artwork: nil),
+						SongCollection(name: "Death Cab for Cutie", songs: nil, songCount: 39, artwork: nil),
+						SongCollection(name: "The Decemberists", songs: nil, songCount: 52, artwork: nil),
+					]
+					songCollectionsViewController?.setCollections(samples, 3, 3)
+				} else {
+					songCollectionsViewController?.setCollections(collectionsArray, maxCount, cutoff)
+				}
+#else
 				songCollectionsViewController?.setCollections(collectionsArray, maxCount, cutoff)
+#endif
 				self.setTitle(enabled: true)
 			}
 			let cache = collectionsArray.map { [ $0.name, $0.songCount ] }

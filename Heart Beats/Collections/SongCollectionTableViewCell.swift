@@ -7,7 +7,7 @@ final class SongCollectionTableViewCell: UITableViewCell {
 	@IBOutlet weak var countLabel: UILabel!
 
 	override func awakeFromNib() {
-		iconImageView.layer.cornerRadius = 4
+		iconImageView.layer.cornerRadius = CORNER_RADIUS
 		iconImageView.clipsToBounds = true
 	}
 

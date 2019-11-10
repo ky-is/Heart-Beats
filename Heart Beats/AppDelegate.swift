@@ -5,6 +5,8 @@ import MediaPlayer
 let SCREENSHOT_MODE = false
 let SCREENSHOT_OBSCURED = true
 
+let CORNER_RADIUS: CGFloat = 4
+
 var songCollectionsViewController: SongCollectionsViewController?
 
 @UIApplicationMain

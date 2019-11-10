@@ -24,7 +24,7 @@ import UIKit
 			if isInteger && stepValue == 1.0 && !items.isEmpty {
 				label.text = items[Int(value)]
 			} else if showIntegerIfDoubleIsInteger && isInteger {
-				label.text = String(Int(value))
+				label.text = SCREENSHOT_MODE ? "20" : String(Int(value))
 			} else {
 				label.text = String(value)
 			}
@@ -120,7 +120,7 @@ import UIKit
 	}
 
 	/// Corner radius of the stepper's layer. Defaults to 4.0.
-	@objc @IBInspectable public var cornerRadius: CGFloat = 4.0 {
+	@objc @IBInspectable public var cornerRadius: CGFloat = CORNER_RADIUS {
 		didSet {
 			layer.cornerRadius = cornerRadius
 			clipsToBounds = true
