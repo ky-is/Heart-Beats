@@ -150,7 +150,7 @@ final class MediaCollection {
 			.map { MediaEntry(id: $0.0, songs: MPMediaItemCollection(items: $0.2), songCount: $0.2.count, artwork: $0.1.artwork) }
 		Task { @MainActor in
 			withAnimation {
-				if SyncStorage.shared.showGenres == showGenres && exceedsMostNumberOfSongs {
+				if SyncStorage.shared.showGenres == showGenres && exceedsMostNumberOfSongs && allowedMinimumNumberOfSongs > 0 {
 					SyncStorage.shared.minimum = allowedMinimumNumberOfSongs
 				}
 				self.maximumSongsLimit = mostSongsLimit
