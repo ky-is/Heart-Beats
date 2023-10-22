@@ -35,9 +35,9 @@ struct MediaListRow: View {
 				if let image = entry.artwork?.image(at: CGSize(width: imageWidth, height: imageWidth)) {
 					Image(uiImage: image)
 						.resizable()
-#if DEBUG
-						.blur(radius: SCREENSHOT_MODE ? 10 : 0) //SAMPLE
-#endif
+//#if DEBUG
+//						.blur(radius: SCREENSHOT_MODE ? 10 : 0) //SAMPLE
+//#endif
 				} else {
 					Rectangle()
 						.foregroundStyle(.tertiary)

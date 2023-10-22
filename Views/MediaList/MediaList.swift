@@ -11,6 +11,8 @@ struct MediaList: View {
 	private let imageWidth = 128
 
 	private func play(entry: MediaEntry) {
+		guard let songs = entry.songs else { return }
+
 		Task { @MainActor in
 			let entryName = entry.id
 			let played = SyncStorage.shared.currentPlayed
@@ -34,7 +36,7 @@ struct MediaList: View {
 
 		Task {
 			let player = MPMusicPlayerController.systemMusicPlayer
-			player.setQueue(with: entry.songs!)
+			player.setQueue(with: songs)
 			player.shuffleMode = .songs
 			player.play()
 			await openMusicApp()
@@ -66,6 +68,25 @@ struct MediaList: View {
 		return favoriteEntries.isEmpty ? [nonfavoriteEntries] : [favoriteEntries, nonfavoriteEntries]
 	}
 
+	private func showHeaders(allEntriesGroups: [[MediaEntry]]) -> Bool {
+#if DEBUG
+		if SCREENSHOT_MODE {
+			return false
+		}
+#endif
+		return allEntriesGroups.count > 1
+	}
+
+	private var navigationTitle: String {
+		var count = collection.entries.count
+#if DEBUG
+		if SCREENSHOT_MODE {
+			count = 42
+		}
+#endif
+		return collection.groupBy.capitalized.pluralize(count)
+	}
+
 	var body: some View {
 		let activeSelection = Binding {
 			selection
@@ -77,43 +98,13 @@ struct MediaList: View {
 				play(entry: newValue)
 			}
 		}
-		let allEntriesGroups = groupedEntries
 //		let allEntriesGroups: [[MediaEntry]] = [[]] //SAMPLE
-		let showHeaders = allEntriesGroups.count > 1
+		let allEntriesGroups = groupedEntries
 		let hasEntries = !allEntriesGroups[0].isEmpty
+		let showHeaders = showHeaders(allEntriesGroups: allEntriesGroups)
 		Group {
 			if !hasEntries {
-				if (collection.groupBy == "genre" ? SyncStorage.shared.cachedGenres : SyncStorage.shared.cachedArtists) == nil {
-					List {
-						ForEach(MediaCollection.screenshotData) {
-							MediaListRow(entry: $0, imageWidth: imageWidth, inFavorites: false, play: play)
-						}
-					}
-						.listStyle(.plain)
-						.redacted(reason: .placeholder)
-						.navigationTitle("… \(collection.groupBy.capitalized)s")
-				} else {
-					List {
-						Section {} footer: {
-							Text("No 5-star songs found in your library…")
-								.font(.title)
-								.multilineTextAlignment(.center)
-								.padding(.top)
-								.padding(.horizontal)
-						}
-
-						Section("Step 1: Ensure star ratings are enabled") {
-							Link(destination: URL(string: "App-prefs:MUSIC")!) {
-								Label("Settings > Music >\nEnable \"Show Star Ratings\"", systemImage: "gear.circle.fill")
-							}
-						}
-						Section("Step 2: Rate songs in Music app") {
-							Link(destination: URL(string: "audio-player-event:")!) {
-								Label("Open Music App to rate", systemImage: "music.note.house.fill")
-							}
-						}
-					}
-				}
+				EmptyMediaList(collection: collection, imageWidth: imageWidth)
 			} else {
 				List(selection: activeSelection) {
 					ForEach(allEntriesGroups, id: \.self) { groupEntries in
@@ -134,7 +125,7 @@ struct MediaList: View {
 					.listStyle(.plain)
 			}
 		}
-			.navigationTitle(collection.groupBy.capitalized.pluralize(collection.entries.count))
+			.navigationTitle(navigationTitle)
 			.onChange(of: scenePhase) { _, newPhase in
 				if newPhase == .active {
 					withAnimation {

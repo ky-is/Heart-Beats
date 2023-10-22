@@ -20,14 +20,16 @@ extension UserDefaults {
 	@objc dynamic var played: [String] {
 		array(forKey: StorageKey.played) as? [String] ?? []
 	}
-	@objc dynamic var favorited: [String] {
-		array(forKey: StorageKey.favorited) as? [String] ?? []
-	}
-	@objc dynamic var combined: [[String]] {
-		array(forKey: StorageKey.combined) as? [[String]] ?? []
-	}
 	@objc dynamic var playedGenres: [String] {
 		array(forKey: StorageKey.playedGenres) as? [String] ?? []
+	}
+	@objc dynamic var favorited: [String] {
+#if DEBUG
+		if SCREENSHOT_MODE {
+			return ["Beach House", "Frédéric Chopin", "indigo la End", "Lost Frequencies", "Polo & Pan", "Stromae", "Toe"]
+		}
+#endif
+		return array(forKey: StorageKey.favorited) as? [String] ?? []
 	}
 	@objc dynamic var favoritedGenres: [String] {
 #if DEBUG
@@ -36,6 +38,9 @@ extension UserDefaults {
 		}
 #endif
 		return array(forKey: StorageKey.favoritedGenres) as? [String] ?? []
+	}
+	@objc dynamic var combined: [[String]] {
+		array(forKey: StorageKey.combined) as? [[String]] ?? []
 	}
 	@objc dynamic var combinedGenres: [[String]] {
 		array(forKey: StorageKey.combinedGenres) as? [[String]] ?? []

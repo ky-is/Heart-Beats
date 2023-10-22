@@ -3,7 +3,7 @@ import UIKit
 import MediaPlayer
 
 #if DEBUG
-let SCREENSHOT_MODE = false
+let SCREENSHOT_MODE = false //SAMPLE
 #endif
 
 @main

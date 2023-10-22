@@ -18,6 +18,7 @@
 		244765932AE4FE5000467DE2 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 244765922AE4FE5000467DE2 /* SettingsView.swift */; };
 		244765952AE5021000467DE2 /* CombineGroupings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 244765942AE5021000467DE2 /* CombineGroupings.swift */; };
 		244765982AE50DCA00467DE2 /* CreateCombineGrouping.swift in Sources */ = {isa = PBXBuildFile; fileRef = 244765972AE50DCA00467DE2 /* CreateCombineGrouping.swift */; };
+		246ECD782AE5C91E00E90334 /* EmptyMediaList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 246ECD772AE5C91E00E90334 /* EmptyMediaList.swift */; };
 		249BF6A92AE3683C00A3E2F1 /* HeartBeatsApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 249BF6A82AE3683C00A3E2F1 /* HeartBeatsApp.swift */; };
 		249BF6AB2AE3683C00A3E2F1 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 249BF6AA2AE3683C00A3E2F1 /* ContentView.swift */; };
 		249BF6AD2AE3683D00A3E2F1 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 249BF6AC2AE3683D00A3E2F1 /* Assets.xcassets */; };
@@ -37,6 +38,7 @@
 		244765942AE5021000467DE2 /* CombineGroupings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CombineGroupings.swift; sourceTree = "<group>"; };
 		244765972AE50DCA00467DE2 /* CreateCombineGrouping.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateCombineGrouping.swift; sourceTree = "<group>"; };
 		246ECD762AE5B6DB00E90334 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		246ECD772AE5C91E00E90334 /* EmptyMediaList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyMediaList.swift; sourceTree = "<group>"; };
 		249BF6A52AE3683C00A3E2F1 /* Heart Beats.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Heart Beats.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		249BF6A82AE3683C00A3E2F1 /* HeartBeatsApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeartBeatsApp.swift; sourceTree = "<group>"; };
 		249BF6AA2AE3683C00A3E2F1 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -60,6 +62,7 @@
 			isa = PBXGroup;
 			children = (
 				2434953E2AE48A920038D8D4 /* MediaList.swift */,
+				246ECD772AE5C91E00E90334 /* EmptyMediaList.swift */,
 				2425D5CC2AE5B1BD00379D68 /* MediaListRow.swift */,
 			);
 			path = MediaList;
@@ -226,6 +229,7 @@
 				2434953A2AE47FF20038D8D4 /* Foundation+Extensions.swift in Sources */,
 				2434953F2AE48A920038D8D4 /* MediaList.swift in Sources */,
 				249BF6A92AE3683C00A3E2F1 /* HeartBeatsApp.swift in Sources */,
+				246ECD782AE5C91E00E90334 /* EmptyMediaList.swift in Sources */,
 				2426FF172AE4BDC1007F425C /* SyncStorage.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

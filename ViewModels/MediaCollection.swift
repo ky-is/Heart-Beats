@@ -37,17 +37,20 @@ final class MediaCollection {
 
 	static var screenshotData: [MediaEntry] {
 		return [
+			MediaEntry(id: "The Album Leaf", songs: nil, songCount: 20, artwork: nil),
 			MediaEntry(id: "Beach House", songs: nil, songCount: 50, artwork: nil),
+			MediaEntry(id: "Belle & Sebastian", songs: nil, songCount: 51, artwork: nil),
+			MediaEntry(id: "Bob Marley & The Wailers", songs: nil, songCount: 33, artwork: nil),
 			MediaEntry(id: "CHVRCHΞS", songs: nil, songCount: 23, artwork: nil),
+			MediaEntry(id: "The Decemberists", songs: nil, songCount: 52, artwork: nil),
+			MediaEntry(id: "Frédéric Chopin", songs: nil, songCount: 22, artwork: nil),
 			MediaEntry(id: "indigo la End", songs: nil, songCount: 37, artwork: nil),
 			MediaEntry(id: "Lost Frequencies", songs: nil, songCount: 23, artwork: nil),
 			MediaEntry(id: "The National", songs: nil, songCount: 61, artwork: nil),
+			MediaEntry(id: "Polo & Pan", songs: nil, songCount: 16, artwork: nil),
 			MediaEntry(id: "Sigur Rós", songs: nil, songCount: 30, artwork: nil),
 			MediaEntry(id: "Stromae", songs: nil, songCount: 15, artwork: nil),
-			MediaEntry(id: "The Album Leaf", songs: nil, songCount: 20, artwork: nil),
-			MediaEntry(id: "Belle & Sebastian", songs: nil, songCount: 51, artwork: nil),
-			MediaEntry(id: "Bob Marley & The Wailers", songs: nil, songCount: 33, artwork: nil),
-			MediaEntry(id: "The Decemberists", songs: nil, songCount: 52, artwork: nil),
+			MediaEntry(id: "Toe", songs: nil, songCount: 34, artwork: nil),
 		]
 	}
 
