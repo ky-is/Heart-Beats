@@ -3,59 +3,49 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 52;
+	objectVersion = 56;
 	objects = {
 
 /* Begin PBXBuildFile section */
-		242A0074210330230072B26B /* SongTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 242A0073210330230072B26B /* SongTableViewController.swift */; };
-		242A0076210330A90072B26B /* SongTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 242A0075210330A90072B26B /* SongTableViewCell.swift */; };
-		242A007821039CA20072B26B /* SettingsTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 242A007721039CA20072B26B /* SettingsTableViewController.swift */; };
-		242A007A2103AE810072B26B /* CombineTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 242A00792103AE810072B26B /* CombineTableViewController.swift */; };
-		242A007C2103B37B0072B26B /* AddCombineTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 242A007B2103B37B0072B26B /* AddCombineTableViewController.swift */; };
-		242A00802103BFBB0072B26B /* SongCollections.swift in Sources */ = {isa = PBXBuildFile; fileRef = 242A007F2103BFBB0072B26B /* SongCollections.swift */; };
-		242A008E2103CF780072B26B /* GMStepper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 242A008D2103CF780072B26B /* GMStepper.swift */; };
-		24649C7220F92ED300822FAC /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24649C7120F92ED300822FAC /* AppDelegate.swift */; };
-		24649C7720F92ED300822FAC /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 24649C7520F92ED300822FAC /* Main.storyboard */; };
-		24649C7920F92ED600822FAC /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 24649C7820F92ED600822FAC /* Assets.xcassets */; };
-		24649C7C20F92ED600822FAC /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 24649C7A20F92ED600822FAC /* LaunchScreen.storyboard */; };
-		24932EFA2106E15D00DC3EE5 /* SongCollection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24932EF92106E15D00DC3EE5 /* SongCollection.swift */; };
-		24A5472A210B91C0000BDEAD /* CircleButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24A54729210B91C0000BDEAD /* CircleButton.swift */; };
-		24A5472D210BFAED000BDEAD /* StepperViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24A5472C210BFAED000BDEAD /* StepperViewController.swift */; };
-		24BF29CB2101B6AD00CD67B5 /* SongCollectionsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24BF29CA2101B6AD00CD67B5 /* SongCollectionsViewController.swift */; };
-		24BF29CD2101B7B000CD67B5 /* SongCollectionTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24BF29CC2101B7B000CD67B5 /* SongCollectionTableViewCell.swift */; };
-		24BF29CF2101BFAB00CD67B5 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24BF29CE2101BFAB00CD67B5 /* Extensions.swift */; };
-		24D2A27E2102D84700C95E79 /* Zephyr.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24D2A27D2102D84700C95E79 /* Zephyr.swift */; };
-		24D2A2802102F55D00C95E79 /* HeaderTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24D2A27F2102F55D00C95E79 /* HeaderTableViewCell.swift */; };
+		2425D5CD2AE5B1BD00379D68 /* MediaListRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2425D5CC2AE5B1BD00379D68 /* MediaListRow.swift */; };
+		2426FF152AE4BC33007F425C /* MinimumSongs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2426FF142AE4BC33007F425C /* MinimumSongs.swift */; };
+		2426FF172AE4BDC1007F425C /* SyncStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2426FF162AE4BDC1007F425C /* SyncStorage.swift */; };
+		2434953A2AE47FF20038D8D4 /* Foundation+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 243495382AE47FF20038D8D4 /* Foundation+Extensions.swift */; };
+		2434953D2AE480040038D8D4 /* MediaCollection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2434953C2AE480040038D8D4 /* MediaCollection.swift */; };
+		2434953F2AE48A920038D8D4 /* MediaList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2434953E2AE48A920038D8D4 /* MediaList.swift */; };
+		243495412AE493890038D8D4 /* Color+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 243495402AE493890038D8D4 /* Color+Extensions.swift */; };
+		243495432AE493A90038D8D4 /* UIKit+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 243495422AE493A90038D8D4 /* UIKit+Extensions.swift */; };
+		244765932AE4FE5000467DE2 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 244765922AE4FE5000467DE2 /* SettingsView.swift */; };
+		244765952AE5021000467DE2 /* CombineGroupings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 244765942AE5021000467DE2 /* CombineGroupings.swift */; };
+		244765982AE50DCA00467DE2 /* CreateCombineGrouping.swift in Sources */ = {isa = PBXBuildFile; fileRef = 244765972AE50DCA00467DE2 /* CreateCombineGrouping.swift */; };
+		249BF6A92AE3683C00A3E2F1 /* HeartBeatsApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 249BF6A82AE3683C00A3E2F1 /* HeartBeatsApp.swift */; };
+		249BF6AB2AE3683C00A3E2F1 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 249BF6AA2AE3683C00A3E2F1 /* ContentView.swift */; };
+		249BF6AD2AE3683D00A3E2F1 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 249BF6AC2AE3683D00A3E2F1 /* Assets.xcassets */; };
+		249BF6B12AE3683D00A3E2F1 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 249BF6B02AE3683D00A3E2F1 /* Preview Assets.xcassets */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		242A0073210330230072B26B /* SongTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SongTableViewController.swift; sourceTree = "<group>"; };
-		242A0075210330A90072B26B /* SongTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SongTableViewCell.swift; sourceTree = "<group>"; };
-		242A007721039CA20072B26B /* SettingsTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsTableViewController.swift; sourceTree = "<group>"; };
-		242A00792103AE810072B26B /* CombineTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CombineTableViewController.swift; sourceTree = "<group>"; };
-		242A007B2103B37B0072B26B /* AddCombineTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddCombineTableViewController.swift; sourceTree = "<group>"; };
-		242A007F2103BFBB0072B26B /* SongCollections.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SongCollections.swift; sourceTree = "<group>"; };
-		242A008D2103CF780072B26B /* GMStepper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GMStepper.swift; sourceTree = "<group>"; };
-		24649C6E20F92ED300822FAC /* Heart Beats.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Heart Beats.app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		24649C7120F92ED300822FAC /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		24649C7620F92ED300822FAC /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
-		24649C7820F92ED600822FAC /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		24649C7B20F92ED600822FAC /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
-		24649C7D20F92ED600822FAC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		24932EF92106E15D00DC3EE5 /* SongCollection.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SongCollection.swift; sourceTree = "<group>"; };
-		24A54729210B91C0000BDEAD /* CircleButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CircleButton.swift; sourceTree = "<group>"; };
-		24A5472C210BFAED000BDEAD /* StepperViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StepperViewController.swift; sourceTree = "<group>"; };
-		24BF29CA2101B6AD00CD67B5 /* SongCollectionsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SongCollectionsViewController.swift; sourceTree = "<group>"; };
-		24BF29CC2101B7B000CD67B5 /* SongCollectionTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SongCollectionTableViewCell.swift; sourceTree = "<group>"; };
-		24BF29CE2101BFAB00CD67B5 /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
-		24D2A27D2102D84700C95E79 /* Zephyr.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Zephyr.swift; sourceTree = "<group>"; };
-		24D2A27F2102F55D00C95E79 /* HeaderTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeaderTableViewCell.swift; sourceTree = "<group>"; };
-		24D2A28321030B4B00C95E79 /* Heart Beats.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "Heart Beats.entitlements"; sourceTree = "<group>"; };
-		24D2A28521030BB400C95E79 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
+		2425D5CC2AE5B1BD00379D68 /* MediaListRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaListRow.swift; sourceTree = "<group>"; };
+		2426FF142AE4BC33007F425C /* MinimumSongs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MinimumSongs.swift; sourceTree = "<group>"; };
+		2426FF162AE4BDC1007F425C /* SyncStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncStorage.swift; sourceTree = "<group>"; };
+		243495382AE47FF20038D8D4 /* Foundation+Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Foundation+Extensions.swift"; sourceTree = "<group>"; };
+		2434953C2AE480040038D8D4 /* MediaCollection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaCollection.swift; sourceTree = "<group>"; };
+		2434953E2AE48A920038D8D4 /* MediaList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaList.swift; sourceTree = "<group>"; };
+		243495402AE493890038D8D4 /* Color+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+Extensions.swift"; sourceTree = "<group>"; };
+		243495422AE493A90038D8D4 /* UIKit+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIKit+Extensions.swift"; sourceTree = "<group>"; };
+		244765922AE4FE5000467DE2 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		244765942AE5021000467DE2 /* CombineGroupings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CombineGroupings.swift; sourceTree = "<group>"; };
+		244765972AE50DCA00467DE2 /* CreateCombineGrouping.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateCombineGrouping.swift; sourceTree = "<group>"; };
+		249BF6A52AE3683C00A3E2F1 /* Heart Beats.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Heart Beats.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		249BF6A82AE3683C00A3E2F1 /* HeartBeatsApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeartBeatsApp.swift; sourceTree = "<group>"; };
+		249BF6AA2AE3683C00A3E2F1 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		249BF6AC2AE3683D00A3E2F1 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		249BF6AE2AE3683D00A3E2F1 /* HeartBeats.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = HeartBeats.entitlements; sourceTree = "<group>"; };
+		249BF6B02AE3683D00A3E2F1 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		24649C6B20F92ED300822FAC /* Frameworks */ = {
+		249BF6A22AE3683C00A3E2F1 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -65,236 +55,190 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		242A00812103CC960072B26B /* Collections */ = {
+		2425D5CE2AE5B29700379D68 /* MediaList */ = {
 			isa = PBXGroup;
 			children = (
-				24BF29CA2101B6AD00CD67B5 /* SongCollectionsViewController.swift */,
-				24BF29CC2101B7B000CD67B5 /* SongCollectionTableViewCell.swift */,
-				24D2A27F2102F55D00C95E79 /* HeaderTableViewCell.swift */,
-				24A5472C210BFAED000BDEAD /* StepperViewController.swift */,
-				242A00852103CCE20072B26B /* Songs */,
+				2434953E2AE48A920038D8D4 /* MediaList.swift */,
+				2425D5CC2AE5B1BD00379D68 /* MediaListRow.swift */,
 			);
-			path = Collections;
+			path = MediaList;
 			sourceTree = "<group>";
 		};
-		242A00822103CCA30072B26B /* Settings */ = {
+		2426FF122AE4AFF4007F425C /* ViewModels */ = {
 			isa = PBXGroup;
 			children = (
-				242A007721039CA20072B26B /* SettingsTableViewController.swift */,
-				242A00842103CCD90072B26B /* Combine */,
+				2434953C2AE480040038D8D4 /* MediaCollection.swift */,
+				2426FF162AE4BDC1007F425C /* SyncStorage.swift */,
+			);
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
+		243495372AE47FE60038D8D4 /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				243495382AE47FF20038D8D4 /* Foundation+Extensions.swift */,
+				243495402AE493890038D8D4 /* Color+Extensions.swift */,
+				243495422AE493A90038D8D4 /* UIKit+Extensions.swift */,
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
+		244765962AE50DB500467DE2 /* Settings */ = {
+			isa = PBXGroup;
+			children = (
+				244765922AE4FE5000467DE2 /* SettingsView.swift */,
+				244765942AE5021000467DE2 /* CombineGroupings.swift */,
+				244765972AE50DCA00467DE2 /* CreateCombineGrouping.swift */,
 			);
 			path = Settings;
 			sourceTree = "<group>";
 		};
-		242A00832103CCAE0072B26B /* Helpers */ = {
+		249BF69C2AE3683C00A3E2F1 = {
 			isa = PBXGroup;
 			children = (
-				24A54729210B91C0000BDEAD /* CircleButton.swift */,
-				24BF29CE2101BFAB00CD67B5 /* Extensions.swift */,
-				24D2A27D2102D84700C95E79 /* Zephyr.swift */,
-				242A008D2103CF780072B26B /* GMStepper.swift */,
-			);
-			path = Helpers;
-			sourceTree = "<group>";
-		};
-		242A00842103CCD90072B26B /* Combine */ = {
-			isa = PBXGroup;
-			children = (
-				242A00792103AE810072B26B /* CombineTableViewController.swift */,
-				242A007B2103B37B0072B26B /* AddCombineTableViewController.swift */,
-			);
-			path = Combine;
-			sourceTree = "<group>";
-		};
-		242A00852103CCE20072B26B /* Songs */ = {
-			isa = PBXGroup;
-			children = (
-				242A0073210330230072B26B /* SongTableViewController.swift */,
-				242A0075210330A90072B26B /* SongTableViewCell.swift */,
-			);
-			path = Songs;
-			sourceTree = "<group>";
-		};
-		24649C6520F92ED300822FAC = {
-			isa = PBXGroup;
-			children = (
-				24649C7020F92ED300822FAC /* Heart Beats */,
-				24649C6F20F92ED300822FAC /* Products */,
-				24D2A28421030BB400C95E79 /* Frameworks */,
+				249BF6A72AE3683C00A3E2F1 /* Views */,
+				2426FF122AE4AFF4007F425C /* ViewModels */,
+				243495372AE47FE60038D8D4 /* Extensions */,
+				24DBAA652AE4D7DC009965C8 /* Assets */,
+				249BF6A62AE3683C00A3E2F1 /* Products */,
 			);
 			sourceTree = "<group>";
 		};
-		24649C6F20F92ED300822FAC /* Products */ = {
+		249BF6A62AE3683C00A3E2F1 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				24649C6E20F92ED300822FAC /* Heart Beats.app */,
+				249BF6A52AE3683C00A3E2F1 /* Heart Beats.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		24649C7020F92ED300822FAC /* Heart Beats */ = {
+		249BF6A72AE3683C00A3E2F1 /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				24649C7120F92ED300822FAC /* AppDelegate.swift */,
-				24649C7520F92ED300822FAC /* Main.storyboard */,
-				24A5472B210BF7AA000BDEAD /* SongCollection */,
-				242A00812103CC960072B26B /* Collections */,
-				242A00822103CCA30072B26B /* Settings */,
-				242A00832103CCAE0072B26B /* Helpers */,
-				24649C7820F92ED600822FAC /* Assets.xcassets */,
-				24649C7A20F92ED600822FAC /* LaunchScreen.storyboard */,
-				24649C7D20F92ED600822FAC /* Info.plist */,
-				24D2A28321030B4B00C95E79 /* Heart Beats.entitlements */,
+				249BF6A82AE3683C00A3E2F1 /* HeartBeatsApp.swift */,
+				249BF6AA2AE3683C00A3E2F1 /* ContentView.swift */,
+				2426FF142AE4BC33007F425C /* MinimumSongs.swift */,
+				2425D5CE2AE5B29700379D68 /* MediaList */,
+				244765962AE50DB500467DE2 /* Settings */,
 			);
-			path = "Heart Beats";
+			path = Views;
 			sourceTree = "<group>";
 		};
-		24A5472B210BF7AA000BDEAD /* SongCollection */ = {
+		249BF6AF2AE3683D00A3E2F1 /* Preview Content */ = {
 			isa = PBXGroup;
 			children = (
-				24932EF92106E15D00DC3EE5 /* SongCollection.swift */,
-				242A007F2103BFBB0072B26B /* SongCollections.swift */,
+				249BF6B02AE3683D00A3E2F1 /* Preview Assets.xcassets */,
 			);
-			path = SongCollection;
+			path = "Preview Content";
 			sourceTree = "<group>";
 		};
-		24D2A28421030BB400C95E79 /* Frameworks */ = {
+		24DBAA652AE4D7DC009965C8 /* Assets */ = {
 			isa = PBXGroup;
 			children = (
-				24D2A28521030BB400C95E79 /* StoreKit.framework */,
+				249BF6AC2AE3683D00A3E2F1 /* Assets.xcassets */,
+				249BF6AE2AE3683D00A3E2F1 /* HeartBeats.entitlements */,
+				249BF6AF2AE3683D00A3E2F1 /* Preview Content */,
 			);
-			name = Frameworks;
+			path = Assets;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		24649C6D20F92ED300822FAC /* Heart Beats */ = {
+		249BF6A42AE3683C00A3E2F1 /* Heart Beats */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 24649C8020F92ED600822FAC /* Build configuration list for PBXNativeTarget "Heart Beats" */;
+			buildConfigurationList = 249BF6B42AE3683D00A3E2F1 /* Build configuration list for PBXNativeTarget "Heart Beats" */;
 			buildPhases = (
-				24649C6A20F92ED300822FAC /* Sources */,
-				24649C6B20F92ED300822FAC /* Frameworks */,
-				24649C6C20F92ED300822FAC /* Resources */,
+				249BF6A12AE3683C00A3E2F1 /* Sources */,
+				249BF6A22AE3683C00A3E2F1 /* Frameworks */,
+				249BF6A32AE3683C00A3E2F1 /* Resources */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
 			name = "Heart Beats";
-			productName = "Heart Beats";
-			productReference = 24649C6E20F92ED300822FAC /* Heart Beats.app */;
+			productName = HeartBeats;
+			productReference = 249BF6A52AE3683C00A3E2F1 /* Heart Beats.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
-		24649C6620F92ED300822FAC /* Project object */ = {
+		249BF69D2AE3683C00A3E2F1 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastSwiftUpdateCheck = 1000;
-				LastUpgradeCheck = 1000;
-				ORGANIZATIONNAME = "Kyle Coburn";
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1500;
+				LastUpgradeCheck = 1500;
 				TargetAttributes = {
-					24649C6D20F92ED300822FAC = {
-						CreatedOnToolsVersion = 10.0;
-						LastSwiftMigration = 1020;
-						SystemCapabilities = {
-							com.apple.InAppPurchase = {
-								enabled = 1;
-							};
-							com.apple.iCloud = {
-								enabled = 1;
-							};
-						};
+					249BF6A42AE3683C00A3E2F1 = {
+						CreatedOnToolsVersion = 15.0;
 					};
 				};
 			};
-			buildConfigurationList = 24649C6920F92ED300822FAC /* Build configuration list for PBXProject "Heart Beats" */;
-			compatibilityVersion = "Xcode 11.0";
+			buildConfigurationList = 249BF6A02AE3683C00A3E2F1 /* Build configuration list for PBXProject "Heart Beats" */;
+			compatibilityVersion = "Xcode 14.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
 				Base,
 			);
-			mainGroup = 24649C6520F92ED300822FAC;
-			productRefGroup = 24649C6F20F92ED300822FAC /* Products */;
+			mainGroup = 249BF69C2AE3683C00A3E2F1;
+			productRefGroup = 249BF6A62AE3683C00A3E2F1 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				24649C6D20F92ED300822FAC /* Heart Beats */,
+				249BF6A42AE3683C00A3E2F1 /* Heart Beats */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		24649C6C20F92ED300822FAC /* Resources */ = {
+		249BF6A32AE3683C00A3E2F1 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				24649C7C20F92ED600822FAC /* LaunchScreen.storyboard in Resources */,
-				24649C7920F92ED600822FAC /* Assets.xcassets in Resources */,
-				24649C7720F92ED300822FAC /* Main.storyboard in Resources */,
+				249BF6B12AE3683D00A3E2F1 /* Preview Assets.xcassets in Resources */,
+				249BF6AD2AE3683D00A3E2F1 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		24649C6A20F92ED300822FAC /* Sources */ = {
+		249BF6A12AE3683C00A3E2F1 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				242A007A2103AE810072B26B /* CombineTableViewController.swift in Sources */,
-				24D2A27E2102D84700C95E79 /* Zephyr.swift in Sources */,
-				24932EFA2106E15D00DC3EE5 /* SongCollection.swift in Sources */,
-				242A00802103BFBB0072B26B /* SongCollections.swift in Sources */,
-				242A0074210330230072B26B /* SongTableViewController.swift in Sources */,
-				24BF29CF2101BFAB00CD67B5 /* Extensions.swift in Sources */,
-				24BF29CB2101B6AD00CD67B5 /* SongCollectionsViewController.swift in Sources */,
-				24649C7220F92ED300822FAC /* AppDelegate.swift in Sources */,
-				242A007C2103B37B0072B26B /* AddCombineTableViewController.swift in Sources */,
-				242A007821039CA20072B26B /* SettingsTableViewController.swift in Sources */,
-				24A5472A210B91C0000BDEAD /* CircleButton.swift in Sources */,
-				242A0076210330A90072B26B /* SongTableViewCell.swift in Sources */,
-				24D2A2802102F55D00C95E79 /* HeaderTableViewCell.swift in Sources */,
-				24BF29CD2101B7B000CD67B5 /* SongCollectionTableViewCell.swift in Sources */,
-				24A5472D210BFAED000BDEAD /* StepperViewController.swift in Sources */,
-				242A008E2103CF780072B26B /* GMStepper.swift in Sources */,
+				2426FF152AE4BC33007F425C /* MinimumSongs.swift in Sources */,
+				244765952AE5021000467DE2 /* CombineGroupings.swift in Sources */,
+				244765982AE50DCA00467DE2 /* CreateCombineGrouping.swift in Sources */,
+				2434953D2AE480040038D8D4 /* MediaCollection.swift in Sources */,
+				2425D5CD2AE5B1BD00379D68 /* MediaListRow.swift in Sources */,
+				249BF6AB2AE3683C00A3E2F1 /* ContentView.swift in Sources */,
+				243495432AE493A90038D8D4 /* UIKit+Extensions.swift in Sources */,
+				243495412AE493890038D8D4 /* Color+Extensions.swift in Sources */,
+				244765932AE4FE5000467DE2 /* SettingsView.swift in Sources */,
+				2434953A2AE47FF20038D8D4 /* Foundation+Extensions.swift in Sources */,
+				2434953F2AE48A920038D8D4 /* MediaList.swift in Sources */,
+				249BF6A92AE3683C00A3E2F1 /* HeartBeatsApp.swift in Sources */,
+				2426FF172AE4BDC1007F425C /* SyncStorage.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
-/* Begin PBXVariantGroup section */
-		24649C7520F92ED300822FAC /* Main.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				24649C7620F92ED300822FAC /* Base */,
-			);
-			name = Main.storyboard;
-			sourceTree = "<group>";
-		};
-		24649C7A20F92ED600822FAC /* LaunchScreen.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				24649C7B20F92ED600822FAC /* Base */,
-			);
-			name = LaunchScreen.storyboard;
-			sourceTree = "<group>";
-		};
-/* End PBXVariantGroup section */
-
 /* Begin XCBuildConfiguration section */
-		24649C7E20F92ED600822FAC /* Debug */ = {
+		249BF6B22AE3683D00A3E2F1 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
-				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_ENABLE_OBJC_WEAK = YES;
@@ -313,19 +257,19 @@
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
-				DEVELOPMENT_TEAM = "${DEVELOPMENT_TEAM}";
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
-				GCC_C_LANGUAGE_STANDARD = gnu11;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -339,24 +283,26 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				INFOPLIST_KEY_CFBundleDisplayName = "Heart Beats";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.music";
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
-				SDKROOT = iphoneos;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				PRODUCT_BUNDLE_IDENTIFIER = "is.ky.Heart-Beats";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
 		};
-		24649C7F20F92ED600822FAC /* Release */ = {
+		249BF6B32AE3683D00A3E2F1 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
-				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_ENABLE_OBJC_WEAK = YES;
@@ -375,19 +321,19 @@
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEVELOPMENT_TEAM = "${DEVELOPMENT_TEAM}";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				GCC_C_LANGUAGE_STANDARD = gnu11;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
@@ -395,55 +341,95 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				INFOPLIST_KEY_CFBundleDisplayName = "Heart Beats";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.music";
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
-				SDKROOT = iphoneos;
+				PRODUCT_BUNDLE_IDENTIFIER = "is.ky.Heart-Beats";
 				SWIFT_COMPILATION_MODE = wholemodule;
-				SWIFT_OPTIMIZATION_LEVEL = "-O";
-				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
 		};
-		24649C8120F92ED600822FAC /* Debug */ = {
+		249BF6B52AE3683D00A3E2F1 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_ENTITLEMENTS = "Heart Beats/Heart Beats.entitlements";
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Assets/HeartBeats.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 5;
-				DERIVE_UIKITFORMAC_PRODUCT_BUNDLE_IDENTIFIER = YES;
-				INFOPLIST_FILE = "Heart Beats/Info.plist";
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
-				MARKETING_VERSION = 1.2;
-				PRODUCT_BUNDLE_IDENTIFIER = "is.ky.Heart-Beats";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SUPPORTS_UIKITFORMAC = YES;
+				CURRENT_PROJECT_VERSION = 6;
+				DEVELOPMENT_ASSET_PATHS = "\"Assets/Preview Content\"";
+				DEVELOPMENT_TEAM = P3YWQG9C86;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "Heart Beats";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.music";
+				INFOPLIST_KEY_NSAppleMusicUsageDescription = "Enables you to choose artists and genres from your library to play in Heart Beats.";
+				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
+				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
+				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
+				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphonesimulator*]" = YES;
+				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphoneos*]" = YES;
+				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphonesimulator*]" = YES;
+				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphoneos*]" = UIStatusBarStyleDefault;
+				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
+				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = 1.3;
+				PRODUCT_NAME = "${TARGET_NAME}";
+				SDKROOT = auto;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
 		};
-		24649C8220F92ED600822FAC /* Release */ = {
+		249BF6B62AE3683D00A3E2F1 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_ENTITLEMENTS = "Heart Beats/Heart Beats.entitlements";
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Assets/HeartBeats.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 5;
-				DERIVE_UIKITFORMAC_PRODUCT_BUNDLE_IDENTIFIER = YES;
-				INFOPLIST_FILE = "Heart Beats/Info.plist";
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
-				MARKETING_VERSION = 1.2;
-				PRODUCT_BUNDLE_IDENTIFIER = "is.ky.Heart-Beats";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SUPPORTS_UIKITFORMAC = YES;
+				CURRENT_PROJECT_VERSION = 6;
+				DEVELOPMENT_ASSET_PATHS = "\"Assets/Preview Content\"";
+				DEVELOPMENT_TEAM = P3YWQG9C86;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "Heart Beats";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.music";
+				INFOPLIST_KEY_NSAppleMusicUsageDescription = "Enables you to choose artists and genres from your library to play in Heart Beats.";
+				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
+				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
+				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
+				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphonesimulator*]" = YES;
+				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphoneos*]" = YES;
+				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphonesimulator*]" = YES;
+				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphoneos*]" = UIStatusBarStyleDefault;
+				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
+				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = 1.3;
+				PRODUCT_NAME = "${TARGET_NAME}";
+				SDKROOT = auto;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -452,25 +438,25 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		24649C6920F92ED300822FAC /* Build configuration list for PBXProject "Heart Beats" */ = {
+		249BF6A02AE3683C00A3E2F1 /* Build configuration list for PBXProject "Heart Beats" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				24649C7E20F92ED600822FAC /* Debug */,
-				24649C7F20F92ED600822FAC /* Release */,
+				249BF6B22AE3683D00A3E2F1 /* Debug */,
+				249BF6B32AE3683D00A3E2F1 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		24649C8020F92ED600822FAC /* Build configuration list for PBXNativeTarget "Heart Beats" */ = {
+		249BF6B42AE3683D00A3E2F1 /* Build configuration list for PBXNativeTarget "Heart Beats" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				24649C8120F92ED600822FAC /* Debug */,
-				24649C8220F92ED600822FAC /* Release */,
+				249BF6B52AE3683D00A3E2F1 /* Debug */,
+				249BF6B62AE3683D00A3E2F1 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
-	rootObject = 24649C6620F92ED300822FAC /* Project object */;
+	rootObject = 249BF69D2AE3683C00A3E2F1 /* Project object */;
 }
