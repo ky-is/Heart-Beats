@@ -5,12 +5,12 @@ struct MediaListRow: View {
 	let entry: MediaEntry
 	let imageWidth: Int
 	let inFavorites: Bool
-	let play: (MediaEntry) -> Void
+	let play: (MediaEntry, Bool) -> Void
 
 	private let displayWidth: CGFloat = 80
 
-	var favoriteButton: some View {
-		Button {
+	private var favoriteButton: some View {
+		Button(inFavorites ? "Unfavorite" : "Favorite", systemImage: inFavorites ? "star" : "star.fill") {
 			var favorites = SyncStorage.shared.currentFavorites
 			if inFavorites {
 				favorites = favorites.filter { $0 != entry.id}
@@ -24,8 +24,12 @@ struct MediaListRow: View {
 					SyncStorage.shared.favorited = favorites
 				}
 			}
-		} label: {
-			Label(inFavorites ? "Unfavorite" : "Favorite", systemImage: inFavorites ? "star" : "star.fill")
+		}
+	}
+
+	private var addToQueueButton: some View {
+		Button("Add to queue", systemImage: "text.line.first.and.arrowtriangle.forward") {
+			play(entry, true)
 		}
 	}
 
@@ -58,15 +62,16 @@ struct MediaListRow: View {
 				.foregroundStyle(.secondary)
 		}
 			.contextMenu {
-				favoriteButton
-				Button("Shuffle", systemImage: "shuffle") {
-					play(entry)
+				addToQueueButton
+				Button("Play", systemImage: "shuffle") {
+					play(entry, false)
 				}
+				favoriteButton
 			} preview: {
 				if let songs = entry.songs {
 					let previewSize: CGFloat = 80
-					let a = Dictionary(grouping: songs.items, by: { $0.albumPersistentID }).values.compactMap { songs in songs.first(where: { $0.artwork != nil })?.artwork }
-					List(songs.items, id: \.self) {
+					let a = Dictionary(grouping: songs, by: { $0.albumPersistentID }).values.compactMap { songs in songs.first(where: { $0.artwork != nil })?.artwork }
+					List(songs, id: \.self) {
 						if let title = $0.title {
 							Text(title)
 								.padding(.leading, previewSize)
@@ -95,7 +100,9 @@ struct MediaListRow: View {
 			.swipeActions {
 				if entry.songs != nil {
 					favoriteButton
-						.tint(Color(red: 1.0, green: 0.85, blue: 0))
+						.tint(.yellow)
+					addToQueueButton
+						.tint(.blue)
 				}
 			}
 	}
@@ -103,7 +110,7 @@ struct MediaListRow: View {
 
 #Preview {
 	List {
-		MediaListRow(entry: MediaCollection.screenshotData[0], imageWidth: 128, inFavorites: true, play: { _ in })
+		MediaListRow(entry: MediaCollection.screenshotData[0], imageWidth: 128, inFavorites: true, play: { _, _ in })
 	}
 		.listStyle(.plain)
 		.fontDesign(.rounded)

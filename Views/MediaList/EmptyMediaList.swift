@@ -4,7 +4,7 @@ struct EmptyMediaList: View {
 	var collection: MediaCollection
 	var imageWidth: Int
 
-	private let play: (MediaEntry) -> Void = { _ in }
+	private let play: (MediaEntry, Bool) -> Void = { _, _ in }
 
 	var body: some View {
 		if (collection.groupBy == "genre" ? SyncStorage.shared.cachedGenres : SyncStorage.shared.cachedArtists) == nil {

@@ -10,7 +10,7 @@ struct MediaList: View {
 
 	private let imageWidth = 128
 
-	private func play(entry: MediaEntry) {
+	private func play(entry: MediaEntry, addToQueue: Bool) {
 		guard let songs = entry.songs else { return }
 
 		Task { @MainActor in
@@ -36,8 +36,12 @@ struct MediaList: View {
 
 		Task {
 			let player = MPMusicPlayerController.systemMusicPlayer
-			player.setQueue(with: songs)
-			player.shuffleMode = .songs
+			let songCollection = MPMediaItemCollection(items: songs.shuffled())
+			if addToQueue {
+				player.prepend(MPMusicPlayerMediaItemQueueDescriptor(itemCollection: songCollection))
+			} else {
+				player.setQueue(with: songCollection)
+			}
 			player.play()
 			await openMusicApp()
 		}
@@ -95,7 +99,7 @@ struct MediaList: View {
 				selection = newValue
 			}
 			if let newValue {
-				play(entry: newValue)
+				play(entry: newValue, addToQueue: false)
 			}
 		}
 //		let allEntriesGroups: [[MediaEntry]] = [[]] //SAMPLE

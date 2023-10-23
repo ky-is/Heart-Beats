@@ -4,7 +4,7 @@ import SwiftUI
 
 struct MediaEntry: Identifiable, Hashable {
 	let id: String
-	let songs: MPMediaItemCollection?
+	let songs: [MPMediaItem]?
 	let songCount: Int
 	let artwork: MPMediaItemArtwork?
 }
@@ -150,7 +150,7 @@ final class MediaCollection {
 		let entries = collections
 			.filter { $0.2.count >= allowedMinimumNumberOfSongs || favorited.contains($0.0) }
 			.sorted { $0.0.forSorting.localizedStandardCompare($1.0.forSorting) == .orderedAscending }
-			.map { MediaEntry(id: $0.0, songs: MPMediaItemCollection(items: $0.2), songCount: $0.2.count, artwork: $0.1.artwork) }
+			.map { MediaEntry(id: $0.0, songs: $0.2, songCount: $0.2.count, artwork: $0.1.artwork) }
 		Task { @MainActor in
 			withAnimation {
 				if SyncStorage.shared.showGenres == showGenres && exceedsMostNumberOfSongs && allowedMinimumNumberOfSongs > 0 {
