@@ -6,7 +6,7 @@ struct SettingsView: View {
 	var body: some View {
 		NavigationStack {
 			List {
-				Section {
+				Section("Manage groupings") {
 					NavigationLink {
 						CombineGroupings(type: "artist")
 					} label: {
@@ -17,8 +17,6 @@ struct SettingsView: View {
 					} label: {
 						Label("Combine Genres", systemImage: "opticaldisc.fill")
 					}
-				} header: {
-					Text("Manage groupings")
 				}
 				Section {
 					ExternalLink(title: "Review Heart Beats", systemImage: "star.circle.fill", urlPath: "itms-apps://itunes.apple.com/app/id1415282075?action=write-review")

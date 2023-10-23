@@ -8,7 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		2425D5CD2AE5B1BD00379D68 /* MediaListRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2425D5CC2AE5B1BD00379D68 /* MediaListRow.swift */; };
-		2426FF152AE4BC33007F425C /* MinimumSongs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2426FF142AE4BC33007F425C /* MinimumSongs.swift */; };
+		2426FF152AE4BC33007F425C /* MinimumSongsButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2426FF142AE4BC33007F425C /* MinimumSongsButton.swift */; };
 		2426FF172AE4BDC1007F425C /* SyncStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2426FF162AE4BDC1007F425C /* SyncStorage.swift */; };
 		2434953A2AE47FF20038D8D4 /* Foundation+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 243495382AE47FF20038D8D4 /* Foundation+Extensions.swift */; };
 		2434953D2AE480040038D8D4 /* MediaCollection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2434953C2AE480040038D8D4 /* MediaCollection.swift */; };
@@ -27,7 +27,7 @@
 
 /* Begin PBXFileReference section */
 		2425D5CC2AE5B1BD00379D68 /* MediaListRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaListRow.swift; sourceTree = "<group>"; };
-		2426FF142AE4BC33007F425C /* MinimumSongs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MinimumSongs.swift; sourceTree = "<group>"; };
+		2426FF142AE4BC33007F425C /* MinimumSongsButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MinimumSongsButton.swift; sourceTree = "<group>"; };
 		2426FF162AE4BDC1007F425C /* SyncStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncStorage.swift; sourceTree = "<group>"; };
 		243495382AE47FF20038D8D4 /* Foundation+Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Foundation+Extensions.swift"; sourceTree = "<group>"; };
 		2434953C2AE480040038D8D4 /* MediaCollection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaCollection.swift; sourceTree = "<group>"; };
@@ -121,7 +121,7 @@
 			children = (
 				249BF6A82AE3683C00A3E2F1 /* HeartBeatsApp.swift */,
 				249BF6AA2AE3683C00A3E2F1 /* ContentView.swift */,
-				2426FF142AE4BC33007F425C /* MinimumSongs.swift */,
+				2426FF142AE4BC33007F425C /* MinimumSongsButton.swift */,
 				2425D5CE2AE5B29700379D68 /* MediaList */,
 				244765962AE50DB500467DE2 /* Settings */,
 			);
@@ -217,7 +217,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2426FF152AE4BC33007F425C /* MinimumSongs.swift in Sources */,
+				2426FF152AE4BC33007F425C /* MinimumSongsButton.swift in Sources */,
 				244765952AE5021000467DE2 /* CombineGroupings.swift in Sources */,
 				244765982AE50DCA00467DE2 /* CreateCombineGrouping.swift in Sources */,
 				2434953D2AE480040038D8D4 /* MediaCollection.swift in Sources */,

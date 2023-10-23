@@ -30,7 +30,7 @@ struct MinimumSongsButton: View {
 	}
 }
 
-struct MinimumSongsStepper: View {
+private struct MinimumSongsStepper: View {
 	@EnvironmentObject private var syncStorage: SyncStorage
 
 	var body: some View {
@@ -38,8 +38,9 @@ struct MinimumSongsStepper: View {
 			Button {
 				syncStorage.minimum -= 1
 			} label: {
-				Image(systemName: "chevron.left")
+				Image(systemName: "minus")
 					.frame(minWidth: 44, maxHeight: .infinity)
+					.bold()
 			}
 				.disabled(syncStorage.minimum <= 0)
 			Text("Minimum number of songs an artist/genre needs to be displayed")
@@ -50,8 +51,9 @@ struct MinimumSongsStepper: View {
 			Button {
 				syncStorage.minimum += 1
 			} label: {
-				Image(systemName: "chevron.right")
+				Image(systemName: "plus")
 					.frame(minWidth: 44, maxHeight: .infinity)
+					.bold()
 			}
 				.disabled(syncStorage.minimum >= MediaCollection.current.maximumSongsLimit)
 		}
