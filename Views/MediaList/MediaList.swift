@@ -8,7 +8,7 @@ struct MediaList: View {
 	@State private var selection: MediaEntry?
 	@EnvironmentObject private var syncStorage: SyncStorage
 
-	@AppStorage("asGrid") private var asGrid = false
+	@AppStorage("asGrid") private var asGrid = UIDevice.current.userInterfaceIdiom == .pad
 
 	private func play(entry: MediaEntry, addToQueue: Bool) {
 		guard let songs = entry.songs else { return }
@@ -132,14 +132,14 @@ private struct GridView: View {
 	@Binding var activeSelection: MediaEntry?
 	let play: (MediaEntry, Bool) -> Void
 
-	private let idealWidth: CGFloat = 144
-	private let spacing: CGFloat = 8
+	private let idealWidth: CGFloat = UIDevice.current.userInterfaceIdiom == .pad ? 176 : 144
+	private let spacing: CGFloat = UIDevice.current.userInterfaceIdiom == .pad ? 16 : 8
 
 	private func sizeColumns(in geometry: GeometryProxy, idealWidth: CGFloat, spacing: CGFloat) -> (count: Int, width: CGFloat) {
 		guard geometry.size.width > 0 else {
 			return (3, idealWidth)
 		}
-		let columnCount = (geometry.size.width / (idealWidth + spacing * 2)).rounded()
+		let columnCount = (geometry.size.width / (idealWidth + spacing * 2)).rounded(.down)
 		let columnWidth = geometry.size.width / columnCount - spacing * 1
 		return (Int(columnCount), columnWidth)
 	}
@@ -148,7 +148,7 @@ private struct GridView: View {
 		GeometryReader { geometry in
 			let (columnCount, columnSize) = sizeColumns(in: geometry, idealWidth: idealWidth, spacing: spacing)
 			ScrollView {
-				LazyVGrid(columns: Array(repeating: GridItem(.fixed(columnSize), spacing: spacing), count: columnCount), spacing: 12) {
+				LazyVGrid(columns: Array(repeating: GridItem(.fixed(columnSize), spacing: spacing), count: columnCount), spacing: spacing * 1.5) {
 					EntriesView(asGrid: true, imageWidth: columnSize - spacing, showHeaders: showHeaders, allEntriesGroups: allEntriesGroups, activeSelection: $activeSelection, play: play)
 				}
 					.padding(.vertical, spacing / 2)

@@ -60,7 +60,7 @@ private struct NavigationContentView<Content: View>: View {
 
 	@State private var showSettings = false
 
-	@AppStorage("asGrid") private var asGrid = false
+	@AppStorage("asGrid") private var asGrid = UIDevice.current.userInterfaceIdiom == .pad
 
 	var body: some View {
 		NavigationStack {
