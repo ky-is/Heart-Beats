@@ -1,3 +1,4 @@
 .DS_Store
 Art/
 xcuserdata/
+Assets/Preview Content/Preview Assets.xcassets/*.imageset/*

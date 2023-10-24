@@ -36,7 +36,7 @@ struct MediaListEntry: View {
 		Group {
 			if asGrid {
 				VStack {
-					AlbumArt(artwork: entry.artwork, displayWidth: imageWidth)
+					AlbumArt(artist: entry.id, artwork: entry.artwork, displayWidth: imageWidth)
 					HStack(spacing: 0) {
 						Text(entry.id)
 							.font(.caption)
@@ -48,7 +48,7 @@ struct MediaListEntry: View {
 				}
 			} else {
 				HStack {
-					AlbumArt(artwork: entry.artwork)
+					AlbumArt(artist: entry.id, artwork: entry.artwork)
 					Text(entry.id)
 						.font(.title2)
 					Spacer()
@@ -79,7 +79,7 @@ struct MediaListEntry: View {
 							VStack(spacing: 0) {
 								Spacer()
 								ForEach(a, id: \.self) {
-									AlbumArt(artwork: $0, displayWidth: previewSize)
+									AlbumArt(artist: "", artwork: $0, displayWidth: previewSize)
 										.padding(.horizontal, 8)
 									Spacer()
 								}

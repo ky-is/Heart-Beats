@@ -62,11 +62,26 @@ private struct NavigationContentView<Content: View>: View {
 
 	@AppStorage("asGrid") private var asGrid = UIDevice.current.userInterfaceIdiom == .pad
 
+#if DEBUG
+	private let imageIncrement = 3
+	func screenshotImages(startIndex: Int) -> [Image] {
+		let idealSize = CGSize(width: 128, height: 128)
+		return MediaCollection.current.entries.filter({ SyncStorage.shared.showGenres ? true : SyncStorage.shared.currentFavorites.contains($0.id) })[startIndex..<startIndex+imageIncrement].compactMap { $0.artwork?.image(at: idealSize) }.map { Image(uiImage: $0.scale(to: idealSize)) }
+	}
+#endif
+
 	var body: some View {
 		NavigationStack {
 			content()
 				.toolbar {
 					ToolbarItemGroup(placement: .topBarTrailing) {
+#if DEBUG
+						if SCREENSHOT_MODE { //SAMPLE
+//							ShareLink(items: screenshotImages(startIndex: 0)) { SharePreview(MediaCollection.current.groupBy, image: $0) }
+//							ShareLink(items: screenshotImages(startIndex: imageIncrement)) { SharePreview(MediaCollection.current.groupBy, image: $0) }
+//							ShareLink(items: screenshotImages(startIndex: imageIncrement * 2)) { SharePreview(MediaCollection.current.groupBy, image: $0) }
+						}
+#endif
 						Button("Show as \(asGrid ? "list" : "grid")", systemImage: asGrid ? "list.triangle" : "square.grid.2x2") {
 							asGrid.toggle()
 						}

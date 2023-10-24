@@ -2,18 +2,30 @@ import SwiftUI
 import MediaPlayer
 
 struct AlbumArt: View {
+	let artist: String
 	let artwork: MPMediaItemArtwork?
 	let displayWidth: CGFloat
 
-	init(artwork: MPMediaItemArtwork?, displayWidth: CGFloat = 88) {
+	init(artist: String, artwork: MPMediaItemArtwork?, displayWidth: CGFloat = 88) {
+		self.artist = artist
 		self.artwork = artwork
 		self.displayWidth = displayWidth
 	}
 
+	var uiImage: UIImage? {
+		var image = artwork?.image(at: CGSize(width: displayWidth * 2, height: displayWidth * 2))
+#if DEBUG
+		if image == nil {
+			image = UIImage(named: "\(artist).jpeg")
+		}
+#endif
+		return image
+	}
+
 	var body: some View {
 		Group {
-			if let image = artwork?.image(at: CGSize(width: displayWidth * 2, height: displayWidth * 2)) {
-				Image(uiImage: image)
+			if let uiImage {
+				Image(uiImage: uiImage)
 					.resizable()
 //#if DEBUG
 //					.blur(radius: SCREENSHOT_MODE ? 10 : 0) //SAMPLE
@@ -36,5 +48,6 @@ struct AlbumArt: View {
 }
 
 #Preview {
-	AlbumArt(artwork: MediaCollection.screenshotData[0].artwork, displayWidth: 88 * 2)
+	let entry = MediaCollection.screenshotData[0]
+	return AlbumArt(artist: entry.id, artwork: entry.artwork, displayWidth: 88 * 2)
 }
