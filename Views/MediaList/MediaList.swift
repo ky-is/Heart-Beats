@@ -8,7 +8,7 @@ struct MediaList: View {
 	@State private var selection: MediaEntry?
 	@EnvironmentObject private var syncStorage: SyncStorage
 
-	@AppStorage("asGrid") private var asGrid = UIDevice.current.userInterfaceIdiom == .pad
+	@AppStorage("listViewMode") private var listViewMode = UIDevice.current.userInterfaceIdiom == .pad ? "grid" : "list"
 
 	private func play(entry: MediaEntry, addToQueue: Bool) {
 		guard let songs = entry.songs else { return }
@@ -108,8 +108,8 @@ struct MediaList: View {
 		let showHeaders = showHeaders(allEntriesGroups: allEntriesGroups)
 		Group {
 			if !hasEntries {
-				EmptyMediaList(collection: collection, asGrid: asGrid, imageWidth: 88)
-			} else if asGrid {
+				EmptyMediaList(collection: collection, listViewMode: listViewMode, imageWidth: 88)
+			} else if listViewMode == "grid" {
 				GridView(showHeaders: showHeaders, allEntriesGroups: allEntriesGroups, activeSelection: activeSelection, play: play)
 			} else {
 				ListView(showHeaders: showHeaders, allEntriesGroups: allEntriesGroups, activeSelection: activeSelection, play: play)
@@ -149,7 +149,7 @@ private struct GridView: View {
 			let (columnCount, columnSize) = sizeColumns(in: geometry, idealWidth: idealWidth, spacing: spacing)
 			ScrollView {
 				LazyVGrid(columns: Array(repeating: GridItem(.fixed(columnSize), spacing: spacing), count: columnCount), spacing: spacing * 1.5) {
-					EntriesView(asGrid: true, imageWidth: columnSize - spacing, showHeaders: showHeaders, allEntriesGroups: allEntriesGroups, activeSelection: $activeSelection, play: play)
+					EntriesView(listViewMode: "grid", imageWidth: columnSize - spacing, showHeaders: showHeaders, allEntriesGroups: allEntriesGroups, activeSelection: $activeSelection, play: play)
 				}
 					.padding(.vertical, spacing / 2)
 			}
@@ -166,14 +166,14 @@ private struct ListView: View {
 
 	var body: some View {
 		List(selection: $activeSelection) {
-			EntriesView(asGrid: false, imageWidth: 128, showHeaders: showHeaders, allEntriesGroups: allEntriesGroups, activeSelection: $activeSelection, play: play)
+			EntriesView(listViewMode: "list", imageWidth: 128, showHeaders: showHeaders, allEntriesGroups: allEntriesGroups, activeSelection: $activeSelection, play: play)
 		}
 			.listStyle(.plain)
 	}
 }
 
 private struct EntriesView: View {
-	let asGrid: Bool
+	let listViewMode: String
 	let imageWidth: CGFloat
 	let showHeaders: Bool
 	let allEntriesGroups: [[MediaEntry]]
@@ -185,14 +185,14 @@ private struct EntriesView: View {
 			let inFavorites = showHeaders && groupEntries == allEntriesGroups[0]
 			Section {
 				ForEach(groupEntries) { entry in
-					if asGrid {
+					if listViewMode == "grid" {
 						Button {
 							activeSelection = entry
 						} label: {
-							MediaListEntry(asGrid: true, entry: entry, imageWidth: imageWidth, inFavorites: inFavorites, play: play)
+							MediaListEntry(listViewMode: listViewMode, entry: entry, imageWidth: imageWidth, inFavorites: inFavorites, play: play)
 						}
 					} else {
-						MediaListEntry(asGrid: false, entry: entry, imageWidth: imageWidth, inFavorites: inFavorites, play: play)
+						MediaListEntry(listViewMode: listViewMode, entry: entry, imageWidth: imageWidth, inFavorites: inFavorites, play: play)
 							.tag(entry)
 					}
 				}

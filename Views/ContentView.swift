@@ -60,7 +60,7 @@ private struct NavigationContentView<Content: View>: View {
 
 	@State private var showSettings = false
 
-	@AppStorage("asGrid") private var asGrid = UIDevice.current.userInterfaceIdiom == .pad
+	@AppStorage("listViewMode") private var listViewMode = UIDevice.current.userInterfaceIdiom == .pad ? "grid" : "list"
 
 #if DEBUG
 	private let imageIncrement = 3
@@ -82,8 +82,8 @@ private struct NavigationContentView<Content: View>: View {
 //							ShareLink(items: screenshotImages(startIndex: imageIncrement * 2)) { SharePreview(MediaCollection.current.groupBy, image: $0) }
 						}
 #endif
-						Button("Show as \(asGrid ? "list" : "grid")", systemImage: asGrid ? "list.triangle" : "square.grid.2x2") {
-							asGrid.toggle()
+						Button("Show as \(listViewMode)", systemImage: listViewMode == "grid" ? "list.triangle" : "square.grid.2x2") {
+							listViewMode = listViewMode == "grid" ? "list" : "grid"
 						}
 						Button("Settings", systemImage: "gearshape") {
 							showSettings = true

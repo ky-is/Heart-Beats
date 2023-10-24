@@ -2,7 +2,7 @@ import SwiftUI
 
 struct EmptyMediaList: View {
 	var collection: MediaCollection
-	let asGrid: Bool
+	let listViewMode: String
 	let imageWidth: CGFloat
 
 	private let play: (MediaEntry, Bool) -> Void = { _, _ in }
@@ -10,16 +10,16 @@ struct EmptyMediaList: View {
 	var body: some View {
 		if (collection.groupBy == "genre" ? SyncStorage.shared.cachedGenres : SyncStorage.shared.cachedArtists) == nil {
 			Group {
-				if asGrid {
+				if listViewMode == "grid" {
 					LazyVGrid(columns: [GridItem(.adaptive(minimum: 88))]) {
 						ForEach(MediaCollection.screenshotData) {
-							MediaListEntry(asGrid: true, entry: $0, imageWidth: imageWidth, inFavorites: false, play: play)
+							MediaListEntry(listViewMode: listViewMode, entry: $0, imageWidth: imageWidth, inFavorites: false, play: play)
 						}
 					}
 				} else {
 					List {
 						ForEach(MediaCollection.screenshotData) {
-							MediaListEntry(asGrid: false, entry: $0, imageWidth: imageWidth, inFavorites: false, play: play)
+							MediaListEntry(listViewMode: listViewMode, entry: $0, imageWidth: imageWidth, inFavorites: false, play: play)
 						}
 					}
 					.listStyle(.plain)
@@ -54,7 +54,7 @@ struct EmptyMediaList: View {
 
 #Preview {
 	NavigationStack {
-		EmptyMediaList(collection: MediaCollection(groupBy: "artist"), asGrid: true, imageWidth: 128)
+		EmptyMediaList(collection: MediaCollection(groupBy: "artist"), listViewMode: "grid", imageWidth: 128)
 	}
 		.fontDesign(.rounded)
 }

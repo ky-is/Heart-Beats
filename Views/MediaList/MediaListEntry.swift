@@ -2,7 +2,7 @@ import SwiftUI
 import MediaPlayer
 
 struct MediaListEntry: View {
-	let asGrid: Bool
+	let listViewMode: String
 	let entry: MediaEntry
 	let imageWidth: CGFloat
 	let inFavorites: Bool
@@ -34,7 +34,7 @@ struct MediaListEntry: View {
 
 	var body: some View {
 		Group {
-			if asGrid {
+			if listViewMode == "grid" {
 				VStack {
 					AlbumArt(artist: entry.id, artwork: entry.artwork, displayWidth: imageWidth)
 					HStack(spacing: 0) {
@@ -100,7 +100,7 @@ struct MediaListEntry: View {
 
 #Preview {
 	List {
-		MediaListEntry(asGrid: true, entry: MediaCollection.screenshotData[0], imageWidth: 88, inFavorites: true, play: { _, _ in })
+		MediaListEntry(listViewMode: "grid", entry: MediaCollection.screenshotData[0], imageWidth: 88, inFavorites: true, play: { _, _ in })
 	}
 		.listStyle(.plain)
 		.fontDesign(.rounded)
