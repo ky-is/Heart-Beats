@@ -148,7 +148,7 @@ final class MediaCollection {
 		let exceedsMostNumberOfSongs = SyncStorage.shared.minimum > mostSongsLimit
 		let allowedMinimumNumberOfSongs = exceedsMostNumberOfSongs ? mostSongsLimit : SyncStorage.shared.minimum
 		let entries = collections
-			.filter { $0.2.count >= allowedMinimumNumberOfSongs || favorited.contains($0.0) }
+			.filter { $0.2.count >= allowedMinimumNumberOfSongs || ($0.2.count > 0 && favorited.contains($0.0)) }
 			.sorted { $0.0.forSorting.localizedStandardCompare($1.0.forSorting) == .orderedAscending }
 			.map { MediaEntry(id: $0.0, songs: $0.2, songCount: $0.2.count, artwork: $0.1.artwork) }
 		Task { @MainActor in
