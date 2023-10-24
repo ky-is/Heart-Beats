@@ -20,6 +20,7 @@ private struct TabsContent: View {
 	@State private var genresCollection = MediaCollection.genres
 
 	var body: some View {
+		let showsUnavailable = Binding(get: { artistsCollection.unavailable != nil }, set: { _,_ in artistsCollection.unavailable = nil })
 		Group {
 			NavigationContentView {
 				MediaList(collection: artistsCollection)
@@ -36,7 +37,7 @@ private struct TabsContent: View {
 				}
 				.tag(true)
 		}
-			.alert("Music Unavailable", isPresented: Binding(get: { artistsCollection.unavailable != nil }, set: { _,_ in artistsCollection.unavailable = nil }), actions: {
+			.alert("Music Unavailable", isPresented: showsUnavailable, actions: {
 				Link("Open Settings", destination: URL(string: UIApplication.openSettingsURLString)!)
 			}) {
 				let detail: String = switch artistsCollection.unavailable {

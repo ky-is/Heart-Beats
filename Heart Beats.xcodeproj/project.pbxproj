@@ -66,6 +66,7 @@
 				2434953E2AE48A920038D8D4 /* MediaList.swift */,
 				246ECD772AE5C91E00E90334 /* EmptyMediaList.swift */,
 				2425D5CC2AE5B1BD00379D68 /* MediaListRow.swift */,
+				243448712AE73DA200B41C2E /* AlbumArt.swift */,
 			);
 			path = MediaList;
 			sourceTree = "<group>";
@@ -124,7 +125,6 @@
 				249BF6A82AE3683C00A3E2F1 /* HeartBeatsApp.swift */,
 				249BF6AA2AE3683C00A3E2F1 /* ContentView.swift */,
 				2426FF142AE4BC33007F425C /* MinimumSongsButton.swift */,
-				243448712AE73DA200B41C2E /* AlbumArt.swift */,
 				2425D5CE2AE5B29700379D68 /* MediaList */,
 				244765962AE50DB500467DE2 /* Settings */,
 			);

@@ -10,15 +10,13 @@ struct MinimumSongsButton: View {
 		Button {
 			showSongMinimum = true
 		} label: {
-			ZStack {
-				Circle()
-					.frame(width: 40, height: 40)
-					.foregroundStyle(.accent).opacity(0.75)
-				Text(String(syncStorage.minimum))
-					.font(.system(size: 24, weight: .bold))
-					.foregroundStyle(.black)
-					.blendMode(.destinationOut)
-			}
+			Text(String(syncStorage.minimum))
+				.font(.system(size: 24, weight: .bold))
+				.foregroundStyle(.black)
+				.blendMode(.destinationOut)
+				.frame(width: 40, height: 40)
+				.background(in: Circle())
+				.backgroundStyle(.accent.opacity(0.75))
 				.compositingGroup()
 				.padding(.bottom, geometry.safeAreaInsets.bottom > 5 ? 0 : 5)
 				.padding(.horizontal, 12)
