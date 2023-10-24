@@ -49,8 +49,11 @@ private struct ExternalLink: View {
 			HStack {
 				Label(title, systemImage: systemImage)
 				Spacer()
-				Image(systemName: "arrow.up.right.square")
-					.foregroundStyle(.secondary)
+				Image(systemName: "rectangle.portrait.and.arrow.right")
+					.imageScale(.small)
+					.fontWeight(.semibold)
+					.foregroundStyle(Color.tertiary)
+					.frame(width: 8)
 			}
 		}
 	}
