@@ -30,11 +30,11 @@ struct AlbumArt: View {
 			}
 		}
 			.frame(width: displayWidth, height: displayWidth)
-			.clipShape(RoundedRectangle(cornerRadius: displayWidth / 6, style: .continuous))
+			.clipShape(RoundedRectangle(cornerRadius: min(24, displayWidth / 6), style: .continuous))
 			.shadow(color: .black.opacity(0.25), radius: 4, y: 3)
 	}
 }
 
 #Preview {
-	AlbumArt(artwork: MediaCollection.screenshotData[0].artwork)
+	AlbumArt(artwork: MediaCollection.screenshotData[0].artwork, displayWidth: 88 * 2)
 }

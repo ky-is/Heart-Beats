@@ -52,19 +52,24 @@ private struct TabsContent: View {
 }
 
 private struct NavigationContentView<Content: View>: View {
-	@State private var showSettings = false
-
 	let content: () -> Content
 
 	init(@ViewBuilder content: @escaping () -> Content) {
 		self.content = content
 	}
 
+	@State private var showSettings = false
+
+	@AppStorage("asGrid") private var asGrid = false
+
 	var body: some View {
 		NavigationStack {
 			content()
 				.toolbar {
-					ToolbarItem(placement: .topBarTrailing) {
+					ToolbarItemGroup(placement: .topBarTrailing) {
+						Button("Show as \(asGrid ? "list" : "grid")", systemImage: asGrid ? "list.triangle" : "square.grid.2x2") {
+							asGrid.toggle()
+						}
 						Button("Settings", systemImage: "gearshape") {
 							showSettings = true
 						}

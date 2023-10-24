@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		2425D5CD2AE5B1BD00379D68 /* MediaListRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2425D5CC2AE5B1BD00379D68 /* MediaListRow.swift */; };
+		2425D5CD2AE5B1BD00379D68 /* MediaListEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2425D5CC2AE5B1BD00379D68 /* MediaListEntry.swift */; };
 		2426FF152AE4BC33007F425C /* MinimumSongsButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2426FF142AE4BC33007F425C /* MinimumSongsButton.swift */; };
 		2426FF172AE4BDC1007F425C /* SyncStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2426FF162AE4BDC1007F425C /* SyncStorage.swift */; };
 		243448722AE73DA200B41C2E /* AlbumArt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 243448712AE73DA200B41C2E /* AlbumArt.swift */; };
@@ -27,7 +27,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		2425D5CC2AE5B1BD00379D68 /* MediaListRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaListRow.swift; sourceTree = "<group>"; };
+		2425D5CC2AE5B1BD00379D68 /* MediaListEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaListEntry.swift; sourceTree = "<group>"; };
 		2426FF142AE4BC33007F425C /* MinimumSongsButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MinimumSongsButton.swift; sourceTree = "<group>"; };
 		2426FF162AE4BDC1007F425C /* SyncStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncStorage.swift; sourceTree = "<group>"; };
 		243448712AE73DA200B41C2E /* AlbumArt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumArt.swift; sourceTree = "<group>"; };
@@ -65,7 +65,7 @@
 			children = (
 				2434953E2AE48A920038D8D4 /* MediaList.swift */,
 				246ECD772AE5C91E00E90334 /* EmptyMediaList.swift */,
-				2425D5CC2AE5B1BD00379D68 /* MediaListRow.swift */,
+				2425D5CC2AE5B1BD00379D68 /* MediaListEntry.swift */,
 				243448712AE73DA200B41C2E /* AlbumArt.swift */,
 			);
 			path = MediaList;
@@ -224,7 +224,7 @@
 				244765952AE5021000467DE2 /* CombineGroupings.swift in Sources */,
 				244765982AE50DCA00467DE2 /* CreateCombineGrouping.swift in Sources */,
 				2434953D2AE480040038D8D4 /* MediaCollection.swift in Sources */,
-				2425D5CD2AE5B1BD00379D68 /* MediaListRow.swift in Sources */,
+				2425D5CD2AE5B1BD00379D68 /* MediaListEntry.swift in Sources */,
 				249BF6AB2AE3683C00A3E2F1 /* ContentView.swift in Sources */,
 				243495432AE493A90038D8D4 /* UIKit+Extensions.swift in Sources */,
 				243495412AE493890038D8D4 /* Color+Extensions.swift in Sources */,

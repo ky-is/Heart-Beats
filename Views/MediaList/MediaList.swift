@@ -8,7 +8,7 @@ struct MediaList: View {
 	@State private var selection: MediaEntry?
 	@EnvironmentObject private var syncStorage: SyncStorage
 
-	private let imageWidth = 128
+	@AppStorage("asGrid") private var asGrid = false
 
 	private func play(entry: MediaEntry, addToQueue: Bool) {
 		guard let songs = entry.songs else { return }
@@ -108,25 +108,11 @@ struct MediaList: View {
 		let showHeaders = showHeaders(allEntriesGroups: allEntriesGroups)
 		Group {
 			if !hasEntries {
-				EmptyMediaList(collection: collection, imageWidth: imageWidth)
+				EmptyMediaList(collection: collection, asGrid: asGrid, imageWidth: 88)
+			} else if asGrid {
+				GridView(showHeaders: showHeaders, allEntriesGroups: allEntriesGroups, activeSelection: activeSelection, play: play)
 			} else {
-				List(selection: activeSelection) {
-					ForEach(allEntriesGroups, id: \.self) { groupEntries in
-						let inFavorites = showHeaders && groupEntries == allEntriesGroups[0]
-						Section {
-							ForEach(groupEntries) { entry in
-								MediaListRow(entry: entry, imageWidth: imageWidth, inFavorites: inFavorites, play: play)
-									.tag(entry)
-							}
-						} header: {
-							if showHeaders {
-								Text(inFavorites ? "Favorites" : "Uncategorized")
-									.font(.headline.smallCaps())
-							}
-						}
-					}
-				}
-					.listStyle(.plain)
+				ListView(showHeaders: showHeaders, allEntriesGroups: allEntriesGroups, activeSelection: activeSelection, play: play)
 			}
 		}
 			.navigationTitle(navigationTitle)
@@ -137,6 +123,87 @@ struct MediaList: View {
 					}
 				}
 			}
+	}
+}
+
+private struct GridView: View {
+	let showHeaders: Bool
+	let allEntriesGroups: [[MediaEntry]]
+	@Binding var activeSelection: MediaEntry?
+	let play: (MediaEntry, Bool) -> Void
+
+	private let idealWidth: CGFloat = 144
+	private let spacing: CGFloat = 8
+
+	private func sizeColumns(in geometry: GeometryProxy, idealWidth: CGFloat, spacing: CGFloat) -> (count: Int, width: CGFloat) {
+		guard geometry.size.width > 0 else {
+			return (3, idealWidth)
+		}
+		let columnCount = (geometry.size.width / (idealWidth + spacing * 2)).rounded()
+		let columnWidth = geometry.size.width / columnCount - spacing * 1
+		return (Int(columnCount), columnWidth)
+	}
+
+	var body: some View {
+		GeometryReader { geometry in
+			let (columnCount, columnSize) = sizeColumns(in: geometry, idealWidth: idealWidth, spacing: spacing)
+			ScrollView {
+				LazyVGrid(columns: Array(repeating: GridItem(.fixed(columnSize), spacing: spacing), count: columnCount), spacing: 12) {
+					EntriesView(asGrid: true, imageWidth: columnSize - spacing, showHeaders: showHeaders, allEntriesGroups: allEntriesGroups, activeSelection: $activeSelection, play: play)
+				}
+					.padding(.vertical, spacing / 2)
+			}
+			.tint(.primary)
+		}
+	}
+}
+
+private struct ListView: View {
+	let showHeaders: Bool
+	let allEntriesGroups: [[MediaEntry]]
+	@Binding var activeSelection: MediaEntry?
+	let play: (MediaEntry, Bool) -> Void
+
+	var body: some View {
+		List(selection: $activeSelection) {
+			EntriesView(asGrid: false, imageWidth: 128, showHeaders: showHeaders, allEntriesGroups: allEntriesGroups, activeSelection: $activeSelection, play: play)
+		}
+			.listStyle(.plain)
+	}
+}
+
+private struct EntriesView: View {
+	let asGrid: Bool
+	let imageWidth: CGFloat
+	let showHeaders: Bool
+	let allEntriesGroups: [[MediaEntry]]
+	@Binding var activeSelection: MediaEntry?
+	let play: (MediaEntry, Bool) -> Void
+
+	var body: some View {
+		ForEach(allEntriesGroups, id: \.self) { groupEntries in
+			let inFavorites = showHeaders && groupEntries == allEntriesGroups[0]
+			Section {
+				ForEach(groupEntries) { entry in
+					if asGrid {
+						Button {
+							activeSelection = entry
+						} label: {
+							MediaListEntry(asGrid: true, entry: entry, imageWidth: imageWidth, inFavorites: inFavorites, play: play)
+						}
+					} else {
+						MediaListEntry(asGrid: false, entry: entry, imageWidth: imageWidth, inFavorites: inFavorites, play: play)
+							.tag(entry)
+					}
+				}
+			} header: {
+				if showHeaders {
+					Text(inFavorites ? "Favorites" : "Uncategorized")
+//						.foregroundStyle(Color.secondary)
+						.font(.headline.smallCaps())
+				}
+			}
+		}
 	}
 }
 

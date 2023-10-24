@@ -1,9 +1,10 @@
 import SwiftUI
 import MediaPlayer
 
-struct MediaListRow: View {
+struct MediaListEntry: View {
+	let asGrid: Bool
 	let entry: MediaEntry
-	let imageWidth: Int
+	let imageWidth: CGFloat
 	let inFavorites: Bool
 	let play: (MediaEntry, Bool) -> Void
 
@@ -32,13 +33,29 @@ struct MediaListRow: View {
 	}
 
 	var body: some View {
-		HStack {
-			AlbumArt(artwork: entry.artwork)
-			Text(entry.id)
-				.font(.title2)
-			Spacer()
-			Text(String(entry.songCount))
-				.foregroundStyle(.secondary)
+		Group {
+			if asGrid {
+				VStack {
+					AlbumArt(artwork: entry.artwork, displayWidth: imageWidth)
+					HStack(spacing: 0) {
+						Text(entry.id)
+							.font(.caption)
+							.lineLimit(1)
+						Text(" " + String(entry.songCount))
+							.foregroundStyle(Color.secondary)
+							.font(.caption)
+					}
+				}
+			} else {
+				HStack {
+					AlbumArt(artwork: entry.artwork)
+					Text(entry.id)
+						.font(.title2)
+					Spacer()
+					Text(String(entry.songCount))
+						.foregroundStyle(Color.secondary)
+				}
+			}
 		}
 			.contextMenu {
 				addToQueueButton
@@ -83,7 +100,7 @@ struct MediaListRow: View {
 
 #Preview {
 	List {
-		MediaListRow(entry: MediaCollection.screenshotData[0], imageWidth: 128, inFavorites: true, play: { _, _ in })
+		MediaListEntry(asGrid: true, entry: MediaCollection.screenshotData[0], imageWidth: 88, inFavorites: true, play: { _, _ in })
 	}
 		.listStyle(.plain)
 		.fontDesign(.rounded)
