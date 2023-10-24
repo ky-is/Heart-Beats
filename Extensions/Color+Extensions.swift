@@ -1,9 +1,9 @@
 import SwiftUI
 
 extension Color {
-	static let brandWarning = Self(UIColor(named: "Warning")!)
 	static let background = Self(UIColor.systemBackground)
 	static let brand = Self(UIColor.tintColor)
+	static let tertiary = Self(UIColor.tertiaryLabel)
 }
 
 extension UIColor {

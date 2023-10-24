@@ -7,8 +7,6 @@ struct MediaListRow: View {
 	let inFavorites: Bool
 	let play: (MediaEntry, Bool) -> Void
 
-	private let displayWidth: CGFloat = 80
-
 	private var favoriteButton: some View {
 		Button(inFavorites ? "Unfavorite" : "Favorite", systemImage: inFavorites ? "star" : "star.fill") {
 			var favorites = SyncStorage.shared.currentFavorites
@@ -35,26 +33,7 @@ struct MediaListRow: View {
 
 	var body: some View {
 		HStack {
-			Group {
-				if let image = entry.artwork?.image(at: CGSize(width: imageWidth, height: imageWidth)) {
-					Image(uiImage: image)
-						.resizable()
-//#if DEBUG
-//						.blur(radius: SCREENSHOT_MODE ? 10 : 0) //SAMPLE
-//#endif
-				} else {
-					Rectangle()
-						.foregroundStyle(.tertiary)
-						.overlay {
-							Image(systemName: "music.note.list")
-								.foregroundStyle(.background)
-								.font(.system(size: displayWidth * (2 / 3)))
-						}
-							.unredacted()
-				}
-			}
-				.frame(width: displayWidth, height: displayWidth)
-				.clipShape(RoundedRectangle(cornerRadius: displayWidth / 6, style: .continuous))
+			AlbumArt(artwork: entry.artwork)
 			Text(entry.id)
 				.font(.title2)
 			Spacer()
@@ -83,15 +62,9 @@ struct MediaListRow: View {
 							VStack(spacing: 0) {
 								Spacer()
 								ForEach(a, id: \.self) {
-									if let image = $0.image(at: CGSize(width: previewSize, height: previewSize)) {
-										Image(uiImage: image)
-											.resizable()
-											.aspectRatio(1, contentMode: .fill)
-											.frame(width: previewSize, height: previewSize)
-											.clipShape(RoundedRectangle(cornerRadius: previewSize / 6, style: .continuous))
-											.padding(.horizontal, 8)
-										Spacer()
-									}
+									AlbumArt(artwork: $0, displayWidth: previewSize)
+										.padding(.horizontal, 8)
+									Spacer()
 								}
 							}
 						}
