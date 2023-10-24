@@ -72,25 +72,6 @@ struct MediaList: View {
 		return favoriteEntries.isEmpty ? [nonfavoriteEntries] : [favoriteEntries, nonfavoriteEntries]
 	}
 
-	private func showHeaders(allEntriesGroups: [[MediaEntry]]) -> Bool {
-#if DEBUG
-		if SCREENSHOT_MODE {
-			return false
-		}
-#endif
-		return allEntriesGroups.count > 1
-	}
-
-	private var navigationTitle: String {
-		var count = collection.entries.count
-#if DEBUG
-		if SCREENSHOT_MODE {
-			count = 42
-		}
-#endif
-		return collection.groupBy.capitalized.pluralize(count)
-	}
-
 	var body: some View {
 		let activeSelection = Binding {
 			selection
@@ -105,7 +86,13 @@ struct MediaList: View {
 //		let allEntriesGroups: [[MediaEntry]] = [[]] //SAMPLE
 		let allEntriesGroups = groupedEntries
 		let hasEntries = !allEntriesGroups[0].isEmpty
-		let showHeaders = showHeaders(allEntriesGroups: allEntriesGroups)
+#if targetEnvironment(simulator)
+		let showHeaders = false
+		let entryCount = 42
+#else
+		let showHeaders = allEntriesGroups.count > 1
+		let entryCount = collection.entries.count
+#endif
 		Group {
 			if !hasEntries {
 				EmptyMediaList(collection: collection, listViewMode: listViewMode, imageWidth: 88)
@@ -115,7 +102,7 @@ struct MediaList: View {
 				ListView(showHeaders: showHeaders, allEntriesGroups: allEntriesGroups, activeSelection: activeSelection, play: play)
 			}
 		}
-			.navigationTitle(navigationTitle)
+			.navigationTitle(collection.groupBy.capitalized.pluralize(entryCount))
 			.onChange(of: scenePhase) { _, newPhase in
 				if newPhase == .active {
 					withAnimation {
@@ -153,7 +140,7 @@ private struct GridView: View {
 				}
 					.padding(.vertical, spacing / 2)
 			}
-			.tint(.primary)
+				.tint(.primary)
 		}
 	}
 }

@@ -27,9 +27,9 @@ struct AlbumArt: View {
 			if let uiImage {
 				Image(uiImage: uiImage)
 					.resizable()
-//#if DEBUG
-//					.blur(radius: SCREENSHOT_MODE ? 10 : 0) //SAMPLE
-//#endif
+#if targetEnvironment(simulator)
+//					.blur(radius: 10) //SAMPLE
+#endif
 			} else {
 				Image(systemName: "music.note.list")
 					.resizable()

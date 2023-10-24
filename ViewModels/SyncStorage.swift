@@ -24,20 +24,18 @@ extension UserDefaults {
 		array(forKey: StorageKey.playedGenres) as? [String] ?? []
 	}
 	@objc dynamic var favorited: [String] {
-#if DEBUG
-		if SCREENSHOT_MODE {
-			return ["Beach House", "Frédéric Chopin", "indigo la End", "Lost Frequencies", "Polo & Pan", "Stromae", "Toe"]
-		}
-#endif
+#if targetEnvironment(simulator)
+		return ["Beach House", "Frédéric Chopin", "indigo la End", "Lost Frequencies", "Polo & Pan", "Stromae", "Sufjan Stevens", "Toe", "Yelle"]
+#else
 		return array(forKey: StorageKey.favorited) as? [String] ?? []
+#endif
 	}
 	@objc dynamic var favoritedGenres: [String] {
-#if DEBUG
-		if SCREENSHOT_MODE {
-			return ["Classical", "French", "Hip-Hop", "K-Pop", "J-Rock", "Post-Rock", "Reggae"]
-		}
-#endif
+#if targetEnvironment(simulator)
+		return ["Classical", "Française", "Hip-Hop", "K-Pop", "J-Rock", "Post-Rock", "Reggae"]
+#else
 		return array(forKey: StorageKey.favoritedGenres) as? [String] ?? []
+#endif
 	}
 	@objc dynamic var combined: [[String]] {
 		array(forKey: StorageKey.combined) as? [[String]] ?? []
@@ -49,13 +47,12 @@ extension UserDefaults {
 		bool(forKey: StorageKey.showGenres)
 	}
 	@objc dynamic var minimum: Int {
-		let stored: Int
-#if DEBUG
-		stored = SCREENSHOT_MODE ? 15 : integer(forKey: #keyPath(minimum))
+#if targetEnvironment(simulator)
+		return 15
 #else
-		stored = integer(forKey: StorageKey.minimum)
-#endif
+		let stored = integer(forKey: StorageKey.minimum)
 		return stored <= 0 ? 15 : stored
+#endif
 	}
 
 	var cachedArtists: [[Any]]? {

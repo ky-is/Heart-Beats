@@ -75,15 +75,15 @@ private struct NavigationContentView<Content: View>: View {
 			content()
 				.toolbar {
 					ToolbarItemGroup(placement: .topBarTrailing) {
-#if DEBUG
-						if SCREENSHOT_MODE { //SAMPLE
+#if targetEnvironment(simulator) //SAMPLE
 //							ShareLink(items: screenshotImages(startIndex: 0)) { SharePreview(MediaCollection.current.groupBy, image: $0) }
 //							ShareLink(items: screenshotImages(startIndex: imageIncrement)) { SharePreview(MediaCollection.current.groupBy, image: $0) }
 //							ShareLink(items: screenshotImages(startIndex: imageIncrement * 2)) { SharePreview(MediaCollection.current.groupBy, image: $0) }
-						}
 #endif
 						Button("Show as \(listViewMode)", systemImage: listViewMode == "grid" ? "list.triangle" : "square.grid.2x2") {
-							listViewMode = listViewMode == "grid" ? "list" : "grid"
+							withAnimation {
+								listViewMode = listViewMode == "grid" ? "list" : "grid"
+							}
 						}
 						Button("Settings", systemImage: "gearshape") {
 							showSettings = true

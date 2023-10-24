@@ -2,10 +2,6 @@ import SwiftUI
 import UIKit
 import MediaPlayer
 
-#if DEBUG
-let SCREENSHOT_MODE = false //SAMPLE
-#endif
-
 @main
 struct HeartBeatsApp: App {
 	init() {

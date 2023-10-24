@@ -17,18 +17,16 @@ final class MediaCollection {
 	let groupBy: String
 
 	var unavailable: MPMediaLibraryAuthorizationStatus?
+#if targetEnvironment(simulator)
+	var entries: [MediaEntry] = MediaCollection.screenshotData
+#else
 	var entries: [MediaEntry] = []
+#endif
 	var maximumSongsLimit = 99
 
 	init(groupBy: String) {
 		self.groupBy = groupBy
-#if targetEnvironment(simulator)
-		self.entries = Self.screenshotData
-#elseif DEBUG
-		if SCREENSHOT_MODE {
-			self.entries = Self.screenshotData
-		}
-#endif
+
 		if self.entries.isEmpty, let cache = groupBy == "genre" ? UserDefaults.standard.cachedGenres : UserDefaults.standard.cachedArtists {
 			self.entries = cache
 				.map { MediaEntry(id: $0[0] as! String, songs: nil, songCount: $0[1] as! Int, artwork: nil) }
@@ -50,7 +48,9 @@ final class MediaCollection {
 			MediaEntry(id: "Polo & Pan", songs: nil, songCount: 16, artwork: nil),
 			MediaEntry(id: "Sigur Rós", songs: nil, songCount: 30, artwork: nil),
 			MediaEntry(id: "Stromae", songs: nil, songCount: 15, artwork: nil),
+			MediaEntry(id: "Sufjan Stevens", songs: nil, songCount: 16, artwork: nil),
 			MediaEntry(id: "Toe", songs: nil, songCount: 34, artwork: nil),
+			MediaEntry(id: "Yelle", songs: nil, songCount: 26, artwork: nil),
 		]
 	}
 
@@ -116,8 +116,8 @@ final class MediaCollection {
 			}
 			for var name in checkNames {
 				var checkName = name.lowercased()
-#if DEBUG
-				if SCREENSHOT_MODE && !self.entries.contains(where: { $0.id.lowercased() == checkName }) {
+#if targetEnvironment(simulator)
+				if !showGenres && !self.entries.contains(where: { $0.id.lowercased() == checkName }) {
 					continue
 				}
 #endif
