@@ -58,12 +58,12 @@ final class MediaCollection {
 		SyncStorage.shared.showGenres ? genres : artists
 	}
 
-	class func updateCurrent() {
+	class func updateCurrent(withAnimation: Bool) {
 		Task {
 			if SyncStorage.shared.showGenres {
-				await genres.update()
+				await genres.update(withAnimation: withAnimation)
 			} else {
-				await artists.update()
+				await artists.update(withAnimation: withAnimation)
 			}
 		}
 	}
@@ -71,9 +71,9 @@ final class MediaCollection {
 	class func updateBackground() {
 		Task(priority: .background) {
 			if SyncStorage.shared.showGenres {
-				await artists.update()
+				await artists.update(withAnimation: false)
 			} else {
-				await genres.update()
+				await genres.update(withAnimation: false)
 			}
 		}
 	}
@@ -82,7 +82,7 @@ final class MediaCollection {
 		artists.unavailable = status
 	}
 
-	private func update() async {
+	private func update(withAnimation animated: Bool) async {
 		let showGenres = groupBy == "genre"
 		let query = showGenres ? MPMediaQuery.genres() : MPMediaQuery.artists()
 		guard let rawCollections = query.collections else {
@@ -151,23 +151,29 @@ final class MediaCollection {
 			.filter { $0.2.count >= allowedMinimumNumberOfSongs || ($0.2.count > 0 && favorited.contains($0.0)) }
 			.sorted { $0.0.forSorting.localizedStandardCompare($1.0.forSorting) == .orderedAscending }
 			.map { MediaEntry(id: $0.0, songs: $0.2, songCount: $0.2.count, artwork: $0.1.artwork) }
+		let updatesMinimum = SyncStorage.shared.showGenres == showGenres && exceedsMostNumberOfSongs && allowedMinimumNumberOfSongs > 0
 		Task { @MainActor in
-			withAnimation {
-				if SyncStorage.shared.showGenres == showGenres && exceedsMostNumberOfSongs && allowedMinimumNumberOfSongs > 0 {
-					SyncStorage.shared.minimum = allowedMinimumNumberOfSongs
+			if animated {
+				withAnimation {
+					apply(allowedMinimumNumberOfSongs: updatesMinimum ? allowedMinimumNumberOfSongs : nil, mostSongsLimit: mostSongsLimit, entries: entries)
 				}
-				self.maximumSongsLimit = mostSongsLimit
-				self.entries = entries
-				Task {
-					let cache = entries.map { [$0.id, $0.songCount] }
-					if showGenres {
-						UserDefaults.standard.cachedGenres = cache
-					} else {
-						UserDefaults.standard.cachedArtists = cache
-					}
-				}
+			} else {
+				apply(allowedMinimumNumberOfSongs: updatesMinimum ? allowedMinimumNumberOfSongs : nil, mostSongsLimit: mostSongsLimit, entries: entries)
 			}
 		}
+		let cache = entries.map { [$0.id, $0.songCount] }
+		if showGenres {
+			UserDefaults.standard.cachedGenres = cache
+		} else {
+			UserDefaults.standard.cachedArtists = cache
+		}
+	}
 
+	private func apply(allowedMinimumNumberOfSongs: Int?, mostSongsLimit: Int, entries: [MediaEntry]) {
+		if let allowedMinimumNumberOfSongs {
+			SyncStorage.shared.minimum = allowedMinimumNumberOfSongs
+		}
+		self.maximumSongsLimit = mostSongsLimit
+		self.entries = entries
 	}
 }

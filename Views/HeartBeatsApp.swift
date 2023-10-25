@@ -28,7 +28,7 @@ struct HeartBeatsApp: App {
 		case .notDetermined:
 			MPMediaLibrary.requestAuthorization(handleAuthorization)
 		case .authorized:
-			MediaCollection.updateCurrent()
+			MediaCollection.updateCurrent(withAnimation: true)
 			MediaCollection.updateBackground()
 		default:
 			MediaCollection.setUnavailable(status: status)

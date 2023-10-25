@@ -212,7 +212,7 @@ final class SyncStorage: ObservableObject {
 		observers.append(UserDefaults.standard.observe(\.showGenres) { (defaults, change) in
 			Task { @MainActor in
 				self.showGenres = UserDefaults.standard.showGenres
-				MediaCollection.updateCurrent()
+				MediaCollection.updateCurrent(withAnimation: false)
 				NSUbiquitousKeyValueStore.default.set(self.showGenres, forKey: StorageKey.showGenres)
 				#if DEBUG
 				NSUbiquitousKeyValueStore.default.synchronize()
@@ -222,7 +222,7 @@ final class SyncStorage: ObservableObject {
 		observers.append(UserDefaults.standard.observe(\.minimum) { (defaults, change) in
 			Task { @MainActor in
 				self.minimum = UserDefaults.standard.minimum
-				MediaCollection.updateCurrent()
+				MediaCollection.updateCurrent(withAnimation: true)
 				NSUbiquitousKeyValueStore.default.set(self.minimum, forKey: StorageKey.minimum)
 				#if DEBUG
 				NSUbiquitousKeyValueStore.default.synchronize()
