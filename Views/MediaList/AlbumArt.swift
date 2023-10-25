@@ -13,10 +13,10 @@ struct AlbumArt: View {
 	}
 
 	var uiImage: UIImage? {
-		var image = artwork?.image(at: CGSize(width: displayWidth * 2, height: displayWidth * 2))
-#if DEBUG
+		let image = artwork?.image(at: CGSize(width: displayWidth * 2, height: displayWidth * 2))
+#if targetEnvironment(simulator)
 		if image == nil {
-			image = UIImage(named: "\(artist).jpeg")
+			return UIImage(named: "\(artist).jpeg")
 		}
 #endif
 		return image

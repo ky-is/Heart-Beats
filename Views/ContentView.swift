@@ -62,7 +62,7 @@ private struct NavigationContentView<Content: View>: View {
 
 	@AppStorage(StorageKey.listViewMode) private var listViewMode = UserDefaults.standard.listViewMode
 
-#if DEBUG
+#if targetEnvironment(simulator)
 	private let imageIncrement = 3
 	func screenshotImages(startIndex: Int) -> [Image] {
 		let idealSize = CGSize(width: 128, height: 128)
@@ -75,11 +75,11 @@ private struct NavigationContentView<Content: View>: View {
 			content()
 				.toolbar {
 					ToolbarItemGroup(placement: .topBarTrailing) {
-#if targetEnvironment(simulator) //SAMPLE
+//#if targetEnvironment(simulator) //SAMPLE
 //							ShareLink(items: screenshotImages(startIndex: 0)) { SharePreview(MediaCollection.current.groupBy, image: $0) }
 //							ShareLink(items: screenshotImages(startIndex: imageIncrement)) { SharePreview(MediaCollection.current.groupBy, image: $0) }
 //							ShareLink(items: screenshotImages(startIndex: imageIncrement * 2)) { SharePreview(MediaCollection.current.groupBy, image: $0) }
-#endif
+//#endif
 						Button("Show as \(listViewMode)", systemImage: listViewMode == "grid" ? "list.triangle" : "square.grid.2x2") {
 							withAnimation {
 								listViewMode = listViewMode == "grid" ? "list" : "grid"
