@@ -1,6 +1,10 @@
 import SwiftUI
 import MediaPlayer
 
+private typealias ListGroupEntry = (label: String?, entries: [MediaEntry])
+
+private let FavoritesLabel = "Favorites"
+
 struct MediaList: View {
 	var collection: MediaCollection
 
@@ -8,7 +12,7 @@ struct MediaList: View {
 	@State private var selection: MediaEntry?
 	@EnvironmentObject private var syncStorage: SyncStorage
 
-	@AppStorage("listViewMode") private var listViewMode = UIDevice.current.userInterfaceIdiom == .pad ? "grid" : "list"
+	@AppStorage(StorageKey.listViewMode) private var listViewMode = UserDefaults.standard.listViewMode
 
 	private func play(entry: MediaEntry, addToQueue: Bool) {
 		guard let songs = entry.songs else { return }
@@ -58,7 +62,7 @@ struct MediaList: View {
 		}
 	}
 
-	private var groupedEntries: [[MediaEntry]] {
+	private var groupedEntries: [ListGroupEntry] {
 		let favorites = UserDefaults.standard.showGenres ? UserDefaults.standard.favoritedGenres : UserDefaults.standard.favorited
 		var favoriteEntries: [MediaEntry] = []
 		var nonfavoriteEntries: [MediaEntry] = []
@@ -69,7 +73,7 @@ struct MediaList: View {
 				nonfavoriteEntries.append(entry)
 			}
 		}
-		return favoriteEntries.isEmpty ? [nonfavoriteEntries] : [favoriteEntries, nonfavoriteEntries]
+		return favoriteEntries.isEmpty ? [(nil, nonfavoriteEntries)] : [(FavoritesLabel, favoriteEntries), (nil, nonfavoriteEntries)]
 	}
 
 	var body: some View {
@@ -83,9 +87,9 @@ struct MediaList: View {
 				play(entry: newValue, addToQueue: false)
 			}
 		}
-//		let allEntriesGroups: [[MediaEntry]] = [[]] //SAMPLE
+//		let allEntriesGroups: [ListGroupEntry] = [(nil, [])] //SAMPLE
 		let allEntriesGroups = groupedEntries
-		let hasEntries = !allEntriesGroups[0].isEmpty
+		let hasEntries = !allEntriesGroups.last!.entries.isEmpty
 #if targetEnvironment(simulator)
 		let showHeaders = false
 		let entryCount = 42
@@ -115,7 +119,7 @@ struct MediaList: View {
 
 private struct GridView: View {
 	let showHeaders: Bool
-	let allEntriesGroups: [[MediaEntry]]
+	let allEntriesGroups: [ListGroupEntry]
 	@Binding var activeSelection: MediaEntry?
 	let play: (MediaEntry, Bool) -> Void
 
@@ -147,7 +151,7 @@ private struct GridView: View {
 
 private struct ListView: View {
 	let showHeaders: Bool
-	let allEntriesGroups: [[MediaEntry]]
+	let allEntriesGroups: [ListGroupEntry]
 	@Binding var activeSelection: MediaEntry?
 	let play: (MediaEntry, Bool) -> Void
 
@@ -163,15 +167,15 @@ private struct EntriesView: View {
 	let listViewMode: String
 	let imageWidth: CGFloat
 	let showHeaders: Bool
-	let allEntriesGroups: [[MediaEntry]]
+	let allEntriesGroups: [ListGroupEntry]
 	@Binding var activeSelection: MediaEntry?
 	let play: (MediaEntry, Bool) -> Void
 
 	var body: some View {
-		ForEach(allEntriesGroups, id: \.self) { groupEntries in
-			let inFavorites = showHeaders && groupEntries == allEntriesGroups[0]
+		ForEach(allEntriesGroups, id: \.label) { listGroup in
 			Section {
-				ForEach(groupEntries) { entry in
+				let inFavorites = listGroup.label == FavoritesLabel
+				ForEach(listGroup.entries) { entry in
 					if listViewMode == "grid" {
 						Button {
 							activeSelection = entry
@@ -185,7 +189,7 @@ private struct EntriesView: View {
 				}
 			} header: {
 				if showHeaders {
-					Text(inFavorites ? "Favorites" : "Uncategorized")
+					Text(listGroup.label ?? "Uncategorized")
 //						.foregroundStyle(Color.secondary)
 						.font(.headline.smallCaps())
 				}

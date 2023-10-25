@@ -8,7 +8,7 @@ struct EmptyMediaList: View {
 	private let play: (MediaEntry, Bool) -> Void = { _, _ in }
 
 	var body: some View {
-		if (collection.groupBy == "genre" ? SyncStorage.shared.cachedGenres : SyncStorage.shared.cachedArtists) == nil {
+		if (collection.groupBy == "genre" ? UserDefaults.standard.cachedGenres : UserDefaults.standard.cachedArtists) == nil {
 			Group {
 				if listViewMode == "grid" {
 					LazyVGrid(columns: [GridItem(.adaptive(minimum: 88))]) {

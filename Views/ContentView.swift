@@ -60,7 +60,7 @@ private struct NavigationContentView<Content: View>: View {
 
 	@State private var showSettings = false
 
-	@AppStorage("listViewMode") private var listViewMode = UIDevice.current.userInterfaceIdiom == .pad ? "grid" : "list"
+	@AppStorage(StorageKey.listViewMode) private var listViewMode = UserDefaults.standard.listViewMode
 
 #if DEBUG
 	private let imageIncrement = 3

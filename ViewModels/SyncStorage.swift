@@ -1,4 +1,4 @@
-import UserNotifications
+import UIKit
 
 struct StorageKey {
 	static let played = "played"
@@ -9,9 +9,10 @@ struct StorageKey {
 	static let combinedGenres = "combinedGenres"
 	static let showGenres = "showGenres"
 	static let minimum = "minimum"
+
+	static let listViewMode = "listViewMode"
 	static let cachedArtists = "cachedArtists"
 	static let cachedGenres = "cachedGenres"
-
 }
 
 typealias CacheSong = (name: String, songCount: Int)
@@ -53,6 +54,17 @@ extension UserDefaults {
 		let stored = integer(forKey: StorageKey.minimum)
 		return stored <= 0 ? 15 : stored
 #endif
+	}
+
+	// Unsycned
+
+	var listViewMode: String {
+		get {
+			return string(forKey: StorageKey.listViewMode) ?? (UIDevice.current.userInterfaceIdiom == .pad ? "grid" : "list")
+		}
+		set(value) {
+			set(value, forKey: StorageKey.listViewMode)
+		}
 	}
 
 	var cachedArtists: [[Any]]? {
@@ -116,16 +128,6 @@ final class SyncStorage: ObservableObject {
 			UserDefaults.standard.set(newValue, forKey: StorageKey.minimum)
 		}
 	}
-	@Published var cachedArtists: [[Any]]? {
-		willSet {
-			UserDefaults.standard.set(newValue, forKey: StorageKey.cachedArtists)
-		}
-	}
-	@Published var cachedGenres: [[Any]]? {
-		willSet {
-			UserDefaults.standard.set(newValue, forKey: StorageKey.cachedGenres)
-		}
-	}
 
 	var currentPlayed: [String] {
 		showGenres ? playedGenres : played
@@ -150,8 +152,6 @@ final class SyncStorage: ObservableObject {
 		combinedGenres = UserDefaults.standard.combinedGenres
 		showGenres = UserDefaults.standard.showGenres
 		minimum = UserDefaults.standard.minimum
-		cachedArtists = UserDefaults.standard.cachedArtists
-		cachedGenres = UserDefaults.standard.cachedGenres
 
 		NotificationCenter.default.addObserver(self, selector: #selector(didChangeExternally), name: NSUbiquitousKeyValueStore.didChangeExternallyNotification, object: nil)
 

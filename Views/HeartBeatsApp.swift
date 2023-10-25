@@ -5,8 +5,8 @@ import MediaPlayer
 @main
 struct HeartBeatsApp: App {
 	init() {
-//		SyncStorage.shared.cachedArtists = nil //SAMPLE
-//		SyncStorage.shared.cachedGenres = nil
+//		UserDefaults.standard.cachedArtists = nil //SAMPLE
+//		UserDefaults.standard.cachedGenres = nil
 
 #if !targetEnvironment(simulator)
 		handleAuthorization(status: MPMediaLibrary.authorizationStatus())
