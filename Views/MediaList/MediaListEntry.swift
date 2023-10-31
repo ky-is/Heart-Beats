@@ -9,18 +9,14 @@ struct MediaListEntry: View {
 
 	private var favoriteButton: some View {
 		Button(inFavorites ? "Unfavorite" : "Favorite", systemImage: inFavorites ? "star" : "star.fill") {
-			var favorites = SyncStorage.shared.currentFavorites
+			var favorites = UserDefaults.standard.currentFavorites
 			if inFavorites {
 				favorites = favorites.filter { $0 != entry.id}
 			} else {
 				favorites.append(entry.id)
 			}
 			withAnimation {
-				if SyncStorage.shared.showGenres {
-					SyncStorage.shared.favoritedGenres = favorites
-				} else {
-					SyncStorage.shared.favorited = favorites
-				}
+				UserDefaults.standard.currentFavorites = favorites
 			}
 		}
 	}

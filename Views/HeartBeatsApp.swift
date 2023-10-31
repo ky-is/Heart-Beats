@@ -11,6 +11,7 @@ struct HeartBeatsApp: App {
 #if !targetEnvironment(simulator)
 		handleAuthorization(status: MPMediaLibrary.authorizationStatus())
 #endif
+		UserDefaults.standard.observe()
 
 		UINavigationBar.appearance().largeTitleTextAttributes = [.font: UIFont.rounded(style: .largeTitle, bold: true)]
 		UINavigationBar.appearance().titleTextAttributes = [.font: UIFont.rounded(style: .headline, bold: false)]
@@ -41,6 +42,5 @@ struct HeartBeatsApp: App {
 				.tint(.accent)
 				.fontDesign(.rounded)
 		}
-			.environmentObject(SyncStorage.shared)
 	}
 }

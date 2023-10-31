@@ -1,11 +1,11 @@
 import SwiftUI
 
 struct ContentView: View {
-	@EnvironmentObject private var syncStorage: SyncStorage
+	@AppStorage(UserDefaults.Key.showGenres) private var showGenres = false
 
 	var body: some View {
 		GeometryReader { geometry in
-			TabView(selection: $syncStorage.showGenres) {
+			TabView(selection: $showGenres) {
 				TabsContent()
 			}
 				.overlay(alignment: .bottom) {
@@ -60,13 +60,14 @@ private struct NavigationContentView<Content: View>: View {
 
 	@State private var showSettings = false
 
-	@AppStorage(StorageKey.listViewMode) private var listViewMode = UserDefaults.standard.listViewMode
+	@AppStorage(UserDefaults.Key.listViewMode) private var listViewMode = UserDefaults.standard.listViewMode
+	@AppStorage(UserDefaults.Key.showGenres) private var showGenres = false
 
 #if targetEnvironment(simulator)
 	private let imageIncrement = 3
 	func screenshotImages(startIndex: Int) -> [Image] {
 		let idealSize = CGSize(width: 128, height: 128)
-		return MediaCollection.current.entries.filter({ SyncStorage.shared.showGenres ? true : SyncStorage.shared.currentFavorites.contains($0.id) })[startIndex..<startIndex+imageIncrement].compactMap { $0.artwork?.image(at: idealSize) }.map { Image(uiImage: $0.scale(to: idealSize)) }
+		return MediaCollection.current.entries.filter({ UserDefaults.standard.showGenres ? true : UserDefaults.standard.currentFavorites.contains($0.id) })[startIndex..<startIndex+imageIncrement].compactMap { $0.artwork?.image(at: idealSize) }.map { Image(uiImage: $0.scale(to: idealSize)) }
 	}
 #endif
 
@@ -100,5 +101,4 @@ private struct NavigationContentView<Content: View>: View {
 #Preview {
 	ContentView()
 		.tint(.accent)
-		.environmentObject(SyncStorage.shared)
 }

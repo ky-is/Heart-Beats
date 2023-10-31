@@ -9,7 +9,7 @@
 /* Begin PBXBuildFile section */
 		2425D5CD2AE5B1BD00379D68 /* MediaListEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2425D5CC2AE5B1BD00379D68 /* MediaListEntry.swift */; };
 		2426FF152AE4BC33007F425C /* MinimumSongsButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2426FF142AE4BC33007F425C /* MinimumSongsButton.swift */; };
-		2426FF172AE4BDC1007F425C /* SyncStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2426FF162AE4BDC1007F425C /* SyncStorage.swift */; };
+		2426FF172AE4BDC1007F425C /* UserDefaults+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2426FF162AE4BDC1007F425C /* UserDefaults+Extensions.swift */; };
 		243448722AE73DA200B41C2E /* AlbumArt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 243448712AE73DA200B41C2E /* AlbumArt.swift */; };
 		2434953A2AE47FF20038D8D4 /* Foundation+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 243495382AE47FF20038D8D4 /* Foundation+Extensions.swift */; };
 		2434953D2AE480040038D8D4 /* MediaCollection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2434953C2AE480040038D8D4 /* MediaCollection.swift */; };
@@ -29,7 +29,7 @@
 /* Begin PBXFileReference section */
 		2425D5CC2AE5B1BD00379D68 /* MediaListEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaListEntry.swift; sourceTree = "<group>"; };
 		2426FF142AE4BC33007F425C /* MinimumSongsButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MinimumSongsButton.swift; sourceTree = "<group>"; };
-		2426FF162AE4BDC1007F425C /* SyncStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncStorage.swift; sourceTree = "<group>"; };
+		2426FF162AE4BDC1007F425C /* UserDefaults+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UserDefaults+Extensions.swift"; sourceTree = "<group>"; };
 		243448712AE73DA200B41C2E /* AlbumArt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumArt.swift; sourceTree = "<group>"; };
 		243495382AE47FF20038D8D4 /* Foundation+Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Foundation+Extensions.swift"; sourceTree = "<group>"; };
 		2434953C2AE480040038D8D4 /* MediaCollection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaCollection.swift; sourceTree = "<group>"; };
@@ -75,7 +75,6 @@
 			isa = PBXGroup;
 			children = (
 				2434953C2AE480040038D8D4 /* MediaCollection.swift */,
-				2426FF162AE4BDC1007F425C /* SyncStorage.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -86,6 +85,7 @@
 				243495382AE47FF20038D8D4 /* Foundation+Extensions.swift */,
 				243495402AE493890038D8D4 /* Color+Extensions.swift */,
 				243495422AE493A90038D8D4 /* UIKit+Extensions.swift */,
+				2426FF162AE4BDC1007F425C /* UserDefaults+Extensions.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -234,7 +234,7 @@
 				243448722AE73DA200B41C2E /* AlbumArt.swift in Sources */,
 				249BF6A92AE3683C00A3E2F1 /* HeartBeatsApp.swift in Sources */,
 				246ECD782AE5C91E00E90334 /* EmptyMediaList.swift in Sources */,
-				2426FF172AE4BDC1007F425C /* SyncStorage.swift in Sources */,
+				2426FF172AE4BDC1007F425C /* UserDefaults+Extensions.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

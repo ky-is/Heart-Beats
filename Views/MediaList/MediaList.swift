@@ -10,31 +10,20 @@ struct MediaList: View {
 
 	@Environment(\.scenePhase) private var scenePhase
 	@State private var selection: MediaEntry?
-	@EnvironmentObject private var syncStorage: SyncStorage
 
-	@AppStorage(StorageKey.listViewMode) private var listViewMode = UserDefaults.standard.listViewMode
+	@AppStorage(UserDefaults.Key.listViewMode) private var listViewMode = UserDefaults.standard.listViewMode
 
 	private func play(entry: MediaEntry, addToQueue: Bool) {
 		guard let songs = entry.songs else { return }
 
 		Task { @MainActor in
 			let entryName = entry.id
-			let played = SyncStorage.shared.currentPlayed
+			let played = UserDefaults.standard.currentPlayed
 			if !played.contains(entryName) {
-				var favorites = SyncStorage.shared.currentFavorites
-				if favorites.count < 3 {
-					favorites.append(entryName)
-					if SyncStorage.shared.showGenres {
-						SyncStorage.shared.favoritedGenres = favorites
-					} else {
-						SyncStorage.shared.favorited = favorites
-					}
+				if UserDefaults.standard.currentFavorites.count < 3 {
+					UserDefaults.standard.currentFavorites.append(entryName)
 				}
-				if SyncStorage.shared.showGenres {
-					SyncStorage.shared.playedGenres.append(entryName)
-				} else {
-					SyncStorage.shared.played.append(entryName)
-				}
+				UserDefaults.standard.currentPlayed.append(entryName)
 			}
 		}
 
@@ -52,7 +41,7 @@ struct MediaList: View {
 	}
 
 	private func openMusicApp() async {
-		if let url = URL(string: "audio-player-event:"), UIApplication.shared.canOpenURL(url) {
+		if let url = URL(string: "audio-player-event:"), await UIApplication.shared.canOpenURL(url) {
 			Task { @MainActor in
 				await UIApplication.shared.open(url)
 			}

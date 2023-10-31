@@ -6,7 +6,6 @@ struct CreateCombineGrouping: View {
 	@State private var fromGrouping = ""
 	@State private var intoGrouping = ""
 
-	@EnvironmentObject private var syncStorage: SyncStorage
 	@Environment(\.dismiss) private var dismiss
 
 	var body: some View {
@@ -35,14 +34,8 @@ struct CreateCombineGrouping: View {
 			.toolbar {
 				ToolbarItem(placement: .topBarTrailing) {
 					Button("Save") {
-						var combined = isGenre ? syncStorage.combinedGenres : syncStorage.combined
-						combined.append([intoGrouping, fromGrouping])
 						withAnimation {
-							if isGenre {
-								syncStorage.combinedGenres = combined
-							} else {
-								syncStorage.combined = combined
-							}
+							UserDefaults.standard.currentCombined.append([intoGrouping, fromGrouping])
 						}
 						dismiss()
 					}
@@ -57,5 +50,4 @@ struct CreateCombineGrouping: View {
 		CreateCombineGrouping(type: "artist")
 	}
 		.tint(.accent)
-		.environmentObject(SyncStorage.shared)
 }

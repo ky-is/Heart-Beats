@@ -3,12 +3,13 @@ import SwiftUI
 struct CombineGroupings: View {
 	let type: String
 
-	@EnvironmentObject private var syncStorage: SyncStorage
+	@AppStorage(UserDefaults.Key.combined) private var combinedArtists = UserDefaults.standard.combined
+	@AppStorage(UserDefaults.Key.combinedGenres) private var combinedGenres = UserDefaults.standard.combinedGenres
 
 	var body: some View {
 		let isGenre = type == "genre"
 		List {
-			var baseCombined = isGenre ? syncStorage.combinedGenres : syncStorage.combined
+			var baseCombined = isGenre ? combinedGenres : combinedArtists
 			Section("Existing combinations:") {
 				if baseCombined.isEmpty {
 					Text("No entries")
@@ -25,11 +26,11 @@ struct CombineGroupings: View {
 						.onDelete { offsets in
 							baseCombined.remove(atOffsets: offsets)
 							withAnimation {
-								if isGenre {
-									syncStorage.combinedGenres = baseCombined
-								} else {
-									syncStorage.combined = baseCombined
-								}
+//								if isGenre {
+//									combinedGenres = baseCombined
+//								} else {
+//									combinedArtists = baseCombined
+//								}
 							}
 						}
 				}
@@ -51,5 +52,4 @@ struct CombineGroupings: View {
 		CombineGroupings(type: "artist")
 	}
 		.tint(.accent)
-		.environmentObject(SyncStorage.shared)
 }

@@ -55,12 +55,12 @@ final class MediaCollection {
 	}
 
 	class var current: MediaCollection {
-		SyncStorage.shared.showGenres ? genres : artists
+		UserDefaults.standard.showGenres ? genres : artists
 	}
 
 	class func updateCurrent(withAnimation: Bool) {
 		Task {
-			if SyncStorage.shared.showGenres {
+			if UserDefaults.standard.showGenres {
 				await genres.update(withAnimation: withAnimation)
 			} else {
 				await artists.update(withAnimation: withAnimation)
@@ -70,7 +70,7 @@ final class MediaCollection {
 
 	class func updateBackground() {
 		Task(priority: .background) {
-			if SyncStorage.shared.showGenres {
+			if UserDefaults.standard.showGenres {
 				await artists.update(withAnimation: false)
 			} else {
 				await genres.update(withAnimation: false)
@@ -88,13 +88,18 @@ final class MediaCollection {
 		guard let rawCollections = query.collections else {
 			return print("Unable to load music")
 		}
-		let favorited = SyncStorage.shared.currentFavorites
-		let combined = SyncStorage.shared.currentCombined
+		let favorited = UserDefaults.standard.currentFavorites
+		let combined = UserDefaults.standard.currentCombined
 		var collectionsAcc = [String: (String, MPMediaItem, [MPMediaItem])]()
 		var mostSongsAcc = 0
 		for collection in rawCollections {
-			guard let representative = collection.representativeItem else {
-				print("No \(groupBy)", collection)
+			let representative: MPMediaItem?
+			if collection.representativeItem?.artwork != nil {
+				representative = collection.representativeItem
+			} else {
+				representative = collection.items.first { $0.artwork != nil }
+			}
+			guard let representative else {
 				continue
 			}
 			var checkNames = [String]()
@@ -145,13 +150,13 @@ final class MediaCollection {
 		}
 		let collections = collectionsAcc.values
 		let mostSongsLimit = min(99, mostSongsAcc)
-		let exceedsMostNumberOfSongs = SyncStorage.shared.minimum > mostSongsLimit
-		let allowedMinimumNumberOfSongs = exceedsMostNumberOfSongs ? mostSongsLimit : SyncStorage.shared.minimum
+		let exceedsMostNumberOfSongs = UserDefaults.standard.minimum > mostSongsLimit
+		let allowedMinimumNumberOfSongs = exceedsMostNumberOfSongs ? mostSongsLimit : UserDefaults.standard.minimum
 		let entries = collections
 			.filter { $0.2.count >= allowedMinimumNumberOfSongs || ($0.2.count > 0 && favorited.contains($0.0)) }
 			.sorted { $0.0.forSorting.localizedStandardCompare($1.0.forSorting) == .orderedAscending }
 			.map { MediaEntry(id: $0.0, songs: $0.2, songCount: $0.2.count, artwork: $0.1.artwork) }
-		let updatesMinimum = SyncStorage.shared.showGenres == showGenres && exceedsMostNumberOfSongs && allowedMinimumNumberOfSongs > 0
+		let updatesMinimum = UserDefaults.standard.showGenres == showGenres && exceedsMostNumberOfSongs && allowedMinimumNumberOfSongs > 0
 		Task { @MainActor in
 			if animated {
 				withAnimation {
@@ -171,7 +176,7 @@ final class MediaCollection {
 
 	private func apply(allowedMinimumNumberOfSongs: Int?, mostSongsLimit: Int, entries: [MediaEntry]) {
 		if let allowedMinimumNumberOfSongs {
-			SyncStorage.shared.minimum = allowedMinimumNumberOfSongs
+			UserDefaults.standard.minimum = allowedMinimumNumberOfSongs
 		}
 		self.maximumSongsLimit = mostSongsLimit
 		self.entries = entries
