@@ -133,7 +133,11 @@ extension UserDefaults {
 			return showGenres ? playedGenres : played
 		}
 		set(value) {
-			set(value, forKey: showGenres ? UserDefaults.Key.playedGenres : UserDefaults.Key.played)
+			if showGenres {
+				playedGenres = value
+			} else {
+				played = value
+			}
 		}
 	}
 	var currentFavorites: [String] {
@@ -141,7 +145,11 @@ extension UserDefaults {
 			return showGenres ? favoritedGenres : favorited
 		}
 		set(value) {
-			set(value, forKey: showGenres ? UserDefaults.Key.favoritedGenres : UserDefaults.Key.favorited)
+			if showGenres {
+				favoritedGenres = value
+			} else {
+				favorited = value
+			}
 		}
 	}
 	var currentCombined: [[String]] {
@@ -149,7 +157,11 @@ extension UserDefaults {
 			return showGenres ? combinedGenres : combined
 		}
 		set(value) {
-			set(value, forKey: showGenres ? UserDefaults.Key.combinedGenres : UserDefaults.Key.combined)
+			if showGenres {
+				combinedGenres = value
+			} else {
+				combined = value
+			}
 		}
 	}
 
