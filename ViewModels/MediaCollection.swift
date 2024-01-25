@@ -119,30 +119,30 @@ final class MediaCollection {
 			guard !checkNames.isEmpty else {
 				continue
 			}
+			let songs = collection.items.filter { $0.rating >= 5 }
 			for var name in checkNames {
-				var checkName = name.lowercased()
+				var normalizedName = name.normalized()
 #if targetEnvironment(simulator)
-				if !showGenres && !self.entries.contains(where: { $0.id.lowercased() == checkName }) {
+				if !showGenres && !self.entries.contains(where: { $0.id.normalized() == normalizedName }) {
 					continue
 				}
 #endif
-				if !showGenres && checkName == "various artists" {
+				if !showGenres && normalizedName == "various artists" {
 					continue
 				}
 				for combining in combined {
 					if let index = combining.firstIndex(of: name), index > 0 {
 						name = combining[0]
-						checkName = name.lowercased()
+						normalizedName = name.normalized()
 						break
 					}
 				}
-				let songs = collection.items.filter { $0.rating >= 5 }
-				if collectionsAcc[checkName] != nil {
-					collectionsAcc[checkName]!.2.append(contentsOf: songs)
+				if collectionsAcc[normalizedName] != nil {
+					collectionsAcc[normalizedName]!.2.append(contentsOf: songs)
 				} else {
-					collectionsAcc[checkName] = (name, representative, songs)
+					collectionsAcc[normalizedName] = (name, representative, songs)
 				}
-				let newTotal = collectionsAcc[checkName]!.2.count
+				let newTotal = collectionsAcc[normalizedName]!.2.count
 				if newTotal > mostSongsAcc {
 					mostSongsAcc = newTotal
 				}

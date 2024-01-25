@@ -7,6 +7,10 @@ extension Bundle {
 }
 
 extension String {
+	func normalized() -> Self {
+		lowercased().trimmingCharacters(in: .whitespacesAndNewlines)
+	}
+
 	func plural(_ amount: Int) -> String {
 		return amount == 1 ? self : "\(self)s"
 	}
