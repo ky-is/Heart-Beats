@@ -27,8 +27,12 @@ struct MediaList: View {
 			}
 		}
 
-		Task {
+		Task { @MainActor in
+#if targetEnvironment(macCatalyst)
+			let player = MPMusicPlayerController.applicationMusicPlayer
+#else
 			let player = MPMusicPlayerController.systemMusicPlayer
+#endif
 			let songCollection = MPMediaItemCollection(items: songs.shuffled())
 			if addToQueue {
 				player.prepend(MPMusicPlayerMediaItemQueueDescriptor(itemCollection: songCollection))
