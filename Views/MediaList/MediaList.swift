@@ -98,6 +98,7 @@ struct MediaList: View {
 			.navigationTitle(collection.groupBy.capitalized.pluralize(entryCount))
 			.onChange(of: scenePhase) { _, newPhase in
 				if newPhase == .active {
+					MediaCollection.updateCurrent(withAnimation: false)
 					withAnimation {
 						selection = nil
 					}
