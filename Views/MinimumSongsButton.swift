@@ -23,6 +23,7 @@ struct MinimumSongsButton: View {
 				.padding(.horizontal, 12)
 				.padding(.top, 8)
 		}
+			.buttonStyle(.plain)
 			.popover(isPresented: $showSongMinimum) {
 				MinimumSongsStepper()
 			}
@@ -58,6 +59,9 @@ private struct MinimumSongsStepper: View {
 		}
 			.imageScale(.large)
 			.presentationCompactAdaptation(.popover)
+#if targetEnvironment(macCatalyst)
+			.padding(.horizontal)
+#endif
 	}
 }
 

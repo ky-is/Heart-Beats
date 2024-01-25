@@ -51,6 +51,9 @@ struct MediaListEntry: View {
 					Text(String(entry.songCount))
 						.foregroundStyle(Color.secondary)
 				}
+#if targetEnvironment(macCatalyst)
+					.padding([.vertical, .trailing], 8)
+#endif
 			}
 		}
 			.contextMenu {
@@ -95,9 +98,13 @@ struct MediaListEntry: View {
 }
 
 #Preview {
-	List {
-		MediaListEntry(listViewMode: "grid", entry: MediaCollection.screenshotData[0], imageWidth: 88, inFavorites: true, play: { _, _ in })
+	NavigationStack {
+		List {
+			MediaListEntry(listViewMode: "list", entry: MediaCollection.screenshotData[0], imageWidth: 88, inFavorites: true, play: { _, _ in })
+			MediaListEntry(listViewMode: "list", entry: MediaCollection.screenshotData[1], imageWidth: 88, inFavorites: true, play: { _, _ in })
+			MediaListEntry(listViewMode: "grid", entry: MediaCollection.screenshotData[0], imageWidth: 88, inFavorites: true, play: { _, _ in })
+		}
+			.listStyle(.plain)
 	}
-		.listStyle(.plain)
 		.fontDesign(.rounded)
 }

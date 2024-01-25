@@ -41,6 +41,8 @@ struct HeartBeatsApp: App {
 			ContentView()
 				.tint(.accent)
 				.fontDesign(.rounded)
+				.frame(minWidth: 320, minHeight: 320)
 		}
+			.windowResizability(.contentMinSize)
 	}
 }

@@ -113,7 +113,7 @@ private struct GridView: View {
 	@Binding var activeSelection: MediaEntry?
 	let play: (MediaEntry, Bool) -> Void
 
-	private let idealWidth: CGFloat = UIDevice.current.userInterfaceIdiom == .pad ? 176 : 144
+	private let idealWidth: CGFloat = UIScreen.main.bounds.width >= 2048 ? 256 : (UIDevice.current.userInterfaceIdiom == .pad ? 176 : 144)
 	private let spacing: CGFloat = UIDevice.current.userInterfaceIdiom == .pad ? 16 : 8
 
 	private func sizeColumns(in geometry: GeometryProxy, idealWidth: CGFloat, spacing: CGFloat) -> (count: Int, width: CGFloat) {
@@ -172,6 +172,7 @@ private struct EntriesView: View {
 						} label: {
 							MediaListEntry(listViewMode: listViewMode, entry: entry, imageWidth: imageWidth, inFavorites: inFavorites, play: play)
 						}
+							.buttonStyle(.plain)
 					} else {
 						MediaListEntry(listViewMode: listViewMode, entry: entry, imageWidth: imageWidth, inFavorites: inFavorites, play: play)
 							.tag(entry)

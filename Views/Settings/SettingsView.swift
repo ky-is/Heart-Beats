@@ -29,10 +29,13 @@ struct SettingsView: View {
 			}
 				.navigationTitle("Settings")
 				.toolbar {
-					ToolbarItem(placement: .topBarTrailing) {
+					ToolbarItem(placement: .cancellationAction) {
 						Button("Close") {
 							dismiss()
 						}
+#if targetEnvironment(macCatalyst)
+							.buttonStyle(.borderless)
+#endif
 					}
 				}
 		}

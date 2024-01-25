@@ -86,9 +86,15 @@ private struct NavigationContentView<Content: View>: View {
 								listViewMode = listViewMode == "grid" ? "list" : "grid"
 							}
 						}
+#if targetEnvironment(macCatalyst)
+							.buttonStyle(.borderless)
+#endif
 						Button("Settings", systemImage: "gearshape") {
 							showSettings = true
 						}
+#if targetEnvironment(macCatalyst)
+							.buttonStyle(.borderless)
+#endif
 					}
 				}
 				.sheet(isPresented: $showSettings) {
