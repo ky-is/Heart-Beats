@@ -17,6 +17,7 @@ struct MediaListEntry: View {
 			}
 			withAnimation {
 				UserDefaults.standard.currentFavorites = favorites
+				MediaCollection.updateCurrent(withAnimation: true)
 			}
 		}
 	}
