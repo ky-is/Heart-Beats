@@ -51,5 +51,4 @@ struct CombineGroupings: View {
 	NavigationStack {
 		CombineGroupings(type: "artist")
 	}
-		.tint(.accent)
 }

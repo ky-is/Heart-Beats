@@ -106,5 +106,4 @@ private struct NavigationContentView<Content: View>: View {
 
 #Preview {
 	ContentView()
-		.tint(.accent)
 }

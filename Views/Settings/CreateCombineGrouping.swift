@@ -49,5 +49,4 @@ struct CreateCombineGrouping: View {
 	NavigationStack {
 		CreateCombineGrouping(type: "artist")
 	}
-		.tint(.accent)
 }

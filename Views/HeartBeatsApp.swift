@@ -4,6 +4,8 @@ import MediaPlayer
 
 @main
 struct HeartBeatsApp: App {
+	@UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
+
 	init() {
 //		UserDefaults.standard.cachedArtists = nil //SAMPLE
 //		UserDefaults.standard.cachedGenres = nil
@@ -12,7 +14,20 @@ struct HeartBeatsApp: App {
 		handleAuthorization(status: MPMediaLibrary.authorizationStatus())
 #endif
 		UserDefaults.standard.observe()
+	}
 
+	var body: some Scene {
+		WindowGroup {
+			ContentView()
+				.fontDesign(.rounded)
+				.frame(minWidth: 320, minHeight: 320)
+		}
+			.windowResizability(.contentMinSize)
+	}
+}
+
+final class AppDelegate: NSObject, UIApplicationDelegate {
+	func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
 		UINavigationBar.appearance().largeTitleTextAttributes = [.font: UIFont.rounded(style: .largeTitle, bold: true)]
 		UINavigationBar.appearance().titleTextAttributes = [.font: UIFont.rounded(style: .headline, bold: false)]
 
@@ -22,7 +37,9 @@ struct HeartBeatsApp: App {
 		UITabBarItem.appearance().setTitleTextAttributes([.font: UIFont.rounded(style: .caption2, bold: false)], for: .normal)
 
 		UIView.appearance(whenContainedInInstancesOf: [UIAlertController.self]).tintColor = .accentColor
+		return true
 	}
+}
 
 	private func handleAuthorization(status: MPMediaLibraryAuthorizationStatus) {
 		switch status {
@@ -46,3 +63,4 @@ struct HeartBeatsApp: App {
 			.windowResizability(.contentMinSize)
 	}
 }
+

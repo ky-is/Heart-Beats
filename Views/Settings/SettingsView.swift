@@ -64,6 +64,5 @@ private struct ExternalLink: View {
 
 #Preview {
 	SettingsView()
-		.tint(.accent)
 		.fontDesign(.rounded)
 }

@@ -74,5 +74,4 @@ private struct MinimumSongsStepper: View {
 			.frame(maxWidth: .infinity, maxHeight: .infinity)
 	}
 		.fontDesign(.rounded)
-		.tint(.accent)
 }
