@@ -10,7 +10,7 @@ extension UserDefaults {
 		static let playedGenres = "playedGenres"
 		static let favoritedGenres = "favoritedGenres"
 		static let combinedGenres = "combinedGenres"
-		static let showGenres = "showGenres"
+		static let selectedTab = "selectedTab"
 		static let minimum = "minimum"
 
 		// Unsynced
@@ -18,6 +18,7 @@ extension UserDefaults {
 		static let listViewMode = "listViewMode"
 		static let cachedArtists = "cachedArtists"
 		static let cachedGenres = "cachedGenres"
+		static let cachedYears = "cachedYears"
 	}
 
 	@objc dynamic var played: [String] {
@@ -77,9 +78,9 @@ extension UserDefaults {
 			set(value, forKey: #function)
 		}
 	}
-	@objc dynamic var showGenres: Bool {
+	@objc dynamic var selectedTab: String {
 		get {
-			bool(forKey: #function)
+			string(forKey: #function) ?? "artists"
 		}
 		set(value) {
 			set(value, forKey: #function)
@@ -126,14 +127,21 @@ extension UserDefaults {
 			set(value, forKey: UserDefaults.Key.cachedGenres)
 		}
 	}
-
+	var cachedYears: [[Any]]? {
+		get {
+			return array(forKey: UserDefaults.Key.cachedYears) as? [[Any]]
+		}
+		set(value) {
+			set(value, forKey: UserDefaults.Key.cachedYears)
+		}
+	}
 
 	var currentPlayed: [String] {
 		get {
-			return showGenres ? playedGenres : played
+			return selectedTab == "genres" ? playedGenres : played
 		}
 		set(value) {
-			if showGenres {
+			if selectedTab == "genres" {
 				playedGenres = value
 			} else {
 				played = value
@@ -142,10 +150,10 @@ extension UserDefaults {
 	}
 	var currentFavorites: [String] {
 		get {
-			return showGenres ? favoritedGenres : favorited
+			return selectedTab == "genres" ? favoritedGenres : favorited
 		}
 		set(value) {
-			if showGenres {
+			if selectedTab == "genres" {
 				favoritedGenres = value
 			} else {
 				favorited = value
@@ -154,10 +162,10 @@ extension UserDefaults {
 	}
 	var currentCombined: [[String]] {
 		get {
-			return showGenres ? combinedGenres : combined
+			return selectedTab == "genres" ? combinedGenres : combined
 		}
 		set(value) {
-			if showGenres {
+			if selectedTab == "genres" {
 				combinedGenres = value
 			} else {
 				combined = value
@@ -176,11 +184,11 @@ extension UserDefaults {
 		keepSynced(\.playedGenres)
 		keepSynced(\.favoritedGenres)
 		keepSynced(\.combinedGenres)
-		keepSynced(\.showGenres) {
-			MediaCollection.updateCurrent(withAnimation: false)
+		keepSynced(\.selectedTab) {
+			GroupedCollection.updateCurrent(withAnimation: false)
 		}
 		keepSynced(\.minimum) {
-			MediaCollection.updateCurrent(withAnimation: true)
+			GroupedCollection.updateCurrent(withAnimation: true)
 		}
 	}
 
@@ -190,9 +198,9 @@ extension UserDefaults {
 			let key = NSExpression(forKeyPath: keyPath).keyPath
 			self.setValue(value, forKey: key)
 			NSUbiquitousKeyValueStore.default.set(value, forKey: key)
-#if DEBUG
-			NSUbiquitousKeyValueStore.default.synchronize()
-#endif
+//#if DEBUG
+//			NSUbiquitousKeyValueStore.default.synchronize()
+//#endif
 			apply?()
 		})
 	}

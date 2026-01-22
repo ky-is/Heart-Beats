@@ -10,7 +10,7 @@ struct CreateCombineGrouping: View {
 
 	var body: some View {
 		let isGenre = type == "genre"
-		let baseEntries = (isGenre ? MediaCollection.genres : MediaCollection.artists).entries
+		let baseEntries = (isGenre ? GroupedCollection.genres : GroupedCollection.artists).entries
 		List {
 			Section("Into \(type):") {
 				Picker("Combine Into", selection: $intoGrouping) {

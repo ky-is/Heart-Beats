@@ -48,6 +48,6 @@ struct AlbumArt: View {
 }
 
 #Preview {
-	let entry = MediaCollection.screenshotData[0]
+	let entry = GroupedCollection.screenshotData[0]
 	return AlbumArt(artist: entry.id, artwork: entry.artwork, displayWidth: 88 * 2)
 }

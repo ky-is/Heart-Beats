@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct EmptyMediaList: View {
-	var collection: MediaCollection
+	var collection: GroupedCollection
 	let listViewMode: String
 	let imageWidth: CGFloat
 
@@ -12,14 +12,14 @@ struct EmptyMediaList: View {
 			Group {
 				if listViewMode == "grid" {
 					LazyVGrid(columns: [GridItem(.adaptive(minimum: 88))]) {
-						ForEach(MediaCollection.screenshotData) {
-							MediaListEntry(listViewMode: listViewMode, entry: $0, imageWidth: imageWidth, inFavorites: false, play: play)
+						ForEach(GroupedCollection.screenshotData) {
+							MediaListEntry(listViewMode: listViewMode, largeTitles: false, entry: $0, imageWidth: imageWidth, inFavorites: false, play: play)
 						}
 					}
 				} else {
 					List {
-						ForEach(MediaCollection.screenshotData) {
-							MediaListEntry(listViewMode: listViewMode, entry: $0, imageWidth: imageWidth, inFavorites: false, play: play)
+						ForEach(GroupedCollection.screenshotData) {
+							MediaListEntry(listViewMode: listViewMode, largeTitles: false, entry: $0, imageWidth: imageWidth, inFavorites: false, play: play)
 						}
 					}
 					.listStyle(.plain)
@@ -54,7 +54,7 @@ struct EmptyMediaList: View {
 
 #Preview {
 	NavigationStack {
-		EmptyMediaList(collection: MediaCollection(groupBy: "artist"), listViewMode: "grid", imageWidth: 128)
+		EmptyMediaList(collection: GroupedCollection(groupBy: "artist"), listViewMode: "grid", imageWidth: 128)
 	}
 		.fontDesign(.rounded)
 }

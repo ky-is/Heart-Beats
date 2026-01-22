@@ -1,7 +1,9 @@
 import SwiftUI
+import MediaPlayer
 
 struct MediaListEntry: View {
 	let listViewMode: String
+	let largeTitles: Bool
 	let entry: MediaEntry
 	let imageWidth: CGFloat
 	let inFavorites: Bool
@@ -17,7 +19,7 @@ struct MediaListEntry: View {
 			}
 			withAnimation {
 				UserDefaults.standard.currentFavorites = favorites
-				MediaCollection.updateCurrent(withAnimation: true)
+				GroupedCollection.updateCurrent(withAnimation: true)
 			}
 		}
 	}
@@ -28,18 +30,67 @@ struct MediaListEntry: View {
 		}
 	}
 
+	let gridRows = Int(sqrt(Double(4)))
+
+	private var subImages: [UIImage] {
+		let subSize = imageWidth / Double(gridRows)
+		var images: [UIImage] = []
+		var albumsIDs: [String] = []
+		if let songs = entry.songs {
+			let gridCount = Int(pow(Double(gridRows), 2))
+			for song in songs {
+				guard let artwork = song.artwork else { continue }
+				let albumID = (song.albumTitle ?? "") + (song.artist ?? "")
+				if !albumsIDs.contains(albumID), let image = artwork.image(at: .init(width: subSize, height: subSize)) {
+					albumsIDs.append(albumID)
+					images.append(image)
+					if images.count >= gridCount {
+						break
+					}
+				}
+			}
+		}
+		return images
+	}
+
+	var imageGrid: some View {
+		let subSize = imageWidth / Double(gridRows)
+		return Grid(horizontalSpacing: 0, verticalSpacing: 0) {
+			ForEach(Array(0..<gridRows), id: \.self) { rowIndex in
+				GridRow {
+					ForEach(Array(0..<gridRows), id: \.self) {
+						let index = rowIndex * gridRows + $0
+						if index < subImages.count {
+							Image(uiImage: subImages[index])
+								.resizable()
+								.frame(width: subSize, height: subSize)
+						}
+					}
+				}
+			}
+		}
+	}
+
 	var body: some View {
 		Group {
 			if listViewMode == "grid" {
 				VStack {
-					AlbumArt(artist: entry.id, artwork: entry.artwork, displayWidth: imageWidth)
-					HStack(spacing: 0) {
+					if largeTitles {
+						imageGrid
+							.frame(width: imageWidth, height: imageWidth)
+							.background(Color.tertiary)
+							.clipShape(RoundedRectangle(cornerRadius: min(24, imageWidth / 6), style: .continuous))
+							.shadow(color: .black.opacity(0.25), radius: 4, y: 3)
+					} else {
+						AlbumArt(artist: entry.id, artwork: entry.artwork, displayWidth: imageWidth)
+					}
+					HStack(alignment: .lastTextBaseline, spacing: 0) {
 						Text(entry.id)
-							.font(.caption)
+							.font(largeTitles ? .headline : .caption)
 							.lineLimit(1)
 						Text(" " + String(entry.songCount))
 							.foregroundStyle(Color.secondary)
-							.font(.caption)
+							.font(largeTitles ? .subheadline : .caption)
 					}
 				}
 			} else {
@@ -100,9 +151,9 @@ struct MediaListEntry: View {
 #Preview {
 	NavigationStack {
 		List {
-			MediaListEntry(listViewMode: "list", entry: MediaCollection.screenshotData[0], imageWidth: 88, inFavorites: true, play: { _, _ in })
-			MediaListEntry(listViewMode: "list", entry: MediaCollection.screenshotData[1], imageWidth: 88, inFavorites: true, play: { _, _ in })
-			MediaListEntry(listViewMode: "grid", entry: MediaCollection.screenshotData[0], imageWidth: 88, inFavorites: true, play: { _, _ in })
+			MediaListEntry(listViewMode: "list", largeTitles: false, entry: GroupedCollection.screenshotData[0], imageWidth: 88, inFavorites: true, play: { _, _ in })
+			MediaListEntry(listViewMode: "list", largeTitles: false, entry: GroupedCollection.screenshotData[1], imageWidth: 88, inFavorites: true, play: { _, _ in })
+			MediaListEntry(listViewMode: "grid", largeTitles: false, entry: GroupedCollection.screenshotData[0], imageWidth: 88, inFavorites: true, play: { _, _ in })
 		}
 			.listStyle(.plain)
 	}

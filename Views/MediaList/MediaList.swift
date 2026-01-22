@@ -1,12 +1,12 @@
 import SwiftUI
 import MediaPlayer
 
-private typealias ListGroupEntry = (label: String?, entries: [MediaEntry])
+typealias ListGroupEntry = (label: String?, entries: [MediaEntry])
 
 private let FavoritesLabel = "Favorites"
 
 struct MediaList: View {
-	var collection: MediaCollection
+	var collection: GroupedCollection
 
 	@Environment(\.scenePhase) private var scenePhase
 	@State private var selection: MediaEntry?
@@ -16,39 +16,33 @@ struct MediaList: View {
 	private func play(entry: MediaEntry, addToQueue: Bool) {
 		guard let songs = entry.songs else { return }
 
-		Task { @MainActor in
-			let entryName = entry.id
-			let played = UserDefaults.standard.currentPlayed
-			if !played.contains(entryName) {
-				if UserDefaults.standard.currentFavorites.count < 3 {
-					UserDefaults.standard.currentFavorites.append(entryName)
-				}
-				UserDefaults.standard.currentPlayed.append(entryName)
+		let entryName = entry.id
+		let played = UserDefaults.standard.currentPlayed
+		if !played.contains(entryName) {
+			if UserDefaults.standard.currentFavorites.count < 3 {
+				UserDefaults.standard.currentFavorites.append(entryName)
 			}
+			UserDefaults.standard.currentPlayed.append(entryName)
 		}
 
-		Task { @MainActor in
 #if targetEnvironment(macCatalyst)
-			let player = MPMusicPlayerController.applicationMusicPlayer
+		let player = MPMusicPlayerController.applicationMusicPlayer
 #else
-			let player = MPMusicPlayerController.systemMusicPlayer
+		let player = MPMusicPlayerController.systemMusicPlayer
 #endif
-			let songCollection = MPMediaItemCollection(items: songs.shuffled())
-			if addToQueue {
-				player.prepend(MPMusicPlayerMediaItemQueueDescriptor(itemCollection: songCollection))
-			} else {
-				player.setQueue(with: songCollection)
-			}
-			player.play()
-			await openMusicApp()
+		let songCollection = MPMediaItemCollection(items: songs.shuffled())
+		if addToQueue {
+			player.prepend(MPMusicPlayerMediaItemQueueDescriptor(itemCollection: songCollection))
+		} else {
+			player.setQueue(with: songCollection)
 		}
+		player.play()
+		openMusicApp()
 	}
 
-	private func openMusicApp() async {
-		if let url = URL(string: "audio-player-event:"), await UIApplication.shared.canOpenURL(url) {
-			Task { @MainActor in
-				await UIApplication.shared.open(url)
-			}
+	private func openMusicApp() {
+		if let url = URL(string: "audio-player-event:"), UIApplication.shared.canOpenURL(url) {
+			UIApplication.shared.open(url)
 		} else {
 			print("Unable to open Music.app")
 			//TODO macOS
@@ -56,7 +50,7 @@ struct MediaList: View {
 	}
 
 	private var groupedEntries: [ListGroupEntry] {
-		let favorites = UserDefaults.standard.showGenres ? UserDefaults.standard.favoritedGenres : UserDefaults.standard.favorited
+		let favorites = UserDefaults.standard.selectedTab == "genres" ? UserDefaults.standard.favoritedGenres : UserDefaults.standard.favorited
 		var favoriteEntries: [MediaEntry] = []
 		var nonfavoriteEntries: [MediaEntry] = []
 		for entry in collection.entries {
@@ -94,7 +88,7 @@ struct MediaList: View {
 			if !hasEntries {
 				EmptyMediaList(collection: collection, listViewMode: listViewMode, imageWidth: 88)
 			} else if listViewMode == "grid" {
-				GridView(showHeaders: showHeaders, allEntriesGroups: allEntriesGroups, activeSelection: activeSelection, play: play)
+				GridView(showHeaders: showHeaders, largeTitles: false, allEntriesGroups: allEntriesGroups, activeSelection: activeSelection, play: play)
 			} else {
 				ListView(showHeaders: showHeaders, allEntriesGroups: allEntriesGroups, activeSelection: activeSelection, play: play)
 			}
@@ -102,7 +96,7 @@ struct MediaList: View {
 			.navigationTitle(collection.groupBy.capitalized.pluralize(entryCount))
 			.onChange(of: scenePhase) { _, newPhase in
 				if newPhase == .active {
-					MediaCollection.updateCurrent(withAnimation: false)
+					GroupedCollection.updateCurrent(withAnimation: false)
 					withAnimation {
 						selection = nil
 					}
@@ -111,8 +105,9 @@ struct MediaList: View {
 	}
 }
 
-private struct GridView: View {
+struct GridView: View {
 	let showHeaders: Bool
+	let largeTitles: Bool
 	let allEntriesGroups: [ListGroupEntry]
 	@Binding var activeSelection: MediaEntry?
 	let play: (MediaEntry, Bool) -> Void
@@ -134,11 +129,10 @@ private struct GridView: View {
 			let (columnCount, columnSize) = sizeColumns(in: geometry, idealWidth: idealWidth, spacing: spacing)
 			ScrollView {
 				LazyVGrid(columns: Array(repeating: GridItem(.fixed(columnSize), spacing: spacing), count: columnCount), spacing: spacing * 1.5) {
-					EntriesView(listViewMode: "grid", imageWidth: columnSize - spacing, showHeaders: showHeaders, allEntriesGroups: allEntriesGroups, activeSelection: $activeSelection, play: play)
+					EntriesView(listViewMode: "grid", largeTitles: largeTitles, imageWidth: columnSize - spacing, showHeaders: showHeaders, allEntriesGroups: allEntriesGroups, activeSelection: $activeSelection, play: play)
 				}
 					.padding(.vertical, spacing / 2)
 			}
-				.tint(.primary)
 		}
 	}
 }
@@ -151,7 +145,7 @@ private struct ListView: View {
 
 	var body: some View {
 		List(selection: $activeSelection) {
-			EntriesView(listViewMode: "list", imageWidth: 128, showHeaders: showHeaders, allEntriesGroups: allEntriesGroups, activeSelection: $activeSelection, play: play)
+			EntriesView(listViewMode: "list", largeTitles: false, imageWidth: 128, showHeaders: showHeaders, allEntriesGroups: allEntriesGroups, activeSelection: $activeSelection, play: play)
 		}
 			.listStyle(.plain)
 	}
@@ -159,6 +153,7 @@ private struct ListView: View {
 
 private struct EntriesView: View {
 	let listViewMode: String
+	let largeTitles: Bool
 	let imageWidth: CGFloat
 	let showHeaders: Bool
 	let allEntriesGroups: [ListGroupEntry]
@@ -174,11 +169,11 @@ private struct EntriesView: View {
 						Button {
 							activeSelection = entry
 						} label: {
-							MediaListEntry(listViewMode: listViewMode, entry: entry, imageWidth: imageWidth, inFavorites: inFavorites, play: play)
+							MediaListEntry(listViewMode: listViewMode, largeTitles: largeTitles, entry: entry, imageWidth: imageWidth, inFavorites: inFavorites, play: play)
 						}
 							.buttonStyle(.plain)
 					} else {
-						MediaListEntry(listViewMode: listViewMode, entry: entry, imageWidth: imageWidth, inFavorites: inFavorites, play: play)
+						MediaListEntry(listViewMode: listViewMode, largeTitles: largeTitles, entry: entry, imageWidth: imageWidth, inFavorites: inFavorites, play: play)
 							.tag(entry)
 					}
 				}
@@ -195,7 +190,7 @@ private struct EntriesView: View {
 
 #Preview {
 	NavigationStack {
-		MediaList(collection: MediaCollection(groupBy: "artist"))
+		MediaList(collection: GroupedCollection(groupBy: "artist"))
 	}
 		.fontDesign(.rounded)
 }

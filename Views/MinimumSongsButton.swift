@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct MinimumSongsButton: View {
-	var geometry: GeometryProxy
+	var geometry: GeometryProxy?
 
 	@State private var showSongMinimum = false
 
@@ -13,49 +13,40 @@ struct MinimumSongsButton: View {
 		} label: {
 			Text(String(minimum))
 				.font(.system(size: 24, weight: .bold))
-				.foregroundStyle(.black)
-				.blendMode(.destinationOut)
-				.frame(width: 40, height: 40)
-				.background(in: Circle())
-				.backgroundStyle(.accent.opacity(0.75))
-				.compositingGroup()
-				.padding(.bottom, geometry.safeAreaInsets.bottom > 5 ? 0 : 5)
-				.padding(.horizontal, 12)
-				.padding(.top, 8)
+				.frame(width: 64, height: 64)
+//				.background(Color.red)
 		}
-			.buttonStyle(.plain)
 			.popover(isPresented: $showSongMinimum) {
 				MinimumSongsStepper()
 			}
 	}
 }
 
-private struct MinimumSongsStepper: View {
+struct MinimumSongsStepper: View {
 	@AppStorage(UserDefaults.Key.minimum) private var minimum = UserDefaults.standard.minimum
 
 	var body: some View {
 		HStack {
+			Text("Minimum number of songs an artist/genre needs to be displayed:")
+				.fixedSize(horizontal: false, vertical: true)
+				.font(.footnote)
+				.padding([.leading, .vertical])
 			Button {
 				minimum -= 1
 			} label: {
 				Image(systemName: "minus")
-					.frame(minWidth: 44, maxHeight: .infinity)
+					.frame(width: 40, height: 40)
 					.bold()
 			}
 				.disabled(minimum <= 0)
-			Text("Minimum number of songs an artist/genre needs to be displayed")
-				.fixedSize(horizontal: false, vertical: true)
-				.multilineTextAlignment(.center)
-				.font(.footnote)
-				.padding(.vertical, 32)
 			Button {
 				minimum += 1
 			} label: {
 				Image(systemName: "plus")
-					.frame(minWidth: 44, maxHeight: .infinity)
+					.frame(width: 40, height: 40)
 					.bold()
 			}
-				.disabled(minimum >= MediaCollection.current.maximumSongsLimit)
+				.disabled(minimum >= GroupedCollection.current.maximumSongsLimit)
 		}
 			.imageScale(.large)
 			.presentationCompactAdaptation(.popover)

@@ -41,26 +41,16 @@ final class AppDelegate: NSObject, UIApplicationDelegate {
 	}
 }
 
-	private func handleAuthorization(status: MPMediaLibraryAuthorizationStatus) {
-		switch status {
-		case .notDetermined:
-			MPMediaLibrary.requestAuthorization(handleAuthorization)
-		case .authorized:
-			MediaCollection.updateCurrent(withAnimation: true)
-			MediaCollection.updateBackground()
-		default:
-			MediaCollection.setUnavailable(status: status)
-		}
-	}
-
-	var body: some Scene {
-		WindowGroup {
-			ContentView()
-				.tint(.accent)
-				.fontDesign(.rounded)
-				.frame(minWidth: 320, minHeight: 320)
-		}
-			.windowResizability(.contentMinSize)
+private func handleAuthorization(status: MPMediaLibraryAuthorizationStatus) {
+	switch status {
+	case .notDetermined:
+//		MPMediaLibrary.requestAuthorization(handleAuthorization) //TODO
+		return
+	case .authorized:
+		GroupedCollection.updateCurrent(withAnimation: true)
+		GroupedCollection.updateBackground()
+	default:
+		GroupedCollection.setUnavailable(status: status)
 	}
 }
 

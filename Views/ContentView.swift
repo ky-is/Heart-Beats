@@ -1,42 +1,57 @@
 import SwiftUI
 
 struct ContentView: View {
-	@AppStorage(UserDefaults.Key.showGenres) private var showGenres = false
+	@AppStorage(UserDefaults.Key.selectedTab) private var selectedTab = "artists"
 
-	var body: some View {
-		GeometryReader { geometry in
-			TabView(selection: $showGenres) {
-				TabsContent()
-			}
-				.overlay(alignment: .bottom) {
-					MinimumSongsButton(geometry: geometry)
-				}
-		}
+	@State private var artistsCollection = GroupedCollection.artists
+	@State private var genresCollection = GroupedCollection.genres
+
+	private var yearSuffix: String.SubSequence {
+		Calendar.current.component(.year, from: .now).description.suffix(2)
 	}
-}
-
-private struct TabsContent: View {
-	@State private var artistsCollection = MediaCollection.artists
-	@State private var genresCollection = MediaCollection.genres
 
 	var body: some View {
-		let showsUnavailable = Binding(get: { artistsCollection.unavailable != nil }, set: { _,_ in artistsCollection.unavailable = nil })
-		Group {
-			NavigationContentView {
-				MediaList(collection: artistsCollection)
-			}
-				.tabItem { //TODO scroll to top
-					Label("Artists", systemImage: "music.mic")
-				}
-				.tag(false)
-			NavigationContentView {
-				MediaList(collection: genresCollection)
-			}
-				.tabItem {
-					Label("Genres", systemImage: "opticaldisc")
-				}
-				.tag(true)
+		let selectionTabDisabled = Binding {
+			selectedTab.isEmpty ? "artists" : selectedTab
+		} set: {
+			selectedTab = $0.isEmpty ? "artists" : $0
 		}
+		let showsUnavailable = Binding(get: { artistsCollection.unavailable != nil }, set: { _,_ in artistsCollection.unavailable = nil })
+		GeometryReader { geometry in
+			TabView(selection: selectionTabDisabled) {
+				Tab("Artists", systemImage: "music.mic", value: "artists") {
+					NavigationContentView {
+						MediaList(collection: artistsCollection)
+					}
+				}
+				Tab("Genres", systemImage: "opticaldisc", value: "genres") {
+					NavigationContentView {
+						MediaList(collection: genresCollection)
+					}
+				}
+				Tab("Years", systemImage: "\(Int(yearSuffix)! > 50 ? "00" : yearSuffix).square", value: "years") {
+					NavigationContentView(canToggle: false) {
+						YearsList()
+					}
+				}
+#if !targetEnvironment(macCatalyst)
+				Tab("", systemImage: "", value: "", role: .search) {
+				}
+					.disabled(true)
+#endif
+			}
+				.overlay(alignment: .bottomTrailing) {
+					MinimumSongsButton()
+						.padding([.bottom, .trailing], 20)
+				}
+//				.tabViewBottomAccessory {
+//					MinimumSongsStepper()
+////					if selectedTab != "years" { //TODO
+////					}
+//				}
+//				.tabBarMinimizeBehavior(.onScrollDown)
+		}
+			.ignoresSafeArea(.container, edges: .bottom)
 			.alert("Music Unavailable", isPresented: showsUnavailable, actions: {
 				Link("Open Settings", destination: URL(string: UIApplication.openSettingsURLString)!)
 			}) {
@@ -52,22 +67,24 @@ private struct TabsContent: View {
 }
 
 private struct NavigationContentView<Content: View>: View {
+	let canToggle: Bool
 	let content: () -> Content
 
-	init(@ViewBuilder content: @escaping () -> Content) {
+	init(canToggle: Bool = true, @ViewBuilder content: @escaping () -> Content) {
+		self.canToggle = canToggle
 		self.content = content
 	}
 
 	@State private var showSettings = false
 
 	@AppStorage(UserDefaults.Key.listViewMode) private var listViewMode = UserDefaults.standard.listViewMode
-	@AppStorage(UserDefaults.Key.showGenres) private var showGenres = false
+	@AppStorage(UserDefaults.Key.selectedTab) private var selectedTab = "artists"
 
 #if targetEnvironment(simulator)
 	private let imageIncrement = 3
 	func screenshotImages(startIndex: Int) -> [Image] {
 		let idealSize = CGSize(width: 128, height: 128)
-		return MediaCollection.current.entries.filter({ UserDefaults.standard.showGenres ? true : UserDefaults.standard.currentFavorites.contains($0.id) })[startIndex..<startIndex+imageIncrement].compactMap { $0.artwork?.image(at: idealSize) }.map { Image(uiImage: $0.scale(to: idealSize)) }
+		return GroupedCollection.current.entries.filter({ UserDefaults.standard.selectedTab == "genres" ? true : UserDefaults.standard.currentFavorites.contains($0.id) })[startIndex..<startIndex+imageIncrement].compactMap { $0.artwork?.image(at: idealSize) }.map { Image(uiImage: $0.scale(to: idealSize)) }
 	}
 #endif
 
@@ -75,27 +92,40 @@ private struct NavigationContentView<Content: View>: View {
 		NavigationStack {
 			content()
 				.toolbar {
-					ToolbarItemGroup(placement: .topBarTrailing) {
+#if targetEnvironment(macCatalyst)
+					ToolbarItem(placement: .principal) {
+						MinimumSongsButton(geometry: nil)
+							.disabled(selectedTab == "years")
+					}
+#endif
+//					ToolbarItemGroup(placement: .topBarTrailing) {
 //#if targetEnvironment(simulator) //SAMPLE
 //							ShareLink(items: screenshotImages(startIndex: 0)) { SharePreview(MediaCollection.current.groupBy, image: $0) }
 //							ShareLink(items: screenshotImages(startIndex: imageIncrement)) { SharePreview(MediaCollection.current.groupBy, image: $0) }
 //							ShareLink(items: screenshotImages(startIndex: imageIncrement * 2)) { SharePreview(MediaCollection.current.groupBy, image: $0) }
 //#endif
-						Button("Show as \(listViewMode)", systemImage: listViewMode == "grid" ? "list.triangle" : "square.grid.2x2") {
-							withAnimation {
-								listViewMode = listViewMode == "grid" ? "list" : "grid"
+						if canToggle {
+							ToolbarItem {
+								Button("Show as \(listViewMode)", systemImage: listViewMode == "grid" ? "list.triangle" : "square.grid.2x2") {
+									withAnimation {
+										listViewMode = listViewMode == "grid" ? "list" : "grid"
+									}
+								}
+#if targetEnvironment(macCatalyst)
+								.buttonStyle(.borderless)
+#endif
 							}
 						}
+						ToolbarSpacer(.fixed)
+						ToolbarItem {
+							Button("Settings", systemImage: "gearshape") {
+								showSettings = true
+							}
 #if targetEnvironment(macCatalyst)
-							.buttonStyle(.borderless)
+								.buttonStyle(.borderless)
 #endif
-						Button("Settings", systemImage: "gearshape") {
-							showSettings = true
 						}
-#if targetEnvironment(macCatalyst)
-							.buttonStyle(.borderless)
-#endif
-					}
+//					}
 				}
 				.sheet(isPresented: $showSettings) {
 					SettingsView()
