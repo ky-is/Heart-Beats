@@ -16,7 +16,8 @@ final class GroupedCollection: MediaCollection {
 #else
 	var entries: [MediaEntry] = []
 #endif
-	var maximumSongsLimit = 99
+	/// The most 5-star songs any entry has (capped at 99), which bounds the minimum stepper.
+	var maximumSongsLimit = LibraryGrouping.minimumSongsCap
 
 	init(groupBy: String) {
 		self.groupBy = groupBy
@@ -24,6 +25,7 @@ final class GroupedCollection: MediaCollection {
 		if self.entries.isEmpty, let cache = groupBy == "genre" ? UserDefaults.standard.cachedGenres : UserDefaults.standard.cachedArtists {
 			self.entries = cache
 				.map { MediaEntry(id: $0[0] as! String, songs: nil, songCount: $0[1] as! Int, artwork: nil) }
+			self.maximumSongsLimit = min(LibraryGrouping.minimumSongsCap, entries.map(\.songCount).max() ?? 0)
 		}
 	}
 
@@ -48,125 +50,107 @@ final class GroupedCollection: MediaCollection {
 		]
 	}
 
+	/// The grouping for the selected tab, or artists while on the Years tab.
 	class var current: GroupedCollection {
 		UserDefaults.standard.selectedTab == "genres" ? genres : artists
 	}
 
-	class func updateCurrent(withAnimation: Bool) {
-		Task {
-			if UserDefaults.standard.selectedTab == "genres" {
-				await genres.update(withAnimation: withAnimation)
-			} else if UserDefaults.standard.selectedTab == "artists" {
-				await artists.update(withAnimation: withAnimation)
-			}
-		}
+	private class var other: GroupedCollection {
+		current === artists ? genres : artists
 	}
 
-	class func updateBackground() {
-		Task(priority: .background) {
-			if UserDefaults.standard.selectedTab == "genres" {
-				await artists.update(withAnimation: false)
-			} else if UserDefaults.standard.selectedTab == "artists" {
-				await genres.update(withAnimation: false)
-			}
-		}
+	/// Rescans the selected tab's grouping (nothing on the Years tab).
+	class func updateCurrent(withAnimation animated: Bool) {
+		guard UserDefaults.standard.selectedTab != "years" else { return }
+		current.scheduleUpdate(withAnimation: animated)
+	}
+
+	/// Rescans both groupings, animating the visible one.
+	class func updateAll(withAnimation animated: Bool, after delay: Duration = .zero) {
+		current.scheduleUpdate(withAnimation: animated, after: delay)
+		other.scheduleUpdate(withAnimation: false, after: delay)
+	}
+
+	/// Rescans each grouping whose last scan predates the library's latest change.
+	class func updateAllIfLibraryChanged(after delay: Duration = .zero) {
+		current.updateIfLibraryChanged(after: delay)
+		other.updateIfLibraryChanged(after: delay)
 	}
 
 	class func setUnavailable(status: MPMediaLibraryAuthorizationStatus) {
 		artists.unavailable = status
 	}
 
-	internal func update(withAnimation animated: Bool) async {
-		let minimum = await MainActor.run { UserDefaults.standard.minimum }
-		let selectedTab = await MainActor.run { UserDefaults.standard.selectedTab }
+	private var pendingUpdate: Task<Void, Never>?
+	private var generation = 0
+	private var scannedLibraryDate: Date?
 
-		let showGenres = groupBy == "genre"
-		let query = showGenres ? MPMediaQuery.genres() : MPMediaQuery.artists()
-		guard let rawCollections = query.collections else {
+	/// Starts a rescan, replacing any rescan still waiting on its delay.
+	func scheduleUpdate(withAnimation animated: Bool, after delay: Duration = .zero) {
+		pendingUpdate?.cancel()
+		pendingUpdate = Task {
+			if delay > .zero {
+				try? await Task.sleep(for: delay)
+			}
+			guard !Task.isCancelled else { return }
+			await update(withAnimation: animated)
+		}
+	}
+
+	func updateIfLibraryChanged(after delay: Duration = .zero) {
+		// The simulator has no music library; a scan would replace the screenshot data
+#if !targetEnvironment(simulator)
+		guard MPMediaLibrary.default().lastModifiedDate != scannedLibraryDate else { return }
+		scheduleUpdate(withAnimation: false, after: delay)
+#endif
+	}
+
+	private struct Inputs {
+		let generation: Int
+		let minimum: Int
+		let favorites: [String]
+		let combined: [[String]]
+		let existingIDs: Set<String>
+	}
+
+	/// Scans the music library off the main thread, then applies the result on it.
+	@concurrent
+	nonisolated func update(withAnimation animated: Bool) async {
+		let inputs = await MainActor.run {
+			self.generation += 1
+			self.scannedLibraryDate = MPMediaLibrary.default().lastModifiedDate
+			let defaults = UserDefaults.standard
+			return Inputs(generation: self.generation, minimum: defaults.minimum, favorites: defaults.favorites(for: groupBy), combined: defaults.combined(for: groupBy), existingIDs: Set(self.entries.map { $0.id.normalized() }))
+		}
+
+		guard let songs = MPMediaQuery.songs().items else {
 			log.error("Unable to load music")
 			return
 		}
-		let (favorited, combined) = await MainActor.run {
-			(UserDefaults.standard.currentFavorites, UserDefaults.standard.currentCombined)
-		}
-		var collectionsAcc = [String: (String, MPMediaItem, [MPMediaItem])]()
-		var mostSongsAcc = 0
-		for collection in rawCollections {
-			let representative: MPMediaItem?
-			if collection.representativeItem?.artwork != nil {
-				representative = collection.representativeItem
-			} else {
-				representative = collection.items.first { $0.artwork != nil }
-			}
-			guard let representative else {
-				continue
-			}
-			var checkNames = [String]()
-			if showGenres {
-				if let genres = representative.genre?.split(separator: ",") {
-					checkNames = genres.map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
-				}
-			} else {
-				let albumArtist = representative.albumArtist
-				if let albumArtist = albumArtist, !checkNames.contains(where: { $0.caseInsensitiveCompare(albumArtist) == .orderedSame }) {
-					checkNames.append(albumArtist)
-				}
-				if let artist = representative.artist, artist != albumArtist && !checkNames.contains(where: { $0.caseInsensitiveCompare(artist) == .orderedSame }) {
-					checkNames.append(artist)
-				}
-			}
-			guard !checkNames.isEmpty else {
-				continue
-			}
-			let songs = collection.items.filter { $0.rating >= 5 }
-			for var name in checkNames {
-				var normalizedName = name//TODO.normalized()
+		let allGroups = LibraryGrouping.group(songs, groupBy: groupBy, combined: inputs.combined)
 #if targetEnvironment(simulator)
-				if !showGenres && !self.entries.contains(where: { $0.id.normalized() == normalizedName }) {
-					continue
-				}
+		// Limits the list to the screenshot artists
+		let groups = groupBy == "artist" ? allGroups.filter { inputs.existingIDs.contains($0.name.normalized()) } : allGroups
+#else
+		let groups = allGroups
 #endif
-				if !showGenres && normalizedName == "various artists" {
-					continue
-				}
-				for combining in combined {
-					if let index = combining.firstIndex(of: name), index > 0 {
-						name = combining[0]
-						normalizedName = name//TODO.normalized()
-						break
-					}
-				}
-				if collectionsAcc[normalizedName] != nil {
-					collectionsAcc[normalizedName]!.2.append(contentsOf: songs)
-				} else {
-					collectionsAcc[normalizedName] = (name, representative, songs)
-				}
-				let newTotal = collectionsAcc[normalizedName]!.2.count
-				if newTotal > mostSongsAcc {
-					mostSongsAcc = newTotal
-				}
-			}
+		let (selected, mostSongsLimit) = LibraryGrouping.select(groups, minimum: inputs.minimum, favorites: inputs.favorites)
+		let entries = selected.map { group in
+			MediaEntry(id: group.name, songs: group.songs, songCount: group.songs.count, artwork: group.songs.first { $0.artwork != nil }?.artwork)
 		}
-		let collections = collectionsAcc.values
-		let mostSongsLimit = min(99, mostSongsAcc)
-		let exceedsMostNumberOfSongs = minimum > mostSongsLimit
-		let allowedMinimumNumberOfSongs = exceedsMostNumberOfSongs ? mostSongsLimit : minimum
-		let outputCollections = collections
-			.filter { $0.2.count >= allowedMinimumNumberOfSongs || ($0.2.count > 0 && favorited.contains($0.0)) }
-			.sorted { $0.0.localizedStandardCompare($1.0) == .orderedAscending } //TODO
-//			.sorted { $0.0.forSorting.localizedStandardCompare($1.0.forSorting) == .orderedAscending }
-		let updatesMinimum = (selectedTab == "genres") == showGenres && exceedsMostNumberOfSongs && allowedMinimumNumberOfSongs > 0
-		Task { @MainActor in
-			let entries = outputCollections.map { MediaEntry(id: $0.0, songs: $0.2, songCount: $0.2.count, artwork: $0.1.artwork) }
+
+		await MainActor.run {
+			// A newer scan started while this one ran, so its result wins
+			guard inputs.generation == self.generation else { return }
 			if animated {
 				withAnimation {
-					apply(allowedMinimumNumberOfSongs: updatesMinimum ? allowedMinimumNumberOfSongs : nil, mostSongsLimit: mostSongsLimit, entries: entries)
+					apply(mostSongsLimit: mostSongsLimit, entries: entries)
 				}
 			} else {
-				apply(allowedMinimumNumberOfSongs: updatesMinimum ? allowedMinimumNumberOfSongs : nil, mostSongsLimit: mostSongsLimit, entries: entries)
+				apply(mostSongsLimit: mostSongsLimit, entries: entries)
 			}
 			let cache = entries.map { [$0.id, $0.songCount] }
-			if showGenres {
+			if groupBy == "genre" {
 				UserDefaults.standard.cachedGenres = cache
 			} else {
 				UserDefaults.standard.cachedArtists = cache
@@ -174,12 +158,9 @@ final class GroupedCollection: MediaCollection {
 		}
 	}
 
-	private func apply(allowedMinimumNumberOfSongs: Int?, mostSongsLimit: Int, entries: [MediaEntry]) {
-		if let allowedMinimumNumberOfSongs {
-			UserDefaults.standard.minimum = allowedMinimumNumberOfSongs
-		}
+	// The stored minimum is left alone when it exceeds this library's largest entry, so a small library on one device doesn't lower it on the others
+	private func apply(mostSongsLimit: Int, entries: [MediaEntry]) {
 		self.maximumSongsLimit = mostSongsLimit
 		self.entries = entries
 	}
 }
-

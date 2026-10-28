@@ -48,10 +48,21 @@ private func handleAuthorization(status: MPMediaLibraryAuthorizationStatus) {
 			handleAuthorization(status: await MPMediaLibrary.requestAuthorization())
 		}
 	case .authorized:
-		GroupedCollection.updateCurrent(withAnimation: true)
-		GroupedCollection.updateBackground()
+		GroupedCollection.updateAll(withAnimation: true)
+		observeLibraryChanges()
 	default:
 		GroupedCollection.setUnavailable(status: status)
 	}
 }
 
+/// Rescans after the library changes while the app is open (e.g. Music side by side on iPad, or a sync).
+private func observeLibraryChanges() {
+	MPMediaLibrary.default().beginGeneratingLibraryChangeNotifications()
+	Task {
+		for await _ in NotificationCenter.default.notifications(named: .MPMediaLibraryDidChange) {
+			// Delayed so a burst of changes causes one rescan
+			GroupedCollection.updateAllIfLibraryChanged(after: .seconds(1))
+			YearsCollection.shared.updateIfLibraryChanged(onlyIfScanned: true, after: .seconds(1))
+		}
+	}
+}

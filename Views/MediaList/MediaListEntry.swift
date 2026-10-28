@@ -2,6 +2,8 @@ import SwiftUI
 import MediaPlayer
 
 struct MediaListEntry: View {
+	/// "artist" or "genre"; nil for years, which have no favorites
+	let groupBy: String?
 	let listViewMode: String
 	let largeTitles: Bool
 	let entry: MediaEntry
@@ -9,17 +11,18 @@ struct MediaListEntry: View {
 	let inFavorites: Bool
 	let play: (MediaEntry, Bool) -> Void
 
+	@ViewBuilder
 	private var favoriteButton: some View {
-		Button(inFavorites ? "Unfavorite" : "Favorite", systemImage: inFavorites ? "star" : "star.fill") {
-			var favorites = UserDefaults.standard.currentFavorites
-			if inFavorites {
-				favorites = favorites.filter { $0 != entry.id}
-			} else {
-				favorites.append(entry.id)
-			}
-			withAnimation {
-				UserDefaults.standard.currentFavorites = favorites
-				GroupedCollection.updateCurrent(withAnimation: true)
+		if let groupBy {
+			Button(inFavorites ? "Unfavorite" : "Favorite", systemImage: inFavorites ? "star" : "star.fill") {
+				var favorites = UserDefaults.standard.favorites(for: groupBy)
+				if inFavorites {
+					favorites.removeAll { $0.normalized() == entry.id.normalized() }
+				} else {
+					favorites.append(entry.id)
+				}
+				// The sync observer rescans the collection after this write
+				UserDefaults.standard.setFavorites(favorites, for: groupBy)
 			}
 		}
 	}
@@ -41,7 +44,7 @@ struct MediaListEntry: View {
 			for song in songs {
 				guard let artwork = song.artwork else { continue }
 				let albumID = (song.albumTitle ?? "") + (song.artist ?? "")
-				if !albumsIDs.contains(albumID), let image = artwork.image(at: .init(width: subSize, height: subSize)) {
+				if !albumsIDs.contains(albumID), let image = ArtworkCache.image(for: artwork, size: subSize) {
 					albumsIDs.append(albumID)
 					images.append(image)
 					if images.count >= gridCount {
@@ -53,7 +56,7 @@ struct MediaListEntry: View {
 		return images
 	}
 
-	var imageGrid: some View {
+	private func imageGrid(_ subImages: [UIImage]) -> some View {
 		let subSize = imageWidth / Double(gridRows)
 		return Grid(horizontalSpacing: 0, verticalSpacing: 0) {
 			ForEach(Array(0..<gridRows), id: \.self) { rowIndex in
@@ -76,7 +79,7 @@ struct MediaListEntry: View {
 			if listViewMode == "grid" {
 				VStack {
 					if largeTitles {
-						imageGrid
+						imageGrid(subImages)
 							.frame(width: imageWidth, height: imageWidth)
 							.background(Color.tertiary)
 							.clipShape(RoundedRectangle(cornerRadius: min(24, imageWidth / 6), style: .continuous))
@@ -151,9 +154,9 @@ struct MediaListEntry: View {
 #Preview {
 	NavigationStack {
 		List {
-			MediaListEntry(listViewMode: "list", largeTitles: false, entry: GroupedCollection.screenshotData[0], imageWidth: 88, inFavorites: true, play: { _, _ in })
-			MediaListEntry(listViewMode: "list", largeTitles: false, entry: GroupedCollection.screenshotData[1], imageWidth: 88, inFavorites: true, play: { _, _ in })
-			MediaListEntry(listViewMode: "grid", largeTitles: false, entry: GroupedCollection.screenshotData[0], imageWidth: 88, inFavorites: true, play: { _, _ in })
+			MediaListEntry(groupBy: "artist", listViewMode: "list", largeTitles: false, entry: GroupedCollection.screenshotData[0], imageWidth: 88, inFavorites: true, play: { _, _ in })
+			MediaListEntry(groupBy: "artist", listViewMode: "list", largeTitles: false, entry: GroupedCollection.screenshotData[1], imageWidth: 88, inFavorites: true, play: { _, _ in })
+			MediaListEntry(groupBy: "artist", listViewMode: "grid", largeTitles: false, entry: GroupedCollection.screenshotData[0], imageWidth: 88, inFavorites: true, play: { _, _ in })
 		}
 			.listStyle(.plain)
 	}

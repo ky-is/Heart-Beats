@@ -134,40 +134,36 @@ extension UserDefaults {
 		}
 	}
 
-	var currentPlayed: [String] {
-		get {
-			return selectedTab == "genres" ? playedGenres : played
-		}
-		set(value) {
-			if selectedTab == "genres" {
-				playedGenres = value
-			} else {
-				played = value
-			}
+	// Per grouping ("artist" or "genre"), independent of the selected tab
+
+	func played(for groupBy: String) -> [String] {
+		groupBy == "genre" ? playedGenres : played
+	}
+	func setPlayed(_ value: [String], for groupBy: String) {
+		if groupBy == "genre" {
+			playedGenres = value
+		} else {
+			played = value
 		}
 	}
-	var currentFavorites: [String] {
-		get {
-			return selectedTab == "genres" ? favoritedGenres : favorited
-		}
-		set(value) {
-			if selectedTab == "genres" {
-				favoritedGenres = value
-			} else {
-				favorited = value
-			}
+	func favorites(for groupBy: String) -> [String] {
+		groupBy == "genre" ? favoritedGenres : favorited
+	}
+	func setFavorites(_ value: [String], for groupBy: String) {
+		if groupBy == "genre" {
+			favoritedGenres = value
+		} else {
+			favorited = value
 		}
 	}
-	var currentCombined: [[String]] {
-		get {
-			return selectedTab == "genres" ? combinedGenres : combined
-		}
-		set(value) {
-			if selectedTab == "genres" {
-				combinedGenres = value
-			} else {
-				combined = value
-			}
+	func combined(for groupBy: String) -> [[String]] {
+		groupBy == "genre" ? combinedGenres : combined
+	}
+	func setCombined(_ value: [[String]], for groupBy: String) {
+		if groupBy == "genre" {
+			combinedGenres = value
+		} else {
+			combined = value
 		}
 	}
 
@@ -175,13 +171,14 @@ extension UserDefaults {
 
 	private static let synced: [(key: String, apply: (() -> Void)?)] = [
 		(Key.played, nil),
-		(Key.favorited, nil),
-		(Key.combined, nil),
+		(Key.favorited, { GroupedCollection.artists.scheduleUpdate(withAnimation: true) }),
+		(Key.combined, { GroupedCollection.artists.scheduleUpdate(withAnimation: true) }),
 		(Key.playedGenres, nil),
-		(Key.favoritedGenres, nil),
-		(Key.combinedGenres, nil),
+		(Key.favoritedGenres, { GroupedCollection.genres.scheduleUpdate(withAnimation: true) }),
+		(Key.combinedGenres, { GroupedCollection.genres.scheduleUpdate(withAnimation: true) }),
 		(Key.selectedTab, { GroupedCollection.updateCurrent(withAnimation: false) }),
-		(Key.minimum, { GroupedCollection.updateCurrent(withAnimation: true) }),
+		// Debounced so rapid stepper taps cause one rescan
+		(Key.minimum, { GroupedCollection.updateAll(withAnimation: true, after: .milliseconds(300)) }),
 	]
 
 	/// Mirrors synced keys to iCloud, and applies changes from other devices.
@@ -189,6 +186,8 @@ extension UserDefaults {
 		let defaults = UserDefaults.standard
 		let cloud = NSUbiquitousKeyValueStore.default
 		let syncedKeys = Set(synced.map(\.key))
+		// Pulls the latest iCloud values; changes arrive as didChangeExternally notifications
+		cloud.synchronize()
 
 		Task {
 			for await notification in NotificationCenter.default.notifications(named: NSUbiquitousKeyValueStore.didChangeExternallyNotification) {

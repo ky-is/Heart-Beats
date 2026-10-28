@@ -3,32 +3,27 @@ import SwiftUI
 struct CombineGroupings: View {
 	let type: String
 
-	@AppStorage(UserDefaults.Key.combined) private var combinedArtists = UserDefaults.standard.combined
-	@AppStorage(UserDefaults.Key.combinedGenres) private var combinedGenres = UserDefaults.standard.combinedGenres
+	// Stored as plist arrays, which @AppStorage can't read, so this mirrors UserDefaults by hand
+	@State private var combined: [[String]] = []
 
 	var body: some View {
-		let isGenre = type == "genre"
 		List {
-			var baseCombined = isGenre ? combinedGenres : combinedArtists
 			Section("Existing combinations:") {
-				if baseCombined.isEmpty {
+				if combined.isEmpty {
 					Text("No entries")
 						.foregroundStyle(.secondary)
 				} else {
-					ForEach(baseCombined, id: \.self) { combineEntries in
+					ForEach(combined, id: \.self) { combineEntries in
 						if combineEntries.count == 2 {
 							Text("\(combineEntries[0])\(Text(" ← \(combineEntries[1])").foregroundStyle(.secondary))")
 						}
 					}
 						.onDelete { offsets in
-							baseCombined.remove(atOffsets: offsets)
 							withAnimation {
-//								if isGenre {
-//									combinedGenres = baseCombined
-//								} else {
-//									combinedArtists = baseCombined
-//								}
+								combined.remove(atOffsets: offsets)
 							}
+							// The sync observer rescans the collection after this write
+							UserDefaults.standard.setCombined(combined, for: type)
 						}
 				}
 			}
@@ -41,6 +36,17 @@ struct CombineGroupings: View {
 		}
 			.pickerStyle(.wheel)
 			.navigationTitle("Combine \(type.capitalized)s")
+			.onAppear {
+				combined = UserDefaults.standard.combined(for: type)
+			}
+			.onReceive(NotificationCenter.default.publisher(for: UserDefaults.didChangeNotification)) { _ in
+				let stored = UserDefaults.standard.combined(for: type)
+				if stored != combined {
+					withAnimation {
+						combined = stored
+					}
+				}
+			}
 	}
 }
 

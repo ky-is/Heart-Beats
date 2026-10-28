@@ -13,7 +13,7 @@ struct AlbumArt: View {
 	}
 
 	var uiImage: UIImage? {
-		let image = artwork?.image(at: CGSize(width: displayWidth * 2, height: displayWidth * 2))
+		let image = artwork.flatMap { ArtworkCache.image(for: $0, size: displayWidth * 2) }
 #if targetEnvironment(simulator)
 		if image == nil {
 			return UIImage(named: "\(artist).jpeg")
@@ -44,6 +44,36 @@ struct AlbumArt: View {
 			.frame(width: displayWidth, height: displayWidth)
 			.clipShape(RoundedRectangle(cornerRadius: min(24, displayWidth / 6), style: .continuous))
 			.shadow(color: .black.opacity(0.25), radius: 4, y: 3)
+	}
+}
+
+/// Decoded artwork, so redraws and scrolling don't decode it again.
+enum ArtworkCache {
+	// Holding the artwork keeps its address from being reused by another artwork while cached
+	private final class Item {
+		let artwork: MPMediaItemArtwork
+		let image: UIImage?
+
+		init(artwork: MPMediaItemArtwork, image: UIImage?) {
+			self.artwork = artwork
+			self.image = image
+		}
+	}
+
+	private static let cache: NSCache<NSString, Item> = {
+		let cache = NSCache<NSString, Item>()
+		cache.countLimit = 500
+		return cache
+	}()
+
+	static func image(for artwork: MPMediaItemArtwork, size: CGFloat) -> UIImage? {
+		let key = "\(ObjectIdentifier(artwork).hashValue)-\(Int(size))" as NSString
+		if let item = cache.object(forKey: key), item.artwork === artwork {
+			return item.image
+		}
+		let image = artwork.image(at: CGSize(width: size, height: size))
+		cache.setObject(Item(artwork: artwork, image: image), forKey: key)
+		return image
 	}
 }
 

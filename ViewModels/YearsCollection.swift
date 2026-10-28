@@ -5,6 +5,8 @@ import SwiftUI
 
 @Observable
 final class YearsCollection: MediaCollection {
+	static let shared = YearsCollection()
+
 #if targetEnvironment(simulator)
 	var entries: [MediaEntry] = YearsCollection.screenshotData
 #else
@@ -39,45 +41,48 @@ final class YearsCollection: MediaCollection {
 		]
 	}
 
-	internal func update(withAnimation animated: Bool) async {
-		let query = MPMediaQuery.songs()
-		guard let songs = query.items else {
+	private var pendingUpdate: Task<Void, Never>?
+	private var generation = 0
+	private var scannedLibraryDate: Date?
+
+	func scheduleUpdate(withAnimation animated: Bool, after delay: Duration = .zero) {
+		pendingUpdate?.cancel()
+		pendingUpdate = Task {
+			if delay > .zero {
+				try? await Task.sleep(for: delay)
+			}
+			guard !Task.isCancelled else { return }
+			await update(withAnimation: animated)
+		}
+	}
+
+	/// Rescans only if the library changed since the last scan. With `onlyIfScanned`, skips a Years tab that was never opened.
+	func updateIfLibraryChanged(onlyIfScanned: Bool = false, after delay: Duration = .zero) {
+		// The simulator has no music library; a scan would replace the screenshot data
+#if !targetEnvironment(simulator)
+		guard !(onlyIfScanned && scannedLibraryDate == nil), MPMediaLibrary.default().lastModifiedDate != scannedLibraryDate else { return }
+		scheduleUpdate(withAnimation: false, after: delay)
+#endif
+	}
+
+	/// Scans every song off the main thread, then applies the result on it.
+	@concurrent
+	nonisolated func update(withAnimation animated: Bool) async {
+		let currentGeneration = await MainActor.run {
+			self.generation += 1
+			self.scannedLibraryDate = MPMediaLibrary.default().lastModifiedDate
+			return self.generation
+		}
+		guard let songs = MPMediaQuery.songs().items else {
 			log.error("Unable to load music")
 			return
 		}
+		let outputEntries = LibraryGrouping.yearsInReview(songs, calendar: .current)
+			.map { MediaEntry(id: $0.year.description, songs: $0.songs, songCount: $0.songs.count, artwork: $0.songs[0].artwork) }
 
-		var years: [Int: [MPMediaItem]] = [:]
-		for song in songs {
-			if song.playCount > 1 {
-				let year = Calendar.current.component(.year, from: song.dateAdded)
-				if years[year] == nil {
-					years[year] = [song]
-				} else {
-					years[year]?.append(song)
-				}
-			}
-		}
-
-		// Collect filtered songs per year outside main actor
-		var filteredYearSongs: [Int: [MPMediaItem]] = [:]
-		for (year, entries) in years {
-			let maxPlayCountCount = max(100, entries.reduce(0, { max($0, $1.playCount) }))
-			let halfPlayCountCount = Int(Double(maxPlayCountCount) * 0.5)
-			let minPlayCountCount = Int(Double(maxPlayCountCount) * 0.1)
-			let songs = entries
-				.filter { $0.playCount >= minPlayCountCount && ($0.playCount > halfPlayCountCount || $0.rating >= 5) }
-				.sorted { $0.playCount > $1.playCount }
-			if songs.count >= 5 {
-				filteredYearSongs[year] = songs
-			}
-		}
-
-		Task { @MainActor in
-			var outputEntries: [MediaEntry] = []
-			for (year, songs) in filteredYearSongs {
-				outputEntries.append(MediaEntry(id: year.description, songs: songs, songCount: songs.count, artwork: songs[0].artwork))
-			}
-			outputEntries.sort { $0.id.compare($1.id) == .orderedDescending }
+		await MainActor.run {
+			// A newer scan started while this one ran, so its result wins
+			guard currentGeneration == self.generation else { return }
 			if animated {
 				withAnimation {
 					self.entries = outputEntries

@@ -34,9 +34,8 @@ struct CreateCombineGrouping: View {
 			.toolbar {
 				ToolbarItem(placement: .topBarTrailing) {
 					Button("Save") {
-						withAnimation {
-							UserDefaults.standard.currentCombined.append([intoGrouping, fromGrouping])
-						}
+						// The sync observer rescans the collection after this write
+						UserDefaults.standard.setCombined(UserDefaults.standard.combined(for: type) + [[intoGrouping, fromGrouping]], for: type)
 						dismiss()
 					}
 						.disabled(fromGrouping == "" || intoGrouping == "" || fromGrouping == intoGrouping)

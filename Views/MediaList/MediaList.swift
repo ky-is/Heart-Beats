@@ -11,52 +11,35 @@ struct MediaList: View {
 
 	@Environment(\.scenePhase) private var scenePhase
 	@State private var selection: MediaEntry?
+	@State private var pendingPlay: PendingPlay?
 
 	@AppStorage(UserDefaults.Key.listViewMode) private var listViewMode = UserDefaults.standard.listViewMode
 
 	private func play(entry: MediaEntry, addToQueue: Bool) {
-		guard let songs = entry.songs else { return }
+		guard let songs = entry.songs else {
+			pendingPlay = PendingPlay(id: entry.id, addToQueue: addToQueue)
+			return
+		}
 
-		let entryName = entry.id
-		let played = UserDefaults.standard.currentPlayed
-		if !played.contains(entryName) {
-			if UserDefaults.standard.currentFavorites.count < 3 {
-				UserDefaults.standard.currentFavorites.append(entryName)
+		let groupBy = collection.groupBy
+		let defaults = UserDefaults.standard
+		let played = defaults.played(for: groupBy)
+		if !played.containsNormalized(entry.id) {
+			let favorites = defaults.favorites(for: groupBy)
+			if favorites.count < 3 {
+				defaults.setFavorites(favorites + [entry.id], for: groupBy)
 			}
-			UserDefaults.standard.currentPlayed.append(entryName)
+			defaults.setPlayed(played + [entry.id], for: groupBy)
 		}
-
-#if targetEnvironment(macCatalyst)
-		let player = MPMusicPlayerController.applicationMusicPlayer
-#else
-		let player = MPMusicPlayerController.systemMusicPlayer
-#endif
-		let songCollection = MPMediaItemCollection(items: songs.shuffled())
-		if addToQueue {
-			player.prepend(MPMusicPlayerMediaItemQueueDescriptor(itemCollection: songCollection))
-		} else {
-			player.setQueue(with: songCollection)
-		}
-		player.play()
-		openMusicApp()
-	}
-
-	private func openMusicApp() {
-		Task {
-			guard let url = URL(string: "audio-player-event:"), await UIApplication.shared.open(url) else {
-				log.error("Unable to open Music.app")
-				//TODO macOS
-				return
-			}
-		}
+		playSongs(songs, addToQueue: addToQueue)
 	}
 
 	private var groupedEntries: [ListGroupEntry] {
-		let favorites = UserDefaults.standard.selectedTab == "genres" ? UserDefaults.standard.favoritedGenres : UserDefaults.standard.favorited
+		let favorites = Set(UserDefaults.standard.favorites(for: collection.groupBy).map { $0.normalized() })
 		var favoriteEntries: [MediaEntry] = []
 		var nonfavoriteEntries: [MediaEntry] = []
 		for entry in collection.entries {
-			if favorites.contains(entry.id) {
+			if favorites.contains(entry.id.normalized()) {
 				favoriteEntries.append(entry)
 			} else {
 				nonfavoriteEntries.append(entry)
@@ -78,7 +61,7 @@ struct MediaList: View {
 		}
 //		let allEntriesGroups: [ListGroupEntry] = [(nil, [])] //SAMPLE
 		let allEntriesGroups = groupedEntries
-		let hasEntries = !allEntriesGroups.last!.entries.isEmpty
+		let hasEntries = !collection.entries.isEmpty
 #if targetEnvironment(simulator)
 		let showHeaders = false
 		let entryCount = 42
@@ -90,15 +73,16 @@ struct MediaList: View {
 			if !hasEntries {
 				EmptyMediaList(collection: collection, listViewMode: listViewMode, imageWidth: 88)
 			} else if listViewMode == "grid" {
-				GridView(showHeaders: showHeaders, largeTitles: false, allEntriesGroups: allEntriesGroups, activeSelection: activeSelection, play: play)
+				GridView(groupBy: collection.groupBy, showHeaders: showHeaders, largeTitles: false, allEntriesGroups: allEntriesGroups, activeSelection: activeSelection, play: play)
 			} else {
-				ListView(showHeaders: showHeaders, allEntriesGroups: allEntriesGroups, activeSelection: activeSelection, play: play)
+				ListView(groupBy: collection.groupBy, showHeaders: showHeaders, allEntriesGroups: allEntriesGroups, activeSelection: activeSelection, play: play)
 			}
 		}
 			.navigationTitle(collection.groupBy.capitalized.pluralize(entryCount))
+			.playWhenLoaded($pendingPlay, entries: collection.entries, play: play)
 			.onChange(of: scenePhase) { _, newPhase in
+				// ContentView rescans the library on foreground
 				if newPhase == .active {
-					GroupedCollection.updateCurrent(withAnimation: false)
 					withAnimation {
 						selection = nil
 					}
@@ -108,6 +92,7 @@ struct MediaList: View {
 }
 
 struct GridView: View {
+	let groupBy: String?
 	let showHeaders: Bool
 	let largeTitles: Bool
 	let allEntriesGroups: [ListGroupEntry]
@@ -121,7 +106,7 @@ struct GridView: View {
 		guard geometry.size.width > 0 else {
 			return (3, idealWidth)
 		}
-		let columnCount = (geometry.size.width / (idealWidth + spacing * 2)).rounded(.down)
+		let columnCount = max(1, (geometry.size.width / (idealWidth + spacing * 2)).rounded(.down))
 		let columnWidth = geometry.size.width / columnCount - spacing * 1
 		return (Int(columnCount), columnWidth)
 	}
@@ -131,7 +116,7 @@ struct GridView: View {
 			let (columnCount, columnSize) = sizeColumns(in: geometry, spacing: spacing)
 			ScrollView {
 				LazyVGrid(columns: Array(repeating: GridItem(.fixed(columnSize), spacing: spacing), count: columnCount), spacing: spacing * 1.5) {
-					EntriesView(listViewMode: "grid", largeTitles: largeTitles, imageWidth: columnSize - spacing, showHeaders: showHeaders, allEntriesGroups: allEntriesGroups, activeSelection: $activeSelection, play: play)
+					EntriesView(groupBy: groupBy, listViewMode: "grid", largeTitles: largeTitles, imageWidth: columnSize - spacing, showHeaders: showHeaders, allEntriesGroups: allEntriesGroups, activeSelection: $activeSelection, play: play)
 				}
 					.padding(.vertical, spacing / 2)
 			}
@@ -140,6 +125,7 @@ struct GridView: View {
 }
 
 private struct ListView: View {
+	let groupBy: String
 	let showHeaders: Bool
 	let allEntriesGroups: [ListGroupEntry]
 	@Binding var activeSelection: MediaEntry?
@@ -147,13 +133,14 @@ private struct ListView: View {
 
 	var body: some View {
 		List(selection: $activeSelection) {
-			EntriesView(listViewMode: "list", largeTitles: false, imageWidth: 128, showHeaders: showHeaders, allEntriesGroups: allEntriesGroups, activeSelection: $activeSelection, play: play)
+			EntriesView(groupBy: groupBy, listViewMode: "list", largeTitles: false, imageWidth: 128, showHeaders: showHeaders, allEntriesGroups: allEntriesGroups, activeSelection: $activeSelection, play: play)
 		}
 			.listStyle(.plain)
 	}
 }
 
 private struct EntriesView: View {
+	let groupBy: String?
 	let listViewMode: String
 	let largeTitles: Bool
 	let imageWidth: CGFloat
@@ -171,11 +158,11 @@ private struct EntriesView: View {
 						Button {
 							activeSelection = entry
 						} label: {
-							MediaListEntry(listViewMode: listViewMode, largeTitles: largeTitles, entry: entry, imageWidth: imageWidth, inFavorites: inFavorites, play: play)
+							MediaListEntry(groupBy: groupBy, listViewMode: listViewMode, largeTitles: largeTitles, entry: entry, imageWidth: imageWidth, inFavorites: inFavorites, play: play)
 						}
 							.buttonStyle(.plain)
 					} else {
-						MediaListEntry(listViewMode: listViewMode, largeTitles: largeTitles, entry: entry, imageWidth: imageWidth, inFavorites: inFavorites, play: play)
+						MediaListEntry(groupBy: groupBy, listViewMode: listViewMode, largeTitles: largeTitles, entry: entry, imageWidth: imageWidth, inFavorites: inFavorites, play: play)
 							.tag(entry)
 					}
 				}
@@ -186,6 +173,46 @@ private struct EntriesView: View {
 						.font(.headline.smallCaps())
 				}
 			}
+		}
+	}
+}
+
+/// An entry tapped while the list still shows cached entries, which have no songs until the first scan finishes.
+struct PendingPlay: Equatable {
+	let id: String
+	let addToQueue: Bool
+}
+
+extension View {
+	/// Plays the pending entry once a scan loads its songs.
+	func playWhenLoaded(_ pending: Binding<PendingPlay?>, entries: [MediaEntry], play: @escaping (MediaEntry, Bool) -> Void) -> some View {
+		onChange(of: entries) { _, entries in
+			guard let request = pending.wrappedValue, let entry = entries.first(where: { $0.id.normalized() == request.id.normalized() }), entry.songs != nil else { return }
+			pending.wrappedValue = nil
+			play(entry, request.addToQueue)
+		}
+	}
+}
+
+/// Plays the songs shuffled in the system player, then opens Music.
+func playSongs(_ songs: [MPMediaItem], addToQueue: Bool) {
+#if targetEnvironment(macCatalyst)
+	let player = MPMusicPlayerController.applicationMusicPlayer
+#else
+	let player = MPMusicPlayerController.systemMusicPlayer
+#endif
+	let songCollection = MPMediaItemCollection(items: songs.shuffled())
+	if addToQueue {
+		player.prepend(MPMusicPlayerMediaItemQueueDescriptor(itemCollection: songCollection))
+	} else {
+		player.setQueue(with: songCollection)
+	}
+	player.play()
+	Task {
+		guard let url = URL(string: "audio-player-event:"), await UIApplication.shared.open(url) else {
+			log.error("Unable to open Music.app")
+			//TODO macOS
+			return
 		}
 	}
 }

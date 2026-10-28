@@ -9,7 +9,8 @@ extension Bundle {
 	}
 }
 
-extension String {
+nonisolated extension String {
+	/// Lowercased and trimmed, for matching names regardless of case.
 	func normalized() -> Self {
 		lowercased().trimmingCharacters(in: .whitespacesAndNewlines)
 	}
@@ -24,6 +25,14 @@ extension String {
 	var forSorting: String {
 		let result = lowercased()
 		return result.starts(with: "the ") ? String(result.dropFirst(4)) : result
+	}
+}
+
+nonisolated extension Sequence<String> {
+	/// Whether any element matches the name, ignoring case.
+	func containsNormalized(_ name: String) -> Bool {
+		let target = name.normalized()
+		return contains { $0.normalized() == target }
 	}
 }
 

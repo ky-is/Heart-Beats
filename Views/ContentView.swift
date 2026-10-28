@@ -4,6 +4,8 @@ import SwiftUI
 struct ContentView: View {
 	@AppStorage(UserDefaults.Key.selectedTab) private var selectedTab = "artists"
 
+	@Environment(\.scenePhase) private var scenePhase
+
 	@State private var artistsCollection = GroupedCollection.artists
 	@State private var genresCollection = GroupedCollection.genres
 
@@ -18,41 +20,49 @@ struct ContentView: View {
 			selectedTab = $0.isEmpty ? "artists" : $0
 		}
 		let showsUnavailable = Binding(get: { artistsCollection.unavailable != nil }, set: { _,_ in artistsCollection.unavailable = nil })
-		GeometryReader { geometry in
-			TabView(selection: selectionTabDisabled) {
-				Tab("Artists", systemImage: "music.mic", value: "artists") {
-					NavigationContentView {
-						MediaList(collection: artistsCollection)
-					}
+		TabView(selection: selectionTabDisabled) {
+			Tab("Artists", systemImage: "music.mic", value: "artists") {
+				NavigationContentView {
+					MediaList(collection: artistsCollection)
 				}
-				Tab("Genres", systemImage: "opticaldisc", value: "genres") {
-					NavigationContentView {
-						MediaList(collection: genresCollection)
-					}
-				}
-				Tab("Years", systemImage: "\(Int(yearSuffix)! > 50 ? "00" : yearSuffix).square", value: "years") {
-					NavigationContentView(canToggle: false) {
-						YearsList()
-					}
-				}
-#if !targetEnvironment(macCatalyst)
-				Tab("", systemImage: "", value: "", role: .search) {
-				}
-					.disabled(true)
-#endif
 			}
-				.overlay(alignment: .bottomTrailing) {
+			Tab("Genres", systemImage: "opticaldisc", value: "genres") {
+				NavigationContentView {
+					MediaList(collection: genresCollection)
+				}
+			}
+			Tab("Years", systemImage: "\(Int(yearSuffix)! > 50 ? "00" : yearSuffix).square", value: "years") {
+				NavigationContentView(canToggle: false) {
+					YearsList()
+				}
+			}
+#if !targetEnvironment(macCatalyst)
+			Tab("", systemImage: "", value: "", role: .search) {
+			}
+				.disabled(true)
+#endif
+		}
+			.overlay(alignment: .bottomTrailing) {
+				// Years ignore the minimum
+				if selectedTab != "years" {
 					MinimumSongsButton()
 						.padding([.bottom, .trailing], 20)
 				}
+			}
 //				.tabViewBottomAccessory {
 //					MinimumSongsStepper()
 ////					if selectedTab != "years" { //TODO
 ////					}
 //				}
-				.tabBarMinimizeBehavior(.onScrollDown)
-		}
+			.tabBarMinimizeBehavior(.onScrollDown)
 			.ignoresSafeArea(.container, edges: .bottom)
+			.onChange(of: scenePhase) { _, newPhase in
+				// Picks up ratings changed in Music; skipped when the library is unchanged
+				if newPhase == .active {
+					GroupedCollection.updateAllIfLibraryChanged()
+					YearsCollection.shared.updateIfLibraryChanged(onlyIfScanned: true)
+				}
+			}
 			.alert("Music Unavailable", isPresented: showsUnavailable, actions: {
 				Link("Open Settings", destination: URL(string: UIApplication.openSettingsURLString)!)
 			}) {
@@ -85,7 +95,7 @@ private struct NavigationContentView<Content: View>: View {
 	private let imageIncrement = 3
 	func screenshotImages(startIndex: Int) -> [Image] {
 		let idealSize = CGSize(width: 128, height: 128)
-		return GroupedCollection.current.entries.filter({ UserDefaults.standard.selectedTab == "genres" ? true : UserDefaults.standard.currentFavorites.contains($0.id) })[startIndex..<startIndex+imageIncrement].compactMap { $0.artwork?.image(at: idealSize) }.map { Image(uiImage: $0.scale(to: idealSize)) }
+		return GroupedCollection.current.entries.filter({ UserDefaults.standard.selectedTab == "genres" ? true : UserDefaults.standard.favorites(for: GroupedCollection.current.groupBy).contains($0.id) })[startIndex..<startIndex+imageIncrement].compactMap { $0.artwork?.image(at: idealSize) }.map { Image(uiImage: $0.scale(to: idealSize)) }
 	}
 #endif
 
@@ -95,7 +105,7 @@ private struct NavigationContentView<Content: View>: View {
 				.toolbar {
 #if targetEnvironment(macCatalyst)
 					ToolbarItem(placement: .principal) {
-						MinimumSongsButton(geometry: nil)
+						MinimumSongsButton()
 							.disabled(selectedTab == "years")
 					}
 #endif

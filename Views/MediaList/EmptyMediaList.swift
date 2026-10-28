@@ -13,13 +13,13 @@ struct EmptyMediaList: View {
 				if listViewMode == "grid" {
 					LazyVGrid(columns: [GridItem(.adaptive(minimum: 88))]) {
 						ForEach(GroupedCollection.screenshotData) {
-							MediaListEntry(listViewMode: listViewMode, largeTitles: false, entry: $0, imageWidth: imageWidth, inFavorites: false, play: play)
+							MediaListEntry(groupBy: nil, listViewMode: listViewMode, largeTitles: false, entry: $0, imageWidth: imageWidth, inFavorites: false, play: play)
 						}
 					}
 				} else {
 					List {
 						ForEach(GroupedCollection.screenshotData) {
-							MediaListEntry(listViewMode: listViewMode, largeTitles: false, entry: $0, imageWidth: imageWidth, inFavorites: false, play: play)
+							MediaListEntry(groupBy: nil, listViewMode: listViewMode, largeTitles: false, entry: $0, imageWidth: imageWidth, inFavorites: false, play: play)
 						}
 					}
 					.listStyle(.plain)
