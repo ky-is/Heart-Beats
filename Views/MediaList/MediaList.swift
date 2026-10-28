@@ -1,5 +1,6 @@
 import SwiftUI
 import MediaPlayer
+import os
 
 typealias ListGroupEntry = (label: String?, entries: [MediaEntry])
 
@@ -41,11 +42,12 @@ struct MediaList: View {
 	}
 
 	private func openMusicApp() {
-		if let url = URL(string: "audio-player-event:"), UIApplication.shared.canOpenURL(url) {
-			UIApplication.shared.open(url)
-		} else {
-			print("Unable to open Music.app")
-			//TODO macOS
+		Task {
+			guard let url = URL(string: "audio-player-event:"), await UIApplication.shared.open(url) else {
+				log.error("Unable to open Music.app")
+				//TODO macOS
+				return
+			}
 		}
 	}
 
@@ -112,10 +114,10 @@ struct GridView: View {
 	@Binding var activeSelection: MediaEntry?
 	let play: (MediaEntry, Bool) -> Void
 
-	private let idealWidth: CGFloat = UIScreen.main.bounds.width >= 2048 ? 256 : (UIDevice.current.userInterfaceIdiom == .pad ? 176 : 144)
 	private let spacing: CGFloat = UIDevice.current.userInterfaceIdiom == .pad ? 16 : 8
 
-	private func sizeColumns(in geometry: GeometryProxy, idealWidth: CGFloat, spacing: CGFloat) -> (count: Int, width: CGFloat) {
+	private func sizeColumns(in geometry: GeometryProxy, spacing: CGFloat) -> (count: Int, width: CGFloat) {
+		let idealWidth: CGFloat = geometry.size.width >= 2048 ? 256 : (UIDevice.current.userInterfaceIdiom == .pad ? 176 : 144)
 		guard geometry.size.width > 0 else {
 			return (3, idealWidth)
 		}
@@ -126,7 +128,7 @@ struct GridView: View {
 
 	var body: some View {
 		GeometryReader { geometry in
-			let (columnCount, columnSize) = sizeColumns(in: geometry, idealWidth: idealWidth, spacing: spacing)
+			let (columnCount, columnSize) = sizeColumns(in: geometry, spacing: spacing)
 			ScrollView {
 				LazyVGrid(columns: Array(repeating: GridItem(.fixed(columnSize), spacing: spacing), count: columnCount), spacing: spacing * 1.5) {
 					EntriesView(listViewMode: "grid", largeTitles: largeTitles, imageWidth: columnSize - spacing, showHeaders: showHeaders, allEntriesGroups: allEntriesGroups, activeSelection: $activeSelection, play: play)

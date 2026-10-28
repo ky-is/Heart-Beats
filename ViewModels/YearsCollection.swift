@@ -1,11 +1,12 @@
 import MediaPlayer
 import Observation
+import os
 import SwiftUI
 
 @Observable
 final class YearsCollection: MediaCollection {
 #if targetEnvironment(simulator)
-	var entries: [MediaEntry] = Self.screenshotData
+	var entries: [MediaEntry] = YearsCollection.screenshotData
 #else
 	var entries: [MediaEntry] = []
 #endif
@@ -40,7 +41,10 @@ final class YearsCollection: MediaCollection {
 
 	internal func update(withAnimation animated: Bool) async {
 		let query = MPMediaQuery.songs()
-		guard let songs = query.items else { return print("Unable to load music") }
+		guard let songs = query.items else {
+			log.error("Unable to load music")
+			return
+		}
 
 		var years: [Int: [MPMediaItem]] = [:]
 		for song in songs {

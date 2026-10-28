@@ -13,7 +13,7 @@ struct HeartBeatsApp: App {
 #if !targetEnvironment(simulator)
 		handleAuthorization(status: MPMediaLibrary.authorizationStatus())
 #endif
-		UserDefaults.standard.observe()
+		UserDefaults.keepSynced()
 	}
 
 	var body: some Scene {
@@ -44,8 +44,9 @@ final class AppDelegate: NSObject, UIApplicationDelegate {
 private func handleAuthorization(status: MPMediaLibraryAuthorizationStatus) {
 	switch status {
 	case .notDetermined:
-//		MPMediaLibrary.requestAuthorization(handleAuthorization) //TODO
-		return
+		Task {
+			handleAuthorization(status: await MPMediaLibrary.requestAuthorization())
+		}
 	case .authorized:
 		GroupedCollection.updateCurrent(withAnimation: true)
 		GroupedCollection.updateBackground()

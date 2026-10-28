@@ -1,7 +1,5 @@
 import UIKit
 
-private var observers: [NSKeyValueObservation] = []
-
 extension UserDefaults {
 	struct Key {
 		static let played = "played"
@@ -21,7 +19,7 @@ extension UserDefaults {
 		static let cachedYears = "cachedYears"
 	}
 
-	@objc dynamic var played: [String] {
+	var played: [String] {
 		get {
 			array(forKey: #function) as? [String] ?? []
 		}
@@ -29,7 +27,7 @@ extension UserDefaults {
 			set(value, forKey: #function)
 		}
 	}
-	@objc dynamic var playedGenres: [String] {
+	var playedGenres: [String] {
 		get {
 			array(forKey: #function) as? [String] ?? []
 		}
@@ -37,7 +35,7 @@ extension UserDefaults {
 			set(value, forKey: #function)
 		}
 	}
-	@objc dynamic var favorited: [String] {
+	var favorited: [String] {
 		get {
 #if targetEnvironment(simulator)
 			return ["Beach House", "Frédéric Chopin", "indigo la End", "Lost Frequencies", "Polo & Pan", "Stromae", "Sufjan Stevens", "Toe", "Yelle"]
@@ -49,7 +47,7 @@ extension UserDefaults {
 			set(value, forKey: #function)
 		}
 	}
-	@objc dynamic var favoritedGenres: [String] {
+	var favoritedGenres: [String] {
 
 		get {
 #if targetEnvironment(simulator)
@@ -62,7 +60,7 @@ extension UserDefaults {
 			set(value, forKey: #function)
 		}
 	}
-	@objc dynamic var combined: [[String]] {
+	var combined: [[String]] {
 		get {
 			array(forKey: #function) as? [[String]] ?? []
 		}
@@ -70,7 +68,7 @@ extension UserDefaults {
 			set(value, forKey: #function)
 		}
 	}
-	@objc dynamic var combinedGenres: [[String]] {
+	var combinedGenres: [[String]] {
 		get {
 			array(forKey: #function) as? [[String]] ?? []
 		}
@@ -78,7 +76,7 @@ extension UserDefaults {
 			set(value, forKey: #function)
 		}
 	}
-	@objc dynamic var selectedTab: String {
+	var selectedTab: String {
 		get {
 			string(forKey: #function) ?? "artists"
 		}
@@ -86,7 +84,7 @@ extension UserDefaults {
 			set(value, forKey: #function)
 		}
 	}
-	@objc dynamic var minimum: Int {
+	var minimum: Int {
 		get {
 #if targetEnvironment(simulator)
 			return 15
@@ -175,44 +173,43 @@ extension UserDefaults {
 
 	// Sync
 
-	func observe() {
-		NotificationCenter.default.addObserver(self, selector: #selector(didChangeExternally), name: NSUbiquitousKeyValueStore.didChangeExternallyNotification, object: nil)
+	private static let synced: [(key: String, apply: (() -> Void)?)] = [
+		(Key.played, nil),
+		(Key.favorited, nil),
+		(Key.combined, nil),
+		(Key.playedGenres, nil),
+		(Key.favoritedGenres, nil),
+		(Key.combinedGenres, nil),
+		(Key.selectedTab, { GroupedCollection.updateCurrent(withAnimation: false) }),
+		(Key.minimum, { GroupedCollection.updateCurrent(withAnimation: true) }),
+	]
 
-		keepSynced(\.played)
-		keepSynced(\.favorited)
-		keepSynced(\.combined)
-		keepSynced(\.playedGenres)
-		keepSynced(\.favoritedGenres)
-		keepSynced(\.combinedGenres)
-		keepSynced(\.selectedTab) {
-			GroupedCollection.updateCurrent(withAnimation: false)
-		}
-		keepSynced(\.minimum) {
-			GroupedCollection.updateCurrent(withAnimation: true)
-		}
-	}
+	/// Mirrors synced keys to iCloud, and applies changes from other devices.
+	static func keepSynced() {
+		let defaults = UserDefaults.standard
+		let cloud = NSUbiquitousKeyValueStore.default
+		let syncedKeys = Set(synced.map(\.key))
 
-	func keepSynced<Value>(_ keyPath: KeyPath<UserDefaults, Value>, apply: (() -> Void)? = nil) {
-		observers.append(observe(keyPath) { defaults, change in
-			let value = defaults[keyPath: keyPath]
-			let key = NSExpression(forKeyPath: keyPath).keyPath
-			self.setValue(value, forKey: key)
-			NSUbiquitousKeyValueStore.default.set(value, forKey: key)
-//#if DEBUG
-//			NSUbiquitousKeyValueStore.default.synchronize()
-//#endif
-			apply?()
-		})
-	}
-
-	@MainActor
-	@objc private func didChangeExternally(notification: Notification) {
-		let keys = notification.userInfo?[NSUbiquitousKeyValueStoreChangedKeysKey] as? [String] ?? []
-		for key in keys {
-			setValue(NSUbiquitousKeyValueStore.default.object(forKey: key), forKey: key)
+		Task {
+			for await notification in NotificationCenter.default.notifications(named: NSUbiquitousKeyValueStore.didChangeExternallyNotification) {
+				let keys = notification.userInfo?[NSUbiquitousKeyValueStoreChangedKeysKey] as? [String] ?? []
+				for key in keys where syncedKeys.contains(key) {
+					defaults.set(cloud.object(forKey: key), forKey: key)
+				}
+			}
 		}
-#if DEBUG
-		synchronize()
-#endif
+
+		Task {
+			var last = Dictionary(uniqueKeysWithValues: synced.map { ($0.key, defaults.object(forKey: $0.key) as? NSObject) })
+			for await _ in NotificationCenter.default.notifications(named: UserDefaults.didChangeNotification) {
+				for (key, apply) in synced {
+					let value = defaults.object(forKey: key) as? NSObject
+					guard value != last[key] else { continue }
+					last[key] = value
+					cloud.set(value, forKey: key)
+					apply?()
+				}
+			}
+		}
 	}
 }

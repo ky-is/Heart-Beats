@@ -1,4 +1,7 @@
 import Foundation
+import os
+
+nonisolated let log = Logger(subsystem: "is.ky.Heart-Beats", category: "app")
 
 extension Bundle {
 	var version: String {
@@ -44,4 +47,3 @@ extension Array: @retroactive @MainActor RawRepresentable where Element: Codable
 	}
 }
 
-extension KeyPath: @unchecked @retroactive Sendable {} //LATER should be sendable

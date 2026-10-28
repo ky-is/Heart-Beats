@@ -1,0 +1,27 @@
+{
+	"fill": {
+		"automatic-gradient": "srgb:0.88627,0.33725,0.44314,1.00000"
+	},
+	"groups": [
+		{
+			"layers": [
+				{
+					"glass": true,
+					"image-name": "heart.png",
+					"name": "heart"
+				}
+			],
+			"shadow": {
+				"kind": "neutral",
+				"opacity": 0.5
+			},
+			"translucency": {
+				"enabled": true,
+				"value": 0.5
+			}
+		}
+	],
+	"supported-platforms": {
+		"squares": "shared"
+	}
+}

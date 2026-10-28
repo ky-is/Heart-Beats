@@ -1,5 +1,6 @@
 import MediaPlayer
 import Observation
+import os
 import SwiftUI
 
 @Observable
@@ -11,7 +12,7 @@ final class GroupedCollection: MediaCollection {
 
 	var unavailable: MPMediaLibraryAuthorizationStatus?
 #if targetEnvironment(simulator)
-	var entries: [MediaEntry] = Self.screenshotData
+	var entries: [MediaEntry] = GroupedCollection.screenshotData
 #else
 	var entries: [MediaEntry] = []
 #endif
@@ -82,7 +83,8 @@ final class GroupedCollection: MediaCollection {
 		let showGenres = groupBy == "genre"
 		let query = showGenres ? MPMediaQuery.genres() : MPMediaQuery.artists()
 		guard let rawCollections = query.collections else {
-			return print("Unable to load music")
+			log.error("Unable to load music")
+			return
 		}
 		let (favorited, combined) = await MainActor.run {
 			(UserDefaults.standard.currentFavorites, UserDefaults.standard.currentCombined)

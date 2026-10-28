@@ -1,3 +1,4 @@
+import MediaPlayer
 import SwiftUI
 
 struct ContentView: View {
@@ -49,7 +50,7 @@ struct ContentView: View {
 ////					if selectedTab != "years" { //TODO
 ////					}
 //				}
-//				.tabBarMinimizeBehavior(.onScrollDown)
+				.tabBarMinimizeBehavior(.onScrollDown)
 		}
 			.ignoresSafeArea(.container, edges: .bottom)
 			.alert("Music Unavailable", isPresented: showsUnavailable, actions: {

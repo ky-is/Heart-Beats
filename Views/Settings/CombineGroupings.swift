@@ -17,10 +17,7 @@ struct CombineGroupings: View {
 				} else {
 					ForEach(baseCombined, id: \.self) { combineEntries in
 						if combineEntries.count == 2 {
-							Text("\(combineEntries[0])")
-							+
-							Text(" ← \(combineEntries[1])")
-								.foregroundStyle(.secondary)
+							Text("\(combineEntries[0])\(Text(" ← \(combineEntries[1])").foregroundStyle(.secondary))")
 						}
 					}
 						.onDelete { offsets in

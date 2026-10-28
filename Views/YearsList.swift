@@ -1,5 +1,6 @@
 import SwiftUI
 import MediaPlayer
+import os
 
 private let FavoritesLabel = "Favorites"
 
@@ -39,11 +40,12 @@ struct YearsList: View {
 	}
 
 	private func openMusicApp() {
-		if let url = URL(string: "audio-player-event:"), UIApplication.shared.canOpenURL(url) {
-			UIApplication.shared.open(url)
-		} else {
-			print("Unable to open Music.app")
-			//TODO macOS
+		Task {
+			guard let url = URL(string: "audio-player-event:"), await UIApplication.shared.open(url) else {
+				log.error("Unable to open Music.app")
+				//TODO macOS
+				return
+			}
 		}
 	}
 
