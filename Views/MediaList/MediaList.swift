@@ -104,6 +104,7 @@ struct GridView: View {
 				}
 					.padding(.vertical, spacing / 2)
 			}
+				.scrollsToTopOnTabRetap()
 		}
 	}
 }
@@ -120,6 +121,7 @@ private struct ListView: View {
 			EntriesView(groupBy: groupBy, listViewMode: "list", largeTitles: false, imageWidth: 128, showHeaders: showHeaders, allEntriesGroups: allEntriesGroups, activeSelection: $activeSelection, play: play)
 		}
 			.listStyle(.plain)
+			.scrollsToTopOnTabRetap()
 	}
 }
 

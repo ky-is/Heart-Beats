@@ -7,6 +7,9 @@ private func effectiveMinimum(_ minimum: Int, selectedTab: String) -> Int {
 }
 
 struct MinimumSongsButton: View {
+	/// A plain nav bar item, which the system styles itself, rather than the floating circle
+	var isInNavigationBar = false
+
 	@State private var showSongMinimum = false
 
 	@AppStorage(UserDefaults.Key.minimum) private var minimum = UserDefaults.standard.minimum
@@ -14,15 +17,37 @@ struct MinimumSongsButton: View {
 
 	var body: some View {
 		let value = effectiveMinimum(minimum, selectedTab: selectedTab)
-		Button {
-			showSongMinimum = true
-		} label: {
-			Text(String(value))
-				.font(.system(size: 24, weight: .bold))
-				.frame(width: 64, height: 64)
+		Group {
+			if isInNavigationBar {
+				// A plain button with a symbol, so the system can move it into a side column with the other nav bar items (it leaves text-only ones up top). Numbered circles only go up to 50.
+				Button {
+					showSongMinimum = true
+				} label: {
+					Label(String(value), systemImage: value <= 50 ? "\(value).circle" : "number.circle")
+				}
+			} else {
+				Button {
+					showSongMinimum = true
+				} label: {
+					Text(String(value))
+						.font(.system(size: 24, weight: .bold))
+						.frame(width: 62, height: 62)
+						.contentShape(.circle)
+						.foregroundStyle(.tint)
+				}
+					.buttonStyle(.plain)
+			}
 		}
 			.accessibilityLabel("Minimum songs")
 			.accessibilityValue(String(value))
+#if DEBUG
+			.onAppear {
+				// Lets screenshot runs open the popover with a launch argument
+				if UserDefaults.standard.string(forKey: "debugScreen") == "minimum" {
+					showSongMinimum = true
+				}
+			}
+#endif
 			.popover(isPresented: $showSongMinimum) {
 				MinimumSongsStepper()
 			}
