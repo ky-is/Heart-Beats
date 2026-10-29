@@ -41,11 +41,9 @@ struct AlbumArt: View {
 				image = ArtworkCache.cachedImage(for: artwork, size: pixelSize)
 			}
 		}
-#if targetEnvironment(simulator)
-		if image == nil {
+		if image == nil && SampleLibrary.isOn {
 			return UIImage(named: "\(artist).jpeg")
 		}
-#endif
 		return image
 	}
 

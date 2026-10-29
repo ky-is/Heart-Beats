@@ -77,6 +77,13 @@ struct MediaListEntry: View {
 							.clipShape(RoundedRectangle(cornerRadius: min(24, imageWidth / 6), style: .continuous))
 							.shadow(color: .black.opacity(0.25), radius: 4, y: 3)
 							.task(id: key) {
+#if targetEnvironment(simulator) || DEBUG
+								// The sample years have no songs, so they show the sample covers
+								if SampleLibrary.isOn && entry.songs == nil {
+									subImages = (key, MediaEntry.screenshotCovers(forYear: entry.id, count: gridRows * gridRows))
+									return
+								}
+#endif
 								guard entry.songs != nil else { return }
 								let images = await ArtworkCache.albumImages(for: entry, size: AlbumArt.pixelSize(forWidth: key.size), count: gridRows * gridRows)
 								guard !Task.isCancelled else { return }

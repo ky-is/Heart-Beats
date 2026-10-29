@@ -54,6 +54,7 @@ struct YearsList: View {
 		}
 			.navigationTitle("Years In Review")
 			.playWhenLoaded($pendingPlay, entries: collection.entries, play: play)
+			.task { await SampleLibrary.ready("years") }
 			.onAppear {
 				collection.updateIfLibraryChanged()
 			}

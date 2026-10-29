@@ -2,6 +2,26 @@ import MediaPlayer
 import os
 import SwiftUI
 
+/// The built-in sample library for screenshots, instead of the music library: always in the simulator, which has none, and
+/// in a Debug Mac build launched with `-screenshotData YES`. Off everywhere else, as a constant, so Release builds drop it.
+nonisolated enum SampleLibrary {
+#if targetEnvironment(simulator)
+	static let isOn = true
+#elseif DEBUG && targetEnvironment(macCatalyst)
+	static let isOn = UserDefaults.standard.bool(forKey: "screenshotData")
+#else
+	static let isOn = false
+#endif
+
+	/// For screenshot runs, which wait for this console line instead of a fixed delay: SCREEN is drawn, covers and all.
+	/// Called once the screen has appeared and had a moment to lay out.
+	static func ready(_ screen: String) async {
+		guard isOn else { return }
+		try? await Task.sleep(for: .milliseconds(400))
+		print("[screenshot] ready \(screen)")
+	}
+}
+
 // Built off the main thread by the library scans. MediaPlayer items and artwork aren't marked Sendable, but they're read-only snapshots of the library.
 nonisolated struct MediaEntry: @unchecked Sendable, Identifiable, Hashable {
 	let id: String
@@ -48,24 +68,72 @@ nonisolated extension MPMediaItem {
 }
 
 extension MediaEntry {
+	/// The screenshot artists, shown in this order as one list (the simulator has no favorites section), with neighboring covers in different colors
 	static let screenshotData = [
 		MediaEntry(id: "The Album Leaf", songs: nil, songCount: 20, artwork: nil),
-		MediaEntry(id: "Beach House", songs: nil, songCount: 50, artwork: nil),
+		MediaEntry(id: "Deafheaven", songs: nil, songCount: 21, artwork: nil),
+		MediaEntry(id: "Bon Iver", songs: nil, songCount: 25, artwork: nil),
+		MediaEntry(id: "Death Cab for Cutie", songs: nil, songCount: 59, artwork: nil),
 		MediaEntry(id: "Belle & Sebastian", songs: nil, songCount: 51, artwork: nil),
-		MediaEntry(id: "Bob Marley & The Wailers", songs: nil, songCount: 33, artwork: nil),
-		MediaEntry(id: "CHVRCHΞS", songs: nil, songCount: 23, artwork: nil),
-		MediaEntry(id: "The Decemberists", songs: nil, songCount: 52, artwork: nil),
-		MediaEntry(id: "Frédéric Chopin", songs: nil, songCount: 22, artwork: nil),
-		MediaEntry(id: "indigo la End", songs: nil, songCount: 37, artwork: nil),
-		MediaEntry(id: "Lost Frequencies", songs: nil, songCount: 23, artwork: nil),
+		MediaEntry(id: "Car Seat Headrest", songs: nil, songCount: 18, artwork: nil),
 		MediaEntry(id: "The National", songs: nil, songCount: 61, artwork: nil),
-		MediaEntry(id: "Polo & Pan", songs: nil, songCount: 16, artwork: nil),
+		MediaEntry(id: "Bob Marley & The Wailers", songs: nil, songCount: 33, artwork: nil),
+		MediaEntry(id: "The Decemberists", songs: nil, songCount: 52, artwork: nil),
+		MediaEntry(id: "The Postal Service", songs: nil, songCount: 19, artwork: nil),
 		MediaEntry(id: "Sigur Rós", songs: nil, songCount: 30, artwork: nil),
+		MediaEntry(id: "Beach House", songs: nil, songCount: 50, artwork: nil),
+		MediaEntry(id: "Polo & Pan", songs: nil, songCount: 16, artwork: nil),
+		MediaEntry(id: "indigo la End", songs: nil, songCount: 37, artwork: nil),
+		MediaEntry(id: "Frédéric Chopin", songs: nil, songCount: 22, artwork: nil),
 		MediaEntry(id: "Stromae", songs: nil, songCount: 15, artwork: nil),
+		MediaEntry(id: "Lost Frequencies", songs: nil, songCount: 23, artwork: nil),
 		MediaEntry(id: "Sufjan Stevens", songs: nil, songCount: 16, artwork: nil),
 		MediaEntry(id: "Toe", songs: nil, songCount: 34, artwork: nil),
 		MediaEntry(id: "Yelle", songs: nil, songCount: 26, artwork: nil),
 	]
+
+	static let yearsScreenshotData = zip(stride(from: 2026, through: 2019, by: -1), [42, 57, 38, 61, 45, 33, 52, 29]).map {
+		MediaEntry(id: String($0), songs: nil, songCount: $1, artwork: nil)
+	}
+
+#if targetEnvironment(simulator) || DEBUG
+	/// The sample covers (the screenshot artists that have one), so a Years tile shows a collage without a library
+	private static let screenshotCovers = screenshotData.compactMap { UIImage(named: "\($0.id).jpeg") }
+
+	/// Each year's sample covers: shuffled with a fixed seed, so every run matches, and none from the three years before it, so no tile shares a cover with its neighbors
+	private static let yearsScreenshotCovers: [String: [UIImage]] = {
+		var generator = SeededGenerator(seed: 27)
+		var recent: [Int] = []
+		var covers: [String: [UIImage]] = [:]
+		for entry in yearsScreenshotData {
+			let picked = Array(screenshotCovers.indices.filter { !recent.contains($0) }.shuffled(using: &generator).prefix(4))
+			covers[entry.id] = picked.map { screenshotCovers[$0] }
+			recent = Array((recent + picked).suffix(12))
+		}
+		return covers
+	}()
+
+	static func screenshotCovers(forYear id: String, count: Int) -> [UIImage] {
+		Array((yearsScreenshotCovers[id] ?? []).prefix(count))
+	}
+
+	/// SplitMix64, a small generator that gives the same numbers for the same seed
+	private struct SeededGenerator: RandomNumberGenerator {
+		var state: UInt64
+
+		init(seed: UInt64) {
+			state = seed
+		}
+
+		mutating func next() -> UInt64 {
+			state &+= 0x9E3779B97F4A7C15
+			var z = state
+			z = (z ^ (z >> 30)) &* 0xBF58476D1CE4E5B9
+			z = (z ^ (z >> 27)) &* 0x94D049BB133111EB
+			return z ^ (z >> 31)
+		}
+	}
+#endif
 }
 
 /// The last scan's names and song counts, kept in a small file in Caches and shown as placeholders on the next launch.

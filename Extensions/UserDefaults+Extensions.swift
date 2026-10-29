@@ -34,11 +34,7 @@ extension UserDefaults {
 	}
 	var favorited: [String] {
 		get {
-#if targetEnvironment(simulator)
-			return ["Beach House", "Frédéric Chopin", "indigo la End", "Lost Frequencies", "Polo & Pan", "Stromae", "Sufjan Stevens", "Toe", "Yelle"]
-#else
 			array(forKey: #function) as? [String] ?? []
-#endif
 		}
 		set(value) {
 			set(value, forKey: #function)
@@ -47,11 +43,10 @@ extension UserDefaults {
 	var favoritedGenres: [String] {
 
 		get {
-#if targetEnvironment(simulator)
-			return ["Classical", "Française", "Hip-Hop", "K-Pop", "J-Rock", "Post-Rock", "Reggae"]
-#else
+			if SampleLibrary.isOn {
+				return ["Classical", "Française", "Hip-Hop", "K-Pop", "J-Rock", "Post-Rock", "Reggae"]
+			}
 			return array(forKey: #function) as? [String] ?? []
-#endif
 		}
 		set(value) {
 			set(value, forKey: #function)
@@ -83,12 +78,11 @@ extension UserDefaults {
 	}
 	var minimum: Int {
 		get {
-#if targetEnvironment(simulator)
-			return 15
-#else
+			if SampleLibrary.isOn {
+				return 15
+			}
 			let stored = integer(forKey: UserDefaults.Key.minimum)
 			return stored <= 0 ? 15 : stored
-#endif
 		}
 		set(value) {
 			set(value, forKey: #function)
@@ -99,7 +93,8 @@ extension UserDefaults {
 
 	var listViewMode: String {
 		get {
-			return string(forKey: UserDefaults.Key.listViewMode) ?? (UIDevice.current.userInterfaceIdiom == .pad ? "grid" : "list")
+			// Grid on iPad and Mac (where the idiom is .mac when optimized for Mac, .pad otherwise), list on iPhone
+			return string(forKey: UserDefaults.Key.listViewMode) ?? ([.pad, .mac].contains(UIDevice.current.userInterfaceIdiom) ? "grid" : "list")
 		}
 		set(value) {
 			set(value, forKey: UserDefaults.Key.listViewMode)

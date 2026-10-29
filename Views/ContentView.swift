@@ -70,7 +70,6 @@ struct ContentView: View {
 				// Years ignore the minimum. In a side column it's a nav bar item instead, which the system stacks there with the others.
 				if !usesFloatingTabBar && !hasSideColumn && selectedTab != "years" {
 					MinimumSongsButton()
-						.glassEffect(.regular.interactive(), in: .circle)
 						.padding(.trailing, FloatingTabBar.margin)
 						.alignedWithSystemTabBar()
 				}
@@ -97,6 +96,12 @@ struct ContentView: View {
 					YearsCollection.shared.updateIfLibraryChanged(onlyIfScanned: true)
 				}
 			}
+#if DEBUG
+			.task {
+				// Screenshot runs wait for this line before shooting a launch
+				print("Heart Beats ready")
+			}
+#endif
 			.alert("Music Unavailable", isPresented: showsUnavailable, actions: {
 				Link("Open Settings", destination: URL(string: UIApplication.openSettingsURLString)!)
 			}) {
@@ -142,17 +147,10 @@ private struct NavigationContentView<Content: View>: View {
 				.scrollEdgeEffectStyle(.soft, for: .top)
 				.toolbarVisibility(usesFloatingTabBar ? .hidden : .automatic, for: .tabBar)
 				.toolbar {
-#if targetEnvironment(macCatalyst)
-					if canToggle {
-						ToolbarItem(placement: .principal) {
-							MinimumSongsButton()
-						}
-					}
-#endif
 #if !targetEnvironment(macCatalyst)
-					// Only tabs with the list toggle use the minimum
+					// Only tabs with the list toggle use the minimum. A bottom bar item, which the system puts at the foot of the side column, just above the tab bar.
 					if canToggle && showsMinimumInNavigationBar {
-						ToolbarItem {
+						ToolbarItem(placement: .bottomBar) {
 							MinimumSongsButton(isInNavigationBar: true)
 						}
 					}
@@ -365,13 +363,10 @@ private struct FloatingTabBar: View {
 					.glassEffect(.regular.interactive(), in: .capsule)
 					.accessibilityElement(children: .contain)
 					.accessibilityAddTraits(.isTabBar)
-				// Years ignore the minimum; hidden but still taking its space, so the tabs don't move under a finger
-				MinimumSongsButton()
-					.glassEffect(.regular.interactive(), in: .circle)
-					.opacity(selection == "years" ? 0 : 1)
-					.allowsHitTesting(selection != "years")
-					.accessibilityHidden(selection == "years")
-					.animation(.default, value: selection == "years")
+				// Years ignore the minimum, so it's left out there. The bar is pinned to the leading edge, so the tabs don't move. (Opacity can't hide it: the glass container draws its children itself.)
+				if selection != "years" {
+					MinimumSongsButton()
+				}
 			}
 		}
 			.frame(maxWidth: .infinity, alignment: .leading)

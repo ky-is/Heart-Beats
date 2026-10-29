@@ -24,16 +24,19 @@ final class GroupedCollection {
 
 	init(groupBy: String) {
 		self.groupBy = groupBy
-#if targetEnvironment(simulator)
-		let entries = MediaEntry.screenshotData
-#else
-		let cached = (groupBy == "genre" ? ListCache.genres : ListCache.artists).load()
-		hasLoaded = cached != nil
-		let entries = cached ?? []
-		maximumSongsLimit = min(LibraryGrouping.minimumSongsCap, entries.map(\.songCount).max() ?? 0)
-#endif
-		self.entries = entries
-		sections = Self.sections(for: entries, favorites: UserDefaults.standard.favorites(for: groupBy))
+		if SampleLibrary.isOn {
+			let entries = MediaEntry.screenshotData
+			self.entries = entries
+			// The screenshot list in its own order, without a favorites section
+			sections = [(nil, entries)]
+		} else {
+			let cached = (groupBy == "genre" ? ListCache.genres : ListCache.artists).load()
+			hasLoaded = cached != nil
+			let entries = cached ?? []
+			maximumSongsLimit = min(LibraryGrouping.minimumSongsCap, entries.map(\.songCount).max() ?? 0)
+			self.entries = entries
+			sections = Self.sections(for: entries, favorites: UserDefaults.standard.favorites(for: groupBy))
+		}
 	}
 
 	nonisolated static func sections(for entries: [MediaEntry], favorites: [String]) -> [ListGroupEntry] {
@@ -112,6 +115,8 @@ final class GroupedCollection {
 
 	/// Starts a rescan, replacing any rescan still waiting or running. Skipped when the library and settings are unchanged since the last one.
 	func scheduleUpdate(withAnimation animated: Bool, after delay: Duration = .zero) {
+		// A scan would replace the sample library with the real one (on a Mac) or an empty one (in the simulator)
+		guard !SampleLibrary.isOn else { return }
 		requestedModifiedDate = MusicLibrary.modifiedDate
 		latestScan.start(after: delay) { [self] in
 			await update(withAnimation: animated)
@@ -119,21 +124,15 @@ final class GroupedCollection {
 	}
 
 	func updateIfLibraryChanged(after delay: Duration = .zero) {
-		// The simulator has no music library; a scan would replace the screenshot data
-#if !targetEnvironment(simulator)
+		guard !SampleLibrary.isOn else { return }
 		let modifiedDate = MusicLibrary.modifiedDate
 		guard modifiedDate != scanned?.modifiedDate, modifiedDate != requestedModifiedDate else { return }
 		scheduleUpdate(withAnimation: false, after: delay)
-#endif
 	}
 
 	private var currentInputs: Inputs {
 		let defaults = UserDefaults.standard
-#if targetEnvironment(simulator)
-		let existingIDs = Set(entries.map { $0.id.normalized() })
-#else
-		let existingIDs: Set<String> = []
-#endif
+		let existingIDs: Set<String> = SampleLibrary.isOn ? Set(entries.map { $0.id.normalized() }) : []
 		return Inputs(groupBy: groupBy, minimum: defaults.minimum, favorites: defaults.favorites(for: groupBy), combined: defaults.combined(for: groupBy), existingIDs: existingIDs)
 	}
 
@@ -177,11 +176,7 @@ final class GroupedCollection {
 		defer { signposter.endInterval("Group list", scanning) }
 		let grouped = grouped ?? Grouped(modifiedDate: songs.modifiedDate, combined: inputs.combined, groups: LibraryGrouping.group(songs.details, groupBy: inputs.groupBy, combined: inputs.combined).map { LibraryGrouping.Group(name: $0.name, songs: songs.items(for: $0.songs)) })
 		let allGroups = grouped.groups
-#if targetEnvironment(simulator)
-		let groups = inputs.groupBy == "artist" ? allGroups.filter { inputs.existingIDs.contains($0.name.normalized()) } : allGroups
-#else
-		let groups = allGroups
-#endif
+		let groups = inputs.groupBy == "artist" && !inputs.existingIDs.isEmpty ? allGroups.filter { inputs.existingIDs.contains($0.name.normalized()) } : allGroups
 		let (selected, mostSongsLimit) = LibraryGrouping.select(groups, minimum: inputs.minimum, favorites: inputs.favorites)
 		return (MediaPlayerValue(value: selected), mostSongsLimit, grouped)
 	}

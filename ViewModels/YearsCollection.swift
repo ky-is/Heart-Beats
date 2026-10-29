@@ -10,11 +10,7 @@ final class YearsCollection {
 	var entries: [MediaEntry]
 
 	init() {
-#if targetEnvironment(simulator)
-		entries = ListCache.years.load() ?? MediaEntry.screenshotData
-#else
-		entries = ListCache.years.load() ?? []
-#endif
+		entries = SampleLibrary.isOn ? MediaEntry.yearsScreenshotData : ListCache.years.load() ?? []
 	}
 
 	@ObservationIgnored private var latestScan = LatestScan()
@@ -24,6 +20,8 @@ final class YearsCollection {
 	@ObservationIgnored private var requestedModifiedDate: Date?
 
 	func scheduleUpdate(withAnimation animated: Bool, after delay: Duration = .zero) {
+		// A scan would replace the sample years
+		guard !SampleLibrary.isOn else { return }
 		requestedModifiedDate = MusicLibrary.modifiedDate
 		latestScan.start(after: delay) { [self] in
 			await update(withAnimation: animated)
@@ -32,12 +30,10 @@ final class YearsCollection {
 
 	/// Rescans only if the library changed since the last scan. With `onlyIfScanned`, skips a Years tab that was never opened.
 	func updateIfLibraryChanged(onlyIfScanned: Bool = false, after delay: Duration = .zero) {
-		// The simulator has no music library; a scan would replace the screenshot data
-#if !targetEnvironment(simulator)
+		guard !SampleLibrary.isOn else { return }
 		let modifiedDate = MusicLibrary.modifiedDate
 		guard !(onlyIfScanned && scannedModifiedDate == nil), modifiedDate != scannedModifiedDate, modifiedDate != requestedModifiedDate else { return }
 		scheduleUpdate(withAnimation: false, after: delay)
-#endif
 	}
 
 	private func update(withAnimation animated: Bool) async {
