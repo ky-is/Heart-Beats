@@ -1,0 +1,200 @@
+default_platform :ios
+
+PROJECT = 'Heart Beats.xcodeproj'
+SCHEME = 'Heart Beats'
+OUTPUT = File.expand_path('build', __dir__)
+# Xcode 27's JSON project file, which agvtool can't edit
+PROJECT_FILE = File.expand_path("../#{PROJECT}/project.xcproj", __dir__)
+# The App Store Connect app (Apple ID), shared by the iOS and Mac apps
+APP_ID = '1415282075'
+
+# The App Store Connect API key in fastlane/.env (shared with kanji-garden-ios), for build numbers and uploads
+def api_key
+	app_store_connect_api_key(key_id: ENV.fetch('ASC_KEY_ID'), issuer_id: ENV.fetch('ASC_ISSUER_ID'), key_filepath: File.expand_path(ENV.fetch('ASC_KEY_PATH')))
+end
+
+# Automatic signing for the archive and the export, signed in to the developer account with the same API key, so Xcode needs no account
+def signing_args
+	['-allowProvisioningUpdates', '-authenticationKeyPath', File.expand_path(ENV.fetch('ASC_KEY_PATH')), '-authenticationKeyID', ENV.fetch('ASC_KEY_ID'), '-authenticationKeyIssuerID', ENV.fetch('ASC_ISSUER_ID')]
+end
+
+def versions
+	text = File.read(PROJECT_FILE)
+	{ version: text[/"MARKETING_VERSION": "([\d.]+)"/, 1], build: text[/"CURRENT_PROJECT_VERSION": "(\d+)"/, 1].to_i }
+end
+
+# The next build number: the project's, unless App Store Connect already has it (or higher) for this version on this
+# platform ('ios', or 'osx' for the Mac Catalyst app)
+def bump_build(key, platform)
+	current = versions
+	uploaded = latest_testflight_build_number(api_key: key, version: current[:version], platform: platform, initial_build_number: 0).to_i
+	build = [current[:build], uploaded + 1].max
+	File.write(PROJECT_FILE, File.read(PROJECT_FILE).sub(/"CURRENT_PROJECT_VERSION": "\d+"/, %("CURRENT_PROJECT_VERSION": "#{build}")))
+	UI.success("Version #{current[:version]} (#{build}) for #{platform}")
+end
+
+# Bumps the build number in the project file (left for you to commit) and builds the App Store package: an .ipa for iOS,
+# a .pkg for the Mac Catalyst app. Plain xcodebuild, since build_app (gym) reads project.pbxproj, which the JSON project
+# format doesn't have.
+def build_package(key, platform)
+	bump_build(key, platform)
+	mac = platform == 'osx'
+	archive = File.join(OUTPUT, "Heart Beats-#{platform}.xcarchive")
+	export = File.join(OUTPUT, "export-#{platform}")
+	options = File.join(OUTPUT, 'ExportOptions.plist')
+	FileUtils.rm_rf([archive, export])
+	File.write(options, <<~PLIST)
+		<?xml version="1.0" encoding="UTF-8"?>
+		<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+		<plist version="1.0">
+		<dict>
+			<key>method</key><string>app-store-connect</string>
+			<key>destination</key><string>export</string>
+			<key>signingStyle</key><string>automatic</string>
+			<key>teamID</key><string>#{CredentialsManager::AppfileConfig.try_fetch_value(:team_id)}</string>
+			<key>manageAppVersionAndBuildNumber</key><false/>
+			<key>uploadSymbols</key><true/>
+		</dict>
+		</plist>
+	PLIST
+	destination = mac ? 'generic/platform=macOS,variant=Mac Catalyst' : 'generic/platform=iOS'
+	sh('xcodebuild', '-project', "../#{PROJECT}", '-scheme', SCHEME, '-configuration', 'Release', '-destination', destination, '-archivePath', archive, *signing_args, '-quiet', 'clean', 'archive')
+	sh('xcodebuild', '-exportArchive', '-archivePath', archive, '-exportOptionsPlist', options, '-exportPath', export, *signing_args)
+	Dir[File.join(export, mac ? '*.pkg' : '*.ipa')].first || UI.user_error!("No package in #{export}")
+end
+
+# fastlane/metadata and fastlane/screenshots, split by platform for deliver: the Mac screenshots (Mac-*) go to the Mac
+# version and the rest to iOS, and the Mac's first version has no release notes. Returns the folders to upload from.
+def store_files(platform)
+	mac = platform == 'osx'
+	metadata = File.join(OUTPUT, "metadata-#{platform}")
+	screenshots = File.join(OUTPUT, "screenshots-#{platform}")
+	FileUtils.rm_rf([metadata, screenshots])
+	FileUtils.cp_r(File.expand_path('metadata', __dir__), metadata)
+	FileUtils.rm_f(Dir[File.join(metadata, '*', 'release_notes.txt')]) if mac && ENV['MAC_FIRST_VERSION'] != 'no'
+	FileUtils.mkdir_p(File.join(screenshots, 'en-US'))
+	Dir[File.expand_path('screenshots/en-US/*.jpg', __dir__)].each { |file| FileUtils.cp(file, File.join(screenshots, 'en-US')) if File.basename(file).start_with?('Mac-') == mac }
+	[metadata, screenshots]
+end
+
+# Uploads only the screenshot sets that changed. Each display type's local screenshots, in order, are compared by MD5 with
+# the checksums App Store Connect keeps, and only a set that differs is replaced (a type no longer here is removed). Much
+# faster than deliver's overwrite, which re-uploads every screenshot and waits for all of them to process.
+def sync_screenshots(key, platform, dry_run: false)
+	require 'digest'
+	require 'deliver'
+	Spaceship::ConnectAPI.token = Spaceship::ConnectAPI::Token.from(hash: key)
+	locale = 'en-US'
+	_, folder = store_files(platform)
+	local = Dir[File.join(folder, locale, '*.jpg')].sort.group_by { |path| Deliver::AppScreenshot.calculate_display_type(path) }
+	UI.user_error!("Screenshots of no App Store size: #{local[nil].map { |path| File.basename(path) }.join(', ')}") if local[nil]
+	app = Spaceship::ConnectAPI::App.find(CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier))
+	asc_platform = platform == 'osx' ? Spaceship::ConnectAPI::Platform::MAC_OS : Spaceship::ConnectAPI::Platform::IOS
+	version = app.get_edit_app_store_version(platform: asc_platform) || UI.user_error!("No editable #{asc_platform} version on App Store Connect")
+	localization = version.get_app_store_version_localizations.find { |l| l.locale == locale } || UI.user_error!("No #{locale} text on the #{asc_platform} version")
+	sets = localization.get_app_screenshot_sets.to_h { |set| [set.screenshot_display_type, set] }
+	(sets.keys - local.keys).each do |type|
+		UI.message("#{type}: #{dry_run ? 'would remove' : 'removed'}")
+		sets[type].delete! unless dry_run
+	end
+	local.each do |type, paths|
+		set = sets[type]
+		remote = (set&.app_screenshots || []).map(&:source_file_checksum)
+		if remote == paths.map { |path| Digest::MD5.file(path).hexdigest }
+			UI.message("#{type}: unchanged (#{paths.size})")
+			next
+		end
+		UI.message("#{type}: #{dry_run ? 'would upload' : 'uploading'} #{paths.size}")
+		next if dry_run
+		(set&.app_screenshots || []).each(&:delete!)
+		set ||= localization.create_app_screenshot_set(attributes: { screenshotDisplayType: type })
+		ids = paths.map { |path| Spaceship::ConnectAPI::AppScreenshot.create(app_screenshot_set_id: set.id, path: path, wait_for_processing: false).id }
+		set.reorder_screenshots(app_screenshot_ids: ids)
+	end
+	# App Store Connect processes the uploads on its own; a submit only needs them uploaded, so this doesn't wait for it
+	UI.success("Screenshots in sync for #{asc_platform}") unless dry_run
+end
+
+# Uploads the text and changed screenshots to this version (unless uploads is false, when they're already there), picks its
+# latest build, and submits it for review. Released by hand once approved, as before.
+def submit(platform, uploads: true)
+	key = api_key
+	metadata, _ = store_files(platform)
+	sync_screenshots(key, platform) if uploads
+	build = latest_testflight_build_number(api_key: key, version: versions[:version], platform: platform)
+	upload_to_app_store(api_key: key, platform: platform, app_version: versions[:version], build_number: build.to_s, skip_binary_upload: true, skip_metadata: !uploads, skip_screenshots: true, metadata_path: metadata, submit_for_review: true, automatic_release: false, force: true, precheck_include_in_app_purchases: false, submission_information: { add_id_info_uses_idfa: false })
+end
+
+platform :ios do
+	desc 'Run unit and UI tests on the simulator'
+	lane :test do
+		run_tests(project: PROJECT, scheme: SCHEME, output_directory: File.join(OUTPUT, 'tests'))
+	end
+
+	desc 'Build Release and install on the iPhone (DEVICE in .env)'
+	lane :device do
+		device = ENV['DEVICE'] || connected_iphone
+		derived = File.join(OUTPUT, 'DerivedData')
+		sh('xcodebuild', '-project', "../#{PROJECT}", '-scheme', SCHEME, '-configuration', 'Release', '-destination', 'generic/platform=iOS', '-derivedDataPath', derived, '-allowProvisioningUpdates', '-quiet', 'build')
+		sh('xcrun', 'devicectl', 'device', 'install', 'app', '--device', device, File.join(derived, 'Build/Products/Release-iphoneos/Heart Beats.app'))
+	end
+
+	desc 'Screenshots for the required App Store sizes (iPhone 6.3", iPad 13") and iPhone Duo into fastlane/screenshots'
+	lane :screenshots do
+		sh('../bin/app-store-screenshots.zsh')
+	end
+
+	desc 'Upload the iOS screenshots that changed to the editable version on App Store Connect (dry_run:true only reports)'
+	lane :upload_screenshots do |options|
+		sync_screenshots(api_key, 'ios', dry_run: options[:dry_run].to_s == 'true')
+	end
+
+	desc 'Upload fastlane/metadata and the screenshots, attach the latest build of this version, and submit it for review (uploads:false skips the uploads)'
+	lane :submit do |options|
+		submit('ios', uploads: options[:uploads].to_s != 'false')
+	end
+
+	desc 'Build and upload to TestFlight'
+	lane :beta do
+		key = api_key
+		upload_to_testflight(api_key: key, ipa: build_package(key, 'ios'), skip_waiting_for_build_processing: true)
+	end
+
+	desc 'Build and upload to App Store Connect (does not submit for review)'
+	lane :release do
+		key = api_key
+		upload_to_app_store(api_key: key, ipa: build_package(key, 'ios'), app_version: versions[:version], skip_metadata: true, skip_screenshots: true, submit_for_review: false, precheck_include_in_app_purchases: false, force: true)
+	end
+
+	# First paired physical iPhone, as a UDID
+	def connected_iphone
+		require 'json'
+		require 'tempfile'
+		Tempfile.create(['devices', '.json']) do |f|
+			sh('xcrun', 'devicectl', 'list', 'devices', '--quiet', '--json-output', f.path, log: false)
+			phone = JSON.parse(File.read(f.path))['result']['devices'].find { |d| d.dig('hardwareProperties', 'deviceType') == 'iPhone' && d.dig('hardwareProperties', 'reality') == 'physical' && d.dig('connectionProperties', 'pairingState') == 'paired' }
+			UI.user_error!('No paired iPhone found; set DEVICE in fastlane/.env') unless phone
+			UI.message("Installing on #{phone.dig('deviceProperties', 'name')}")
+			phone.dig('hardwareProperties', 'udid')
+		end
+	end
+
+end
+
+platform :mac do
+	desc 'Build the Mac Catalyst app and upload it to TestFlight (adds macOS to the same App Store record)'
+	lane :beta do
+		key = api_key
+		upload_to_testflight(api_key: key, apple_id: APP_ID, app_platform: 'osx', pkg: build_package(key, 'osx'), skip_waiting_for_build_processing: true)
+	end
+
+	desc 'Upload the Mac screenshots that changed to the editable version on App Store Connect (dry_run:true only reports)'
+	lane :upload_screenshots do |options|
+		sync_screenshots(api_key, 'osx', dry_run: options[:dry_run].to_s == 'true')
+	end
+
+	desc 'The same as ios submit, for the Mac version (no release notes on its first version; MAC_FIRST_VERSION=no adds them)'
+	lane :submit do |options|
+		submit('osx', uploads: options[:uploads].to_s != 'false')
+	end
+end

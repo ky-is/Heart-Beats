@@ -2,3 +2,13 @@
 Art/
 xcuserdata/
 Assets/Preview Content/Preview Assets.xcassets/*.imageset/*
+
+# fastlane
+fastlane/.env
+fastlane/build/
+fastlane/report.xml
+fastlane/test_output/
+fastlane/screenshots/
+
+# Local builds and Duo screenshots
+build/
