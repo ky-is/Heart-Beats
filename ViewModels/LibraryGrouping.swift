@@ -71,12 +71,15 @@ nonisolated enum LibraryGrouping {
 		let mostSongsLimit = min(minimumSongsCap, groups.map(\.songs.count).max() ?? 0)
 		let effectiveMinimum = min(minimum, mostSongsLimit)
 		let favoriteKeys = Set(favorites.map { $0.normalized() })
+		// Sort keys are built once per group rather than on every comparison
 		let selected = groups
 			.filter { !$0.songs.isEmpty && ($0.songs.count >= effectiveMinimum || favoriteKeys.contains($0.name.normalized())) }
+			.map { (sortKey: $0.name.forSorting, group: $0) }
 			.sorted {
-				let order = $0.name.forSorting.localizedStandardCompare($1.name.forSorting)
-				return order == .orderedSame ? $0.name < $1.name : order == .orderedAscending
+				let order = $0.sortKey.localizedStandardCompare($1.sortKey)
+				return order == .orderedSame ? $0.group.name < $1.group.name : order == .orderedAscending
 			}
+			.map(\.group)
 		return (selected, mostSongsLimit)
 	}
 

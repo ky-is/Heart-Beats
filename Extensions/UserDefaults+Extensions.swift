@@ -14,9 +14,6 @@ extension UserDefaults {
 		// Unsynced
 
 		static let listViewMode = "listViewMode"
-		static let cachedArtists = "cachedArtists"
-		static let cachedGenres = "cachedGenres"
-		static let cachedYears = "cachedYears"
 	}
 
 	var played: [String] {
@@ -109,31 +106,6 @@ extension UserDefaults {
 		}
 	}
 
-	var cachedArtists: [[Any]]? {
-		get {
-			return array(forKey: UserDefaults.Key.cachedArtists) as? [[Any]]
-		}
-		set(value) {
-			set(value, forKey: UserDefaults.Key.cachedArtists)
-		}
-	}
-	var cachedGenres: [[Any]]? {
-		get {
-			return array(forKey: UserDefaults.Key.cachedGenres) as? [[Any]]
-		}
-		set(value) {
-			set(value, forKey: UserDefaults.Key.cachedGenres)
-		}
-	}
-	var cachedYears: [[Any]]? {
-		get {
-			return array(forKey: UserDefaults.Key.cachedYears) as? [[Any]]
-		}
-		set(value) {
-			set(value, forKey: UserDefaults.Key.cachedYears)
-		}
-	}
-
 	// Per grouping ("artist" or "genre"), independent of the selected tab
 
 	func played(for groupBy: String) -> [String] {
@@ -177,8 +149,8 @@ extension UserDefaults {
 		(Key.favoritedGenres, { GroupedCollection.genres.scheduleUpdate(withAnimation: true) }),
 		(Key.combinedGenres, { GroupedCollection.genres.scheduleUpdate(withAnimation: true) }),
 		(Key.selectedTab, { GroupedCollection.updateCurrent(withAnimation: false) }),
-		// Debounced so rapid stepper taps cause one rescan
-		(Key.minimum, { GroupedCollection.updateAll(withAnimation: true, after: .milliseconds(300)) }),
+		// Only filters the cached grouping, so each stepper tap applies right away
+		(Key.minimum, { GroupedCollection.updateAll(withAnimation: true) }),
 	]
 
 	/// Mirrors synced keys to iCloud, and applies changes from other devices.

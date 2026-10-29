@@ -1,19 +1,22 @@
 import SwiftUI
 import UIKit
 import MediaPlayer
+import os
 
 @main
 struct HeartBeatsApp: App {
 	@UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
 
 	init() {
-//		UserDefaults.standard.cachedArtists = nil //SAMPLE
-//		UserDefaults.standard.cachedGenres = nil
+//		try? FileManager.default.removeItem(at: ListCache.artists.url) //SAMPLE
+//		try? FileManager.default.removeItem(at: ListCache.genres.url)
 
+		ListCache.migrateLegacyDefaults()
 #if !targetEnvironment(simulator)
 		handleAuthorization(status: MPMediaLibrary.authorizationStatus())
 #endif
 		UserDefaults.keepSynced()
+		observeMemoryWarnings()
 	}
 
 	var body: some Scene {
@@ -52,6 +55,18 @@ private func handleAuthorization(status: MPMediaLibraryAuthorizationStatus) {
 		observeLibraryChanges()
 	default:
 		GroupedCollection.setUnavailable(status: status)
+	}
+}
+
+/// Frees what can be rebuilt: decoded artwork, the shared songs and the cached groupings.
+private func observeMemoryWarnings() {
+	Task {
+		for await _ in NotificationCenter.default.notifications(named: UIApplication.didReceiveMemoryWarningNotification) {
+			log.info("Memory warning: releasing caches")
+			ArtworkCache.removeAll()
+			MusicLibrary.releaseMemory()
+			GroupedCollection.releaseMemory()
+		}
 	}
 }
 

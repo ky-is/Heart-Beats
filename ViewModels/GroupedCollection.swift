@@ -3,96 +3,117 @@ import Observation
 import os
 import SwiftUI
 
+/// The section label for favorited entries, which list first.
+nonisolated let FavoritesLabel = "Favorites"
+
 @Observable
-final class GroupedCollection: MediaCollection {
+final class GroupedCollection {
 	static let artists = GroupedCollection(groupBy: "artist")
 	static let genres = GroupedCollection(groupBy: "genre")
 
 	let groupBy: String
 
 	var unavailable: MPMediaLibraryAuthorizationStatus?
-#if targetEnvironment(simulator)
-	var entries: [MediaEntry] = GroupedCollection.screenshotData
-#else
-	var entries: [MediaEntry] = []
-#endif
+	private(set) var entries: [MediaEntry]
+	/// The entries with favorites first, in their own section when there are any
+	private(set) var sections: [ListGroupEntry]
+	/// Whether a scan has ever finished, on this launch or a previous one
+	private(set) var hasLoaded = true
 	/// The most 5-star songs any entry has (capped at 99), which bounds the minimum stepper.
 	var maximumSongsLimit = LibraryGrouping.minimumSongsCap
 
 	init(groupBy: String) {
 		self.groupBy = groupBy
-
-		if self.entries.isEmpty, let cache = groupBy == "genre" ? UserDefaults.standard.cachedGenres : UserDefaults.standard.cachedArtists {
-			self.entries = cache
-				.map { MediaEntry(id: $0[0] as! String, songs: nil, songCount: $0[1] as! Int, artwork: nil) }
-			self.maximumSongsLimit = min(LibraryGrouping.minimumSongsCap, entries.map(\.songCount).max() ?? 0)
-		}
+#if targetEnvironment(simulator)
+		let entries = MediaEntry.screenshotData
+#else
+		let cached = (groupBy == "genre" ? ListCache.genres : ListCache.artists).load()
+		hasLoaded = cached != nil
+		let entries = cached ?? []
+		maximumSongsLimit = min(LibraryGrouping.minimumSongsCap, entries.map(\.songCount).max() ?? 0)
+#endif
+		self.entries = entries
+		sections = Self.sections(for: entries, favorites: UserDefaults.standard.favorites(for: groupBy))
 	}
 
-	static var screenshotData: [MediaEntry] {
-		return [
-			MediaEntry(id: "The Album Leaf", songs: nil, songCount: 20, artwork: nil),
-			MediaEntry(id: "Beach House", songs: nil, songCount: 50, artwork: nil),
-			MediaEntry(id: "Belle & Sebastian", songs: nil, songCount: 51, artwork: nil),
-			MediaEntry(id: "Bob Marley & The Wailers", songs: nil, songCount: 33, artwork: nil),
-			MediaEntry(id: "CHVRCHΞS", songs: nil, songCount: 23, artwork: nil),
-			MediaEntry(id: "The Decemberists", songs: nil, songCount: 52, artwork: nil),
-			MediaEntry(id: "Frédéric Chopin", songs: nil, songCount: 22, artwork: nil),
-			MediaEntry(id: "indigo la End", songs: nil, songCount: 37, artwork: nil),
-			MediaEntry(id: "Lost Frequencies", songs: nil, songCount: 23, artwork: nil),
-			MediaEntry(id: "The National", songs: nil, songCount: 61, artwork: nil),
-			MediaEntry(id: "Polo & Pan", songs: nil, songCount: 16, artwork: nil),
-			MediaEntry(id: "Sigur Rós", songs: nil, songCount: 30, artwork: nil),
-			MediaEntry(id: "Stromae", songs: nil, songCount: 15, artwork: nil),
-			MediaEntry(id: "Sufjan Stevens", songs: nil, songCount: 16, artwork: nil),
-			MediaEntry(id: "Toe", songs: nil, songCount: 34, artwork: nil),
-			MediaEntry(id: "Yelle", songs: nil, songCount: 26, artwork: nil),
-		]
+	nonisolated static func sections(for entries: [MediaEntry], favorites: [String]) -> [ListGroupEntry] {
+		let favoriteKeys = Set(favorites.map { $0.normalized() })
+		var favoriteEntries: [MediaEntry] = []
+		var otherEntries: [MediaEntry] = []
+		for entry in entries {
+			if favoriteKeys.contains(entry.id.normalized()) {
+				favoriteEntries.append(entry)
+			} else {
+				otherEntries.append(entry)
+			}
+		}
+		return favoriteEntries.isEmpty ? [(nil, otherEntries)] : [(FavoritesLabel, favoriteEntries), (nil, otherEntries)]
 	}
 
 	/// The grouping for the selected tab, or artists while on the Years tab.
-	class var current: GroupedCollection {
+	static var current: GroupedCollection {
 		UserDefaults.standard.selectedTab == "genres" ? genres : artists
 	}
 
-	private class var other: GroupedCollection {
+	private static var other: GroupedCollection {
 		current === artists ? genres : artists
 	}
 
 	/// Rescans the selected tab's grouping (nothing on the Years tab).
-	class func updateCurrent(withAnimation animated: Bool) {
+	static func updateCurrent(withAnimation animated: Bool) {
 		guard UserDefaults.standard.selectedTab != "years" else { return }
 		current.scheduleUpdate(withAnimation: animated)
 	}
 
 	/// Rescans both groupings, animating the visible one.
-	class func updateAll(withAnimation animated: Bool, after delay: Duration = .zero) {
+	static func updateAll(withAnimation animated: Bool, after delay: Duration = .zero) {
 		current.scheduleUpdate(withAnimation: animated, after: delay)
 		other.scheduleUpdate(withAnimation: false, after: delay)
 	}
 
 	/// Rescans each grouping whose last scan predates the library's latest change.
-	class func updateAllIfLibraryChanged(after delay: Duration = .zero) {
+	static func updateAllIfLibraryChanged(after delay: Duration = .zero) {
 		current.updateIfLibraryChanged(after: delay)
 		other.updateIfLibraryChanged(after: delay)
 	}
 
-	class func setUnavailable(status: MPMediaLibraryAuthorizationStatus) {
+	/// Drops the cached groupings under memory pressure; the next scan groups again.
+	static func releaseMemory() {
+		artists.grouped = nil
+		genres.grouped = nil
+	}
+
+	static func setUnavailable(status: MPMediaLibraryAuthorizationStatus) {
 		artists.unavailable = status
 	}
 
-	private var pendingUpdate: Task<Void, Never>?
-	private var generation = 0
-	private var scannedLibraryDate: Date?
+	nonisolated struct Inputs: Equatable, Sendable {
+		let groupBy: String
+		let minimum: Int
+		let favorites: [String]
+		let combined: [[String]]
+		/// Only used in the simulator, to limit the list to the screenshot artists
+		let existingIDs: Set<String>
+	}
 
-	/// Starts a rescan, replacing any rescan still waiting on its delay.
+	@ObservationIgnored private var latestScan = LatestScan()
+	/// What the shown entries were built from, so a scan with nothing new to read is skipped
+	@ObservationIgnored private var scanned: (modifiedDate: Date, inputs: Inputs)?
+	/// Grouping only depends on the library and combinations, so a new minimum or favorite only filters it again
+	@ObservationIgnored private var grouped: Grouped?
+	/// The library version the latest scheduled scan will read, so a "library changed?" check doesn't restart a scan that's already on its way
+	@ObservationIgnored private var requestedModifiedDate: Date?
+
+	nonisolated struct Grouped: @unchecked Sendable {
+		let modifiedDate: Date
+		let combined: [[String]]
+		let groups: [LibraryGrouping.Group<MPMediaItem>]
+	}
+
+	/// Starts a rescan, replacing any rescan still waiting or running. Skipped when the library and settings are unchanged since the last one.
 	func scheduleUpdate(withAnimation animated: Bool, after delay: Duration = .zero) {
-		pendingUpdate?.cancel()
-		pendingUpdate = Task {
-			if delay > .zero {
-				try? await Task.sleep(for: delay)
-			}
-			guard !Task.isCancelled else { return }
+		requestedModifiedDate = MusicLibrary.modifiedDate
+		latestScan.start(after: delay) { [self] in
 			await update(withAnimation: animated)
 		}
 	}
@@ -100,67 +121,76 @@ final class GroupedCollection: MediaCollection {
 	func updateIfLibraryChanged(after delay: Duration = .zero) {
 		// The simulator has no music library; a scan would replace the screenshot data
 #if !targetEnvironment(simulator)
-		guard MPMediaLibrary.default().lastModifiedDate != scannedLibraryDate else { return }
+		let modifiedDate = MusicLibrary.modifiedDate
+		guard modifiedDate != scanned?.modifiedDate, modifiedDate != requestedModifiedDate else { return }
 		scheduleUpdate(withAnimation: false, after: delay)
 #endif
 	}
 
-	private struct Inputs {
-		let generation: Int
-		let minimum: Int
-		let favorites: [String]
-		let combined: [[String]]
-		let existingIDs: Set<String>
+	private var currentInputs: Inputs {
+		let defaults = UserDefaults.standard
+#if targetEnvironment(simulator)
+		let existingIDs = Set(entries.map { $0.id.normalized() })
+#else
+		let existingIDs: Set<String> = []
+#endif
+		return Inputs(groupBy: groupBy, minimum: defaults.minimum, favorites: defaults.favorites(for: groupBy), combined: defaults.combined(for: groupBy), existingIDs: existingIDs)
 	}
 
-	/// Scans the music library off the main thread, then applies the result on it.
-	@concurrent
-	nonisolated func update(withAnimation animated: Bool) async {
-		let inputs = await MainActor.run {
-			self.generation += 1
-			self.scannedLibraryDate = MPMediaLibrary.default().lastModifiedDate
-			let defaults = UserDefaults.standard
-			return Inputs(generation: self.generation, minimum: defaults.minimum, favorites: defaults.favorites(for: groupBy), combined: defaults.combined(for: groupBy), existingIDs: Set(self.entries.map { $0.id.normalized() }))
-		}
-
-		guard let songs = MPMediaQuery.songs().items else {
-			log.error("Unable to load music")
+	private func update(withAnimation animated: Bool) async {
+		let inputs = currentInputs
+		if let scanned, scanned.inputs == inputs, scanned.modifiedDate == MusicLibrary.modifiedDate {
 			return
 		}
-		let allGroups = LibraryGrouping.group(songs, groupBy: groupBy, combined: inputs.combined)
+		guard let songs = await MusicLibrary.songs() else {
+			// Lets the next check try again
+			requestedModifiedDate = nil
+			return
+		}
+		let reusable = grouped.flatMap { $0.modifiedDate == songs.modifiedDate && $0.combined == inputs.combined ? $0 : nil }
+		let (selected, mostSongsLimit, grouped) = await Self.select(songs, inputs: inputs, grouped: reusable)
+		let built = await MediaPlayerQueue.run {
+			Self.entries(for: selected.value, favorites: inputs.favorites)
+		}
+		let (entries, sections) = (built.entries, built.sections)
+		// A newer scan replaced this one while it ran, so its result wins
+		guard !Task.isCancelled else { return }
+
+		scanned = (songs.modifiedDate, inputs)
+		self.grouped = grouped
+		let applying = signposter.beginInterval("Apply list", id: signposter.makeSignpostID(), "\(self.groupBy, privacy: .public)")
+		defer { signposter.endInterval("Apply list", applying) }
+		// The stored minimum is left alone when it exceeds this library's largest entry, so a small library on one device doesn't lower it on the others
+		withAnimation(animated ? .default : nil) {
+			maximumSongsLimit = mostSongsLimit
+			self.entries = entries
+			self.sections = sections
+			hasLoaded = true
+		}
+		(groupBy == "genre" ? ListCache.genres : ListCache.artists).save(entries)
+	}
+
+	/// Groups the library's 5-star songs and keeps those the list shows, reusing an earlier grouping of the same library and combinations. Only reads song details, so it runs on any background thread.
+	@concurrent
+	private nonisolated static func select(_ songs: LibrarySongs, inputs: Inputs, grouped: Grouped?) async -> (selected: MediaPlayerValue<[LibraryGrouping.Group<MPMediaItem>]>, mostSongsLimit: Int, grouped: Grouped) {
+		let scanning = signposter.beginInterval("Group list", id: signposter.makeSignpostID(), "\(inputs.groupBy, privacy: .public), regroup: \(grouped == nil)")
+		defer { signposter.endInterval("Group list", scanning) }
+		let grouped = grouped ?? Grouped(modifiedDate: songs.modifiedDate, combined: inputs.combined, groups: LibraryGrouping.group(songs.details, groupBy: inputs.groupBy, combined: inputs.combined).map { LibraryGrouping.Group(name: $0.name, songs: songs.items(for: $0.songs)) })
+		let allGroups = grouped.groups
 #if targetEnvironment(simulator)
-		// Limits the list to the screenshot artists
-		let groups = groupBy == "artist" ? allGroups.filter { inputs.existingIDs.contains($0.name.normalized()) } : allGroups
+		let groups = inputs.groupBy == "artist" ? allGroups.filter { inputs.existingIDs.contains($0.name.normalized()) } : allGroups
 #else
 		let groups = allGroups
 #endif
 		let (selected, mostSongsLimit) = LibraryGrouping.select(groups, minimum: inputs.minimum, favorites: inputs.favorites)
-		let entries = selected.map { group in
-			MediaEntry(id: group.name, songs: group.songs, songCount: group.songs.count, artwork: group.songs.first { $0.artwork != nil }?.artwork)
-		}
-
-		await MainActor.run {
-			// A newer scan started while this one ran, so its result wins
-			guard inputs.generation == self.generation else { return }
-			if animated {
-				withAnimation {
-					apply(mostSongsLimit: mostSongsLimit, entries: entries)
-				}
-			} else {
-				apply(mostSongsLimit: mostSongsLimit, entries: entries)
-			}
-			let cache = entries.map { [$0.id, $0.songCount] }
-			if groupBy == "genre" {
-				UserDefaults.standard.cachedGenres = cache
-			} else {
-				UserDefaults.standard.cachedArtists = cache
-			}
-		}
+		return (MediaPlayerValue(value: selected), mostSongsLimit, grouped)
 	}
 
-	// The stored minimum is left alone when it exceeds this library's largest entry, so a small library on one device doesn't lower it on the others
-	private func apply(mostSongsLimit: Int, entries: [MediaEntry]) {
-		self.maximumSongsLimit = mostSongsLimit
-		self.entries = entries
+	/// Builds the list's entries. Runs on the MediaPlayer queue, since it looks up each entry's artwork; visible rows decode their own covers as soon as they appear.
+	private nonisolated static func entries(for selected: [LibraryGrouping.Group<MPMediaItem>], favorites: [String]) -> (entries: [MediaEntry], sections: [ListGroupEntry]) {
+		signposter.withIntervalSignpost("Build list entries", id: signposter.makeSignpostID()) {
+			let entries = selected.map { MediaEntry(id: $0.name, songs: $0.songs) }
+			return (entries, sections(for: entries, favorites: favorites))
+		}
 	}
 }

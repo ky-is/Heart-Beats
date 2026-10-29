@@ -4,8 +4,6 @@ import os
 
 typealias ListGroupEntry = (label: String?, entries: [MediaEntry])
 
-private let FavoritesLabel = "Favorites"
-
 struct MediaList: View {
 	var collection: GroupedCollection
 
@@ -34,20 +32,6 @@ struct MediaList: View {
 		playSongs(songs, addToQueue: addToQueue)
 	}
 
-	private var groupedEntries: [ListGroupEntry] {
-		let favorites = Set(UserDefaults.standard.favorites(for: collection.groupBy).map { $0.normalized() })
-		var favoriteEntries: [MediaEntry] = []
-		var nonfavoriteEntries: [MediaEntry] = []
-		for entry in collection.entries {
-			if favorites.contains(entry.id.normalized()) {
-				favoriteEntries.append(entry)
-			} else {
-				nonfavoriteEntries.append(entry)
-			}
-		}
-		return favoriteEntries.isEmpty ? [(nil, nonfavoriteEntries)] : [(FavoritesLabel, favoriteEntries), (nil, nonfavoriteEntries)]
-	}
-
 	var body: some View {
 		let activeSelection = Binding {
 			selection
@@ -60,7 +44,7 @@ struct MediaList: View {
 			}
 		}
 //		let allEntriesGroups: [ListGroupEntry] = [(nil, [])] //SAMPLE
-		let allEntriesGroups = groupedEntries
+		let allEntriesGroups = collection.sections
 		let hasEntries = !collection.entries.isEmpty
 #if targetEnvironment(simulator)
 		let showHeaders = false

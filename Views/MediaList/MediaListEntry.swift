@@ -35,29 +35,20 @@ struct MediaListEntry: View {
 
 	let gridRows = Int(sqrt(Double(4)))
 
-	private var subImages: [UIImage] {
-		let subSize = imageWidth / Double(gridRows)
-		var images: [UIImage] = []
-		var albumsIDs: [String] = []
-		if let songs = entry.songs {
-			let gridCount = Int(pow(Double(gridRows), 2))
-			for song in songs {
-				guard let artwork = song.artwork else { continue }
-				let albumID = (song.albumTitle ?? "") + (song.artist ?? "")
-				if !albumsIDs.contains(albumID), let image = ArtworkCache.image(for: artwork, size: subSize) {
-					albumsIDs.append(albumID)
-					images.append(image)
-					if images.count >= gridCount {
-						break
-					}
-				}
-			}
-		}
-		return images
+	private var subImageSize: CGFloat {
+		imageWidth / Double(gridRows)
+	}
+
+	/// The Years grid's album covers, decoded off the main thread once the scan has loaded the songs
+	@State private var subImages: (key: SubImagesKey, images: [UIImage])?
+
+	private struct SubImagesKey: Equatable {
+		let entry: MediaEntry
+		let size: CGFloat
 	}
 
 	private func imageGrid(_ subImages: [UIImage]) -> some View {
-		let subSize = imageWidth / Double(gridRows)
+		let subSize = subImageSize
 		return Grid(horizontalSpacing: 0, verticalSpacing: 0) {
 			ForEach(Array(0..<gridRows), id: \.self) { rowIndex in
 				GridRow {
@@ -79,13 +70,20 @@ struct MediaListEntry: View {
 			if listViewMode == "grid" {
 				VStack {
 					if largeTitles {
-						imageGrid(subImages)
+						let key = SubImagesKey(entry: entry, size: subImageSize)
+						imageGrid(subImages?.key == key ? subImages?.images ?? [] : [])
 							.frame(width: imageWidth, height: imageWidth)
 							.background(Color.tertiary)
 							.clipShape(RoundedRectangle(cornerRadius: min(24, imageWidth / 6), style: .continuous))
 							.shadow(color: .black.opacity(0.25), radius: 4, y: 3)
+							.task(id: key) {
+								guard entry.songs != nil else { return }
+								let images = await ArtworkCache.albumImages(for: entry, size: AlbumArt.pixelSize(forWidth: key.size), count: gridRows * gridRows)
+								guard !Task.isCancelled else { return }
+								subImages = (key, images)
+							}
 					} else {
-						AlbumArt(artist: entry.id, artwork: entry.artwork, displayWidth: imageWidth)
+						AlbumArt(artist: entry.id, artwork: entry.albumArtwork, displayWidth: imageWidth)
 					}
 					HStack(alignment: .lastTextBaseline, spacing: 0) {
 						Text(entry.id)
@@ -98,7 +96,7 @@ struct MediaListEntry: View {
 				}
 			} else {
 				HStack {
-					AlbumArt(artist: entry.id, artwork: entry.artwork)
+					AlbumArt(artist: entry.id, artwork: entry.albumArtwork)
 					Text(entry.id)
 						.font(.title2)
 					Spacer()
@@ -118,26 +116,8 @@ struct MediaListEntry: View {
 				favoriteButton
 			} preview: {
 				if let songs = entry.songs {
-					let previewSize: CGFloat = 80
-					let a = Dictionary(grouping: songs, by: { $0.albumPersistentID }).values.compactMap { songs in songs.first(where: { $0.artwork != nil })?.artwork }
-					List(songs, id: \.self) {
-						if let title = $0.title {
-							Text(title)
-								.padding(.leading, previewSize)
-								.lineLimit(1)
-						}
-					}
-						.listStyle(.plain)
-						.overlay(alignment: .leading) {
-							VStack(spacing: 0) {
-								Spacer()
-								ForEach(a, id: \.self) {
-									AlbumArt(artist: "", artwork: $0, displayWidth: previewSize)
-										.padding(.horizontal, 8)
-									Spacer()
-								}
-							}
-						}
+					// Its own view, so the album grouping only runs when the preview opens
+					SongsPreview(songs: songs)
 				}
 			}
 			.swipeActions {
@@ -151,12 +131,41 @@ struct MediaListEntry: View {
 	}
 }
 
+/// The long-press preview: the entry's songs beside one cover per album.
+private struct SongsPreview: View {
+	let songs: [MPMediaItem]
+
+	private let previewSize: CGFloat = 80
+
+	var body: some View {
+		let albumArtworks = Dictionary(grouping: songs, by: \.artworkID).values.compactMap { songs in songs.lazy.compactMap { ArtworkCache.Artwork(song: $0) }.first }
+		List(songs, id: \.self) {
+			if let title = $0.title {
+				Text(title)
+					.padding(.leading, previewSize)
+					.lineLimit(1)
+			}
+		}
+			.listStyle(.plain)
+			.overlay(alignment: .leading) {
+				VStack(spacing: 0) {
+					Spacer()
+					ForEach(albumArtworks, id: \.self) {
+						AlbumArt(artist: "", artwork: $0, displayWidth: previewSize)
+							.padding(.horizontal, 8)
+						Spacer()
+					}
+				}
+			}
+	}
+}
+
 #Preview {
 	NavigationStack {
 		List {
-			MediaListEntry(groupBy: "artist", listViewMode: "list", largeTitles: false, entry: GroupedCollection.screenshotData[0], imageWidth: 88, inFavorites: true, play: { _, _ in })
-			MediaListEntry(groupBy: "artist", listViewMode: "list", largeTitles: false, entry: GroupedCollection.screenshotData[1], imageWidth: 88, inFavorites: true, play: { _, _ in })
-			MediaListEntry(groupBy: "artist", listViewMode: "grid", largeTitles: false, entry: GroupedCollection.screenshotData[0], imageWidth: 88, inFavorites: true, play: { _, _ in })
+			MediaListEntry(groupBy: "artist", listViewMode: "list", largeTitles: false, entry: MediaEntry.screenshotData[0], imageWidth: 88, inFavorites: true, play: { _, _ in })
+			MediaListEntry(groupBy: "artist", listViewMode: "list", largeTitles: false, entry: MediaEntry.screenshotData[1], imageWidth: 88, inFavorites: true, play: { _, _ in })
+			MediaListEntry(groupBy: "artist", listViewMode: "grid", largeTitles: false, entry: MediaEntry.screenshotData[0], imageWidth: 88, inFavorites: true, play: { _, _ in })
 		}
 			.listStyle(.plain)
 	}

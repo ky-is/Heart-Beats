@@ -16,12 +16,14 @@
     { "kind": "folder", "path": "Extensions", "target-membership": [ "Heart Beats" ] },
     { "kind": "folder", "path": "Assets", "target-membership": [ "Heart Beats" ] },
     { "kind": "folder", "path": "Tests", "target-membership": [ "Heart Beats Tests" ] },
+    { "kind": "folder", "path": "UITests", "target-membership": [ "Heart Beats UI Tests" ] },
     {
       "kind": "group",
       "name": "Products",
       "children": [
         { "path": "<PRODUCTS>/Heart Beats.app", "id": "249BF6A52AE3683C00A3E2F1", "type": "wrapper.application", "index": false },
         { "path": "<PRODUCTS>/Heart Beats Tests.xctest", "id": "249BF6A52AE3683C00A3E2F2", "type": "wrapper.cfbundle", "index": false },
+        { "path": "<PRODUCTS>/Heart Beats UI Tests.xctest", "id": "249BF6A52AE3683C00A3E2F3", "type": "wrapper.cfbundle", "index": false },
       ],
     },
   ],
@@ -91,6 +93,28 @@
         "SUPPORTED_PLATFORMS": "iphoneos iphonesimulator",
         "TARGETED_DEVICE_FAMILY": "1,2",
         "TEST_HOST": "$(BUILT_PRODUCTS_DIR)/Heart Beats.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Heart Beats",
+      },
+    },
+    {
+      "name": "Heart Beats UI Tests",
+      "id": "249BF6A42AE3683C00A3E2F3",
+      "product": "Products/Heart Beats UI Tests.xctest",
+      "product-type": "bundle.ui-testing",
+      "dependencies": [
+        "Heart Beats",
+      ],
+      "build-phases": [
+        "compile-sources",
+        "frameworks",
+        "resources",
+      ],
+      "build-settings": {
+        "GENERATE_INFOPLIST_FILE": "YES",
+        "PRODUCT_BUNDLE_IDENTIFIER": "is.ky.Heart-Beats.UITests",
+        "PRODUCT_NAME": "$(TARGET_NAME)",
+        "SUPPORTED_PLATFORMS": "iphoneos iphonesimulator",
+        "TARGETED_DEVICE_FAMILY": "1,2",
+        "TEST_TARGET_NAME": "Heart Beats",
       },
     },
   ],

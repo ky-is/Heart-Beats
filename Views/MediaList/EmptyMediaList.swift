@@ -8,17 +8,17 @@ struct EmptyMediaList: View {
 	private let play: (MediaEntry, Bool) -> Void = { _, _ in }
 
 	var body: some View {
-		if (collection.groupBy == "genre" ? UserDefaults.standard.cachedGenres : UserDefaults.standard.cachedArtists) == nil {
+		if !collection.hasLoaded {
 			Group {
 				if listViewMode == "grid" {
 					LazyVGrid(columns: [GridItem(.adaptive(minimum: 88))]) {
-						ForEach(GroupedCollection.screenshotData) {
+						ForEach(MediaEntry.screenshotData) {
 							MediaListEntry(groupBy: nil, listViewMode: listViewMode, largeTitles: false, entry: $0, imageWidth: imageWidth, inFavorites: false, play: play)
 						}
 					}
 				} else {
 					List {
-						ForEach(GroupedCollection.screenshotData) {
+						ForEach(MediaEntry.screenshotData) {
 							MediaListEntry(groupBy: nil, listViewMode: listViewMode, largeTitles: false, entry: $0, imageWidth: imageWidth, inFavorites: false, play: play)
 						}
 					}

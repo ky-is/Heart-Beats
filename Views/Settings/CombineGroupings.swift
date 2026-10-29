@@ -39,11 +39,14 @@ struct CombineGroupings: View {
 			.onAppear {
 				combined = UserDefaults.standard.combined(for: type)
 			}
-			.onReceive(NotificationCenter.default.publisher(for: UserDefaults.didChangeNotification)) { _ in
-				let stored = UserDefaults.standard.combined(for: type)
-				if stored != combined {
-					withAnimation {
-						combined = stored
+			// Picks up combinations created in the next screen or synced from another device
+			.task {
+				for await _ in NotificationCenter.default.notifications(named: UserDefaults.didChangeNotification) {
+					let stored = UserDefaults.standard.combined(for: type)
+					if stored != combined {
+						withAnimation {
+							combined = stored
+						}
 					}
 				}
 			}

@@ -2,6 +2,8 @@ import Foundation
 import os
 
 nonisolated let log = Logger(subsystem: "is.ky.Heart-Beats", category: "app")
+/// Marks library scans and artwork decoding as Points of Interest in Instruments.
+nonisolated let signposter = OSSignposter(subsystem: "is.ky.Heart-Beats", category: .pointsOfInterest)
 
 extension Bundle {
 	var version: String {
@@ -35,24 +37,3 @@ nonisolated extension Sequence<String> {
 		return contains { $0.normalized() == target }
 	}
 }
-
-extension Array: @retroactive @MainActor RawRepresentable where Element: Codable {
-	public init?(rawValue: String) {
-		guard let data = rawValue.data(using: .utf8),
-			let result = try? JSONDecoder().decode([Element].self, from: data)
-		else {
-			return nil
-		}
-		self = result
-	}
-
-	public var rawValue: String {
-		guard let data = try? JSONEncoder().encode(self),
-			let result = String(data: data, encoding: .utf8)
-		else {
-			return "[]"
-		}
-		return result
-	}
-}
-
