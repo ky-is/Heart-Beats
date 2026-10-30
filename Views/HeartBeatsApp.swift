@@ -85,6 +85,12 @@ private func handleAuthorization(status: MPMediaLibraryAuthorizationStatus) {
 	case .authorized:
 		GroupedCollection.updateAll(withAnimation: true)
 		observeLibraryChanges()
+#if targetEnvironment(macCatalyst)
+		MacPlayback.prewarm()
+#endif
+#if DEBUG && targetEnvironment(macCatalyst)
+		debugPlayIfAsked()
+#endif
 	default:
 		GroupedCollection.setUnavailable(status: status)
 	}
@@ -113,3 +119,14 @@ private func observeLibraryChanges() {
 		}
 	}
 }
+
+#if DEBUG && targetEnvironment(macCatalyst)
+/// Mac checks: -debugPlay 3 plays that many library songs as a tap would, without opening Music in front of what the user is doing
+private func debugPlayIfAsked() {
+	guard let count = Int(UserDefaults.standard.string(forKey: "debugPlay") ?? "") else { return }
+	Task {
+		try? await Task.sleep(for: .seconds(2))
+		playSongs(Array((MPMediaQuery.songs().items ?? []).prefix(count)), addToQueue: false)
+	}
+}
+#endif

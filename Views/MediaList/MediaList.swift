@@ -213,26 +213,148 @@ extension View {
 
 /// Plays the songs shuffled in the system player, then opens Music.
 func playSongs(_ songs: [MPMediaItem], addToQueue: Bool) {
+	let songCollection = MPMediaItemCollection(items: songs.shuffled())
 #if targetEnvironment(macCatalyst)
-	let player = MPMusicPlayerController.applicationMusicPlayer
+	MacPlayback.play(songCollection, addToQueue: addToQueue)
 #else
 	let player = MPMusicPlayerController.systemMusicPlayer
-#endif
-	let songCollection = MPMediaItemCollection(items: songs.shuffled())
-	if addToQueue {
-		player.prepend(MPMusicPlayerMediaItemQueueDescriptor(itemCollection: songCollection))
-	} else {
-		player.setQueue(with: songCollection)
-	}
+	enqueue(songCollection, on: player, addToQueue: addToQueue)
 	player.play()
 	Task {
 		guard let url = URL(string: "audio-player-event:"), await UIApplication.shared.open(url) else {
 			log.error("Unable to open Music.app")
-			//TODO macOS
 			return
 		}
 	}
+#endif
 }
+
+nonisolated private func enqueue(_ songs: MPMediaItemCollection, on player: MPMusicPlayerController, addToQueue: Bool) {
+	if addToQueue {
+		player.prepend(MPMusicPlayerMediaItemQueueDescriptor(itemCollection: songs))
+	} else {
+		player.setQueue(with: songs)
+	}
+}
+
+#if targetEnvironment(macCatalyst)
+/// The player finds Music by its bundle ID, which a stand-in can also claim (like Music Decoy, which keeps the Play key from
+/// opening Music); then it's the stand-in that gets started, it never answers, and each player call waits on it. So Music is
+/// opened first by its music: link, which only the real app handles, and the player runs off the main thread with a
+/// deadline, so a Music that doesn't answer leaves the window responsive and says so.
+///
+/// Music takes player connections only a few seconds after it launches, once it has restored its queue, and one made
+/// before then (even to read the player's state) stalls for 10 s. Nothing says when it's ready, so Heart Beats starts Music
+/// in the background when it opens, which has it ready by the time an artist is picked, and a tap waits out what's left of
+/// those first seconds.
+enum MacPlayback {
+	private static let queue = DispatchQueue(label: "is.ky.Heart-Beats.playback")
+	private static let deadline: Duration = .seconds(20)
+	/// How long after launch Music takes connections: 3.7-5.2 s here (an M-series MacBook Pro, 13,000 songs), with margin
+	private static let readyAfterLaunch: TimeInterval = 6
+
+	/// Starts Music hidden in the background, unless it's running.
+	static func prewarm() {
+		guard runningMusic() == nil, let workspace = (NSClassFromString("NSWorkspace") as? NSObject.Type)?.value(forKey: "sharedWorkspace") as? NSObject, let configuration = (NSClassFromString("NSWorkspaceOpenConfiguration") as? NSObject.Type)?.init() else { return }
+		configuration.setValue(false, forKey: "activates")
+		configuration.setValue(true, forKey: "hides")
+		configuration.setValue(false, forKey: "addsToRecentItems")
+		unsafe unsafeBitCast(workspace, to: Workspace.self).openApplication(at: URL(fileURLWithPath: "/System/Applications/Music.app"), configuration: configuration) { _, error in
+			if let error {
+				log.error("Couldn't start Music: \(error.localizedDescription, privacy: .public)")
+			}
+		}
+		log.notice("Starting Music in the background")
+	}
+
+	static func play(_ songs: MPMediaItemCollection, addToQueue: Bool) {
+		Task {
+			let tapped = ContinuousClock.now
+#if DEBUG
+			// Mac checks open nothing in front of what the user is doing (see debugPlayIfAsked)
+			let opensMusic = UserDefaults.standard.string(forKey: "debugPlay") == nil
+#else
+			let opensMusic = true
+#endif
+			if opensMusic, let url = URL(string: "music://"), !(await UIApplication.shared.open(url)) {
+				log.error("Unable to open Music")
+			}
+			await waitUntilMusicIsReady()
+			let songs = UncheckedSendable(value: songs)
+			let played = await withCheckedContinuation { (continuation: CheckedContinuation<Bool, Never>) in
+				let pending = OSAllocatedUnfairLock<CheckedContinuation<Bool, Never>?>(initialState: continuation)
+				let finish: @Sendable (Bool) -> Void = { result in pending.withLock { $0.take() }?.resume(returning: result) }
+				queue.async {
+					let player = MPMusicPlayerController.applicationMusicPlayer
+					enqueue(songs.value, on: player, addToQueue: addToQueue)
+					player.play()
+					finish(true)
+				}
+				Task {
+					try? await Task.sleep(for: deadline)
+					finish(false)
+				}
+			}
+			if played {
+				log.notice("Playing \(songs.value.count) songs, \(ContinuousClock.now - tapped, privacy: .public) after the tap")
+			} else {
+				log.error("Music didn't answer within \(deadline, privacy: .public)")
+				showMusicNotAnswering()
+			}
+		}
+	}
+
+	/// The real Music (not a stand-in with its bundle ID), if it's running. NSRunningApplication and NSWorkspace are AppKit,
+	/// which a Mac Catalyst app has loaded but can't name, so they're looked up at run time.
+	private static func runningMusic() -> NSObject? {
+		guard let runningApplication = NSClassFromString("NSRunningApplication") as? NSObject.Type, let apps = unsafe runningApplication.perform(NSSelectorFromString("runningApplicationsWithBundleIdentifier:"), with: "com.apple.Music")?.takeUnretainedValue() as? [NSObject] else { return nil }
+		return apps.first { ($0.value(forKey: "bundleURL") as? URL)?.path.hasPrefix("/System/") == true }
+	}
+
+	/// Waits for Music to be running (it may only just have been opened), then until it's been up long enough to take
+	/// connections.
+	private static func waitUntilMusicIsReady() async {
+		let start = ContinuousClock.now
+		var launched: Date?
+		while launched == nil, ContinuousClock.now - start < .seconds(10) {
+			launched = runningMusic()?.value(forKey: "launchDate") as? Date
+			if launched == nil {
+				try? await Task.sleep(for: .milliseconds(100))
+			}
+		}
+		guard let launched else {
+			log.error("Music didn't start within 10 s")
+			return
+		}
+		let wait = readyAfterLaunch + launched.timeIntervalSinceNow
+		log.notice("Music launched \(-launched.timeIntervalSinceNow, privacy: .public) s ago, waiting \(max(0, wait), privacy: .public) s")
+		if wait > 0 {
+			try? await Task.sleep(for: .seconds(wait))
+		}
+	}
+
+	private static func showMusicNotAnswering() {
+		let scene = UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }.first { $0.activationState == .foregroundActive } ?? UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }.first
+		guard var controller = scene?.keyWindow?.rootViewController ?? scene?.windows.first?.rootViewController else { return }
+		while let presented = controller.presentedViewController {
+			controller = presented
+		}
+		let alert = UIAlertController(title: "Music Isn't Answering", message: "Open Music, then try again. If another app stands in for Music (like Music Decoy), quit it first.", preferredStyle: .alert)
+		alert.addAction(UIAlertAction(title: "OK", style: .default))
+		controller.present(alert, animated: true)
+	}
+}
+
+/// NSWorkspace's way to open an app without bringing it forward
+@objc private protocol Workspace {
+	@objc(openApplicationAtURL:configuration:completionHandler:)
+	func openApplication(at url: URL, configuration: NSObject, completionHandler: (@Sendable (NSObject?, (any Error)?) -> Void)?)
+}
+
+nonisolated private struct UncheckedSendable<Value>: @unchecked Sendable {
+	let value: Value
+}
+#endif
 
 #Preview {
 	NavigationStack {

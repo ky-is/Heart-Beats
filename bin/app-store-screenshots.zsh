@@ -59,7 +59,7 @@ replace_set() {
 		old=$out/${new:t}
 		if [[ -f $old ]] && [[ $(magick compare -metric AE -fuzz 3% $old $new null: 2>&1 | awk '{print $1}') == 0 ]]; then
 			cp -p $old $new
-			(( kept++ ))
+			(( ++kept ))
 		fi
 	done
 	rm -f $out/$name-*.jpg(N)
