@@ -6,6 +6,10 @@ struct YearsList: View {
 	@Environment(\.scenePhase) private var scenePhase
 	@State private var selection: MediaEntry?
 	@State private var pendingPlay: PendingPlay?
+	/// The year played last, which VoiceOver returns to when Music hands back
+	@State private var lastPlayedID: String?
+	@AccessibilityFocusState private var focusedEntry: String?
+	@Namespace private var rotorNamespace
 
 	@State private var collection = YearsCollection.shared
 
@@ -13,6 +17,7 @@ struct YearsList: View {
 
 	// Years don't count toward artist or genre play history and favorites
 	private func play(entry: MediaEntry, addToQueue: Bool) {
+		lastPlayedID = entry.id
 		guard let songs = entry.songs else {
 			pendingPlay = PendingPlay(id: entry.id, addToQueue: addToQueue)
 			return
@@ -42,14 +47,16 @@ struct YearsList: View {
 							.padding(.horizontal)
 					}
 
-					Section("Songs played more than once show up by the year they were added") {
+					Section {
 						Link(destination: URL(string: "audio-player-event:")!) {
 							Label("Open Music App", systemImage: "music.note.house.fill")
 						}
+					} header: {
+						SectionTitle("Songs played more than once show up by the year they were added")
 					}
 				}
 			} else {
-				GridView(groupBy: nil, showHeaders: false, largeTitles: true, allEntriesGroups: [(label: nil, entries: collection.entries)], activeSelection: activeSelection, play: play)
+				GridView(groupBy: nil, showHeaders: false, largeTitles: true, allEntriesGroups: [(label: nil, entries: collection.entries)], activeSelection: activeSelection, focusedEntry: $focusedEntry, rotorNamespace: rotorNamespace, play: play)
 			}
 		}
 			.navigationTitle("Years In Review")
@@ -64,6 +71,9 @@ struct YearsList: View {
 					withAnimation {
 						selection = nil
 					}
+					// Once, so a later return to the app starts where VoiceOver normally would
+					restoreFocus(to: lastPlayedID, focus: $focusedEntry)
+					lastPlayedID = nil
 				}
 			}
 	}

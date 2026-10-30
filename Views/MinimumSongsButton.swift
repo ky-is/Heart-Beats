@@ -8,6 +8,20 @@ private func effectiveMinimum(_ minimum: Int, selectedTab: String) -> Int {
 	return min(minimum, collection.maximumSongsLimit)
 }
 
+/// Changes the minimum by one from the applied value, staying between 1 and the library's largest entry. Returns whether it changed.
+@discardableResult
+func stepMinimum(by step: Int) -> Bool {
+	let defaults = UserDefaults.standard
+	let collection = defaults.selectedTab == "genres" ? GroupedCollection.genres : GroupedCollection.artists
+	let value = effectiveMinimum(defaults.minimum, selectedTab: defaults.selectedTab)
+	let next = value + step
+	guard next >= 1, next <= collection.maximumSongsLimit else { return false }
+	defaults.minimum = next
+	// Closes the tutorial, like a tap on the number
+	MinimumSongsTip().invalidate(reason: .actionPerformed)
+	return true
+}
+
 /// The first-run tutorial for the minimum, pointing at the button
 struct MinimumSongsTip: Tip {
 	var showsSteppers = false
@@ -47,6 +61,8 @@ struct MinimumSongsButton: View {
 	var isInNavigationBar = false
 
 	@Environment(\.horizontalSizeClass) private var horizontalSizeClass
+	@Environment(\.accessibilityReduceMotion) private var reduceMotion
+	@Environment(\.legibilityWeight) private var legibilityWeight
 
 	@State private var showSongMinimum = false
 	@State private var isHovering = false
@@ -105,8 +121,10 @@ struct MinimumSongsButton: View {
 			}
 				.buttonStyle(.plain)
 				.accessibilityLabel("Minimum songs")
-				.accessibilityValue(String(value))
+				.accessibilityValue("song".pluralize(value))
 				.accessibilityHint("Shows what the minimum does")
+				.accessibilityAdjustableAction(adjust)
+				.accessibilityInputLabels(["Minimum", "Minimum songs", "Songs"])
 				// Only the number shows the tutorial on hover, not the +/- buttons beside it
 				.onHover {
 					isHovering = $0
@@ -145,9 +163,13 @@ struct MinimumSongsButton: View {
 					Label {
 						Text(String(value))
 					} icon: {
-						Image(uiImage: .number(value))
+						Image(uiImage: .number(value, heavier: legibilityWeight == .bold))
 					}
 				}
+					// The number is an image of a fixed size, so a long press at large text sizes shows it enlarged
+					.accessibilityShowsLargeContentViewer {
+						Label("Minimum songs: \(value)", systemImage: "music.note.list")
+					}
 			} else {
 				Button {
 					showSongMinimum = true
@@ -159,10 +181,17 @@ struct MinimumSongsButton: View {
 						.foregroundStyle(.tint)
 				}
 					.buttonStyle(.plain)
+					// Fixed-size like the tab bar beside it, so a long press at large text sizes shows it enlarged
+					.accessibilityShowsLargeContentViewer {
+						Label("Minimum songs: \(value)", systemImage: "music.note.list")
+					}
 			}
 		}
 			.accessibilityLabel("Minimum songs")
-			.accessibilityValue(String(value))
+			.accessibilityValue("song".pluralize(value))
+			.accessibilityHint("Shows buttons to change it")
+			.accessibilityAdjustableAction(adjust)
+			.accessibilityInputLabels(["Minimum", "Minimum songs", "Songs"])
 #if DEBUG
 			.onAppear {
 				// Lets screenshot runs open the popover with a launch argument, until it has shown once like a tap, so a hinge move doesn't open it again from the moved button
@@ -203,6 +232,18 @@ struct MinimumSongsButton: View {
 					await followTip()
 				}
 			}
+	}
+
+	/// VoiceOver's swipe up and down, which step the minimum without opening the buttons
+	private func adjust(_ direction: AccessibilityAdjustmentDirection) {
+		switch direction {
+		case .increment:
+			stepMinimum(by: 1)
+		case .decrement:
+			stepMinimum(by: -1)
+		default:
+			break
+		}
 	}
 
 	/// Closes the tutorial (the first-run tip for good), and keeps hovering from bringing it straight back
@@ -247,7 +288,7 @@ struct MinimumSongsButton: View {
 			.frame(width: 320)
 			.glassEffect(.regular, in: .rect(cornerRadius: 24))
 			.offset(y: -(12 + 62))
-			.transition(.opacity.combined(with: .scale(0.9, anchor: .bottomTrailing)))
+			.transition(reduceMotion ? AnyTransition.opacity : .opacity.combined(with: .scale(scale: 0.9, anchor: .bottomTrailing)))
 	}
 
 	private func followTip() async {
@@ -297,9 +338,7 @@ private struct MinimumSongsStepButton: View {
 		// 0 isn't a valid minimum: the stored value treats it as unset (15)
 		let isDisabled = step < 0 ? value <= 1 : value >= collection.maximumSongsLimit
 		Button {
-			minimum = value + step
-			// Closes the tutorial, like a tap on the number
-			MinimumSongsTip().invalidate(reason: .actionPerformed)
+			stepMinimum(by: step)
 			onStep()
 		} label: {
 			Label(step < 0 ? "Fewer songs" : "More songs", systemImage: step < 0 ? "minus" : "plus")
@@ -313,6 +352,7 @@ private struct MinimumSongsStepButton: View {
 			// Plain, so the Mac doesn't give each its own bordered background sized to its symbol
 			.buttonStyle(.plain)
 			.disabled(isDisabled)
+			.accessibilityInputLabels(step < 0 ? ["Minus", "Fewer", "Fewer songs"] : ["Plus", "More", "More songs"])
 	}
 }
 
@@ -346,8 +386,9 @@ struct MinimumSongsStepper: View {
 
 private extension UIImage {
 	/// A bold accent-colored number the size of a nav bar item's glass, for a button whose number is the point
-	static func number(_ value: Int) -> UIImage {
-		let descriptor = UIFont.systemFont(ofSize: 24, weight: .bold).fontDescriptor.withDesign(.rounded)!
+	/// `heavier` follows the Bold Text setting, which an image doesn't pick up by itself.
+	static func number(_ value: Int, heavier: Bool = false) -> UIImage {
+		let descriptor = UIFont.systemFont(ofSize: 24, weight: heavier ? .heavy : .bold).fontDescriptor.withDesign(.rounded)!
 		let text = NSAttributedString(string: String(value), attributes: [.font: UIFont(descriptor: descriptor, size: 24), .foregroundColor: UIColor(named: "AccentColor") ?? .tintColor])
 		let size = text.size()
 		return UIGraphicsImageRenderer(size: CGSize(width: ceil(size.width), height: ceil(size.height))).image { _ in

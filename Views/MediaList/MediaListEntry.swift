@@ -33,7 +33,14 @@ struct MediaListEntry: View {
 		}
 	}
 
+	@Environment(\.dynamicTypeSize) private var dynamicTypeSize
+
 	let gridRows = Int(sqrt(Double(4)))
+
+	/// Read as one element: the name, then how many songs
+	private var accessibilityLabel: String {
+		"\(entry.id), \("song".pluralize(entry.songCount))"
+	}
 
 	private var subImageSize: CGFloat {
 		imageWidth / Double(gridRows)
@@ -68,7 +75,8 @@ struct MediaListEntry: View {
 	var body: some View {
 		Group {
 			if listViewMode == "grid" {
-				VStack {
+				// Room below the artwork's shadow, so it doesn't sit behind the caption and dull it
+				VStack(spacing: 10) {
 					if largeTitles {
 						let key = SubImagesKey(entry: entry, size: subImageSize)
 						imageGrid(subImages?.key == key ? subImages?.images ?? [] : [])
@@ -76,6 +84,7 @@ struct MediaListEntry: View {
 							.background(Color.tertiary)
 							.clipShape(RoundedRectangle(cornerRadius: min(24, imageWidth / 6), style: .continuous))
 							.shadow(color: .black.opacity(0.25), radius: 4, y: 3)
+							.accessibilityHidden(true)
 							.task(id: key) {
 #if targetEnvironment(simulator) || DEBUG
 								// The sample years have no songs, so they show the sample covers
@@ -91,30 +100,51 @@ struct MediaListEntry: View {
 							}
 					} else {
 						AlbumArt(artist: entry.id, artwork: entry.albumArtwork, displayWidth: imageWidth)
+							.accessibilityHidden(true)
 					}
 					HStack(alignment: .lastTextBaseline, spacing: 0) {
 						Text(entry.id)
 							.font(largeTitles ? .headline : .caption)
-							.lineLimit(1)
+							// One line at the default text size and smaller; wraps when larger text would cut it off
+							.lineLimit(dynamicTypeSize > .large ? nil : 1)
 						Text(" " + String(entry.songCount))
-							.foregroundStyle(Color.secondary)
+							.foregroundStyle(Color.secondaryText)
 							.font(largeTitles ? .subheadline : .caption)
 					}
 				}
 			} else {
 				HStack {
 					AlbumArt(artist: entry.id, artwork: entry.albumArtwork)
-					Text(entry.id)
-						.font(.title2)
-					Spacer()
-					Text(String(entry.songCount))
-						.foregroundStyle(Color.secondary)
+						.accessibilityHidden(true)
+					// At accessibility text sizes the count moves under the name, leaving the name the whole width
+					if dynamicTypeSize.isAccessibilitySize {
+						VStack(alignment: .leading) {
+							Text(entry.id)
+								.font(.title2)
+							Text("song".pluralize(entry.songCount))
+								.foregroundStyle(Color.secondaryText)
+						}
+					} else {
+						Text(entry.id)
+							.font(.title2)
+						Spacer()
+						Text(String(entry.songCount))
+							.foregroundStyle(Color.secondaryText)
+					}
 				}
 #if targetEnvironment(macCatalyst)
 					.padding([.vertical, .trailing], 8)
 #endif
 			}
 		}
+			.accessibilityElement(children: .ignore)
+			.accessibilityLabel(accessibilityLabel)
+			.accessibilityAddTraits(.isButton)
+			.accessibilityHint("Plays shuffled in Music")
+			.modifier(EntryAccessibilityActions(isOn: listViewMode == "grid", content: {
+				addToQueueButton
+				favoriteButton
+			}))
 			.contextMenu {
 				addToQueueButton
 				Button("Play", systemImage: "shuffle") {
@@ -135,6 +165,20 @@ struct MediaListEntry: View {
 						.tint(.blue)
 				}
 			}
+	}
+}
+
+/// Queue and favorite as VoiceOver actions, for the grid. A list row already offers its swipe actions there, so it skips these to avoid listing them twice.
+private struct EntryAccessibilityActions<Actions: View>: ViewModifier {
+	let isOn: Bool
+	@ViewBuilder let content: () -> Actions
+
+	func body(content body: Content) -> some View {
+		if isOn {
+			body.accessibilityActions(content)
+		} else {
+			body
+		}
 	}
 }
 

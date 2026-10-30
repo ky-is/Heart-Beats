@@ -54,6 +54,9 @@ struct HeartBeatsApp: App {
 			.defaultSize(width: 640, height: 860)
 #endif
 			.windowResizability(.contentMinSize)
+#if targetEnvironment(macCatalyst)
+			.commands { HeartBeatsCommands() }
+#endif
 	}
 
 #if DEBUG && targetEnvironment(macCatalyst)

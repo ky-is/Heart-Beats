@@ -6,7 +6,7 @@ struct SettingsView: View {
 	var body: some View {
 		NavigationStack {
 			List {
-				Section("Manage groupings") {
+				Section {
 					NavigationLink {
 						CombineGroupings(type: "artist")
 					} label: {
@@ -17,14 +17,17 @@ struct SettingsView: View {
 					} label: {
 						Label("Combine Genres", systemImage: "opticaldisc.fill")
 					}
+				} header: {
+					SectionTitle("Manage groupings")
 				}
 				Section {
 					ExternalLink(title: "Review Heart Beats", systemImage: "star.circle.fill", urlPath: "itms-apps://itunes.apple.com/app/id1415282075?action=write-review")
 					ExternalLink(title: "View Source", systemImage: "cat.circle.fill", urlPath: "https://github.com/ky-is/Heart-Beats")
 				} header: {
-					Text("Heart Beats")
+					SectionTitle("Heart Beats")
 				} footer: {
 					Text("v\(Bundle.main.version) by Kyle Coburn")
+						.foregroundStyle(Color.secondaryText)
 				}
 			}
 				.navigationTitle("Settings")
@@ -57,8 +60,10 @@ private struct ExternalLink: View {
 					.fontWeight(.semibold)
 					.foregroundStyle(Color.tertiary)
 					.frame(width: 8)
+					.accessibilityHidden(true)
 			}
 		}
+			.accessibilityHint("Opens outside Heart Beats")
 	}
 }
 

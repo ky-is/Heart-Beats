@@ -10,8 +10,16 @@ struct MediaList: View {
 	@Environment(\.scenePhase) private var scenePhase
 	@State private var selection: MediaEntry?
 	@State private var pendingPlay: PendingPlay?
+	/// The entry played last, which VoiceOver returns to when Music hands back
+	@State private var lastPlayedID: String?
+	@AccessibilityFocusState private var focusedEntry: String?
+	@Namespace private var rotorNamespace
 
 	@AppStorage(UserDefaults.Key.listViewMode) private var listViewMode = UserDefaults.standard.listViewMode
+	@AppStorage(UserDefaults.Key.minimum) private var minimum = UserDefaults.standard.minimum
+	@AppStorage(UserDefaults.Key.selectedTab) private var selectedTab = "artists"
+	/// When the minimum last changed, so the rescan it causes is announced but other rescans aren't
+	@State private var minimumChangedAt: Date?
 
 	private func play(entry: MediaEntry, addToQueue: Bool) {
 		guard let songs = entry.songs else {
@@ -19,6 +27,7 @@ struct MediaList: View {
 			return
 		}
 
+		lastPlayedID = entry.id
 		let groupBy = collection.groupBy
 		let defaults = UserDefaults.standard
 		let played = defaults.played(for: groupBy)
@@ -52,22 +61,62 @@ struct MediaList: View {
 			if !hasEntries {
 				EmptyMediaList(collection: collection, listViewMode: listViewMode, imageWidth: 88)
 			} else if listViewMode == "grid" {
-				GridView(groupBy: collection.groupBy, showHeaders: showHeaders, largeTitles: false, allEntriesGroups: allEntriesGroups, activeSelection: activeSelection, play: play)
+				GridView(groupBy: collection.groupBy, showHeaders: showHeaders, largeTitles: false, allEntriesGroups: allEntriesGroups, activeSelection: activeSelection, focusedEntry: $focusedEntry, rotorNamespace: rotorNamespace, play: play)
 			} else {
-				ListView(groupBy: collection.groupBy, showHeaders: showHeaders, allEntriesGroups: allEntriesGroups, activeSelection: activeSelection, play: play)
+				ListView(groupBy: collection.groupBy, showHeaders: showHeaders, allEntriesGroups: allEntriesGroups, activeSelection: activeSelection, focusedEntry: $focusedEntry, rotorNamespace: rotorNamespace, play: play)
 			}
 		}
+			.favoritesRotor(allEntriesGroups.first { $0.label == FavoritesLabel }?.entries ?? [], in: rotorNamespace)
 			.navigationTitle(collection.groupBy.capitalized.pluralize(entryCount))
 			.playWhenLoaded($pendingPlay, entries: collection.entries, play: play)
 			.task { await SampleLibrary.ready(collection.groupBy) }
+			.onChange(of: minimum) {
+				minimumChangedAt = .now
+			}
+			.onChange(of: collection.entries.count) { _, count in
+				announceShown(count)
+			}
 			.onChange(of: scenePhase) { _, newPhase in
 				// ContentView rescans the library on foreground
 				if newPhase == .active {
 					withAnimation {
 						selection = nil
 					}
+					// Once, so a later return to the app starts where VoiceOver normally would
+					restoreFocus(to: lastPlayedID, focus: $focusedEntry)
+					lastPlayedID = nil
 				}
 			}
+	}
+}
+
+private extension MediaList {
+	/// VoiceOver already reads the new minimum; this says what it did to the list
+	func announceShown(_ count: Int) {
+		guard selectedTab == "\(collection.groupBy)s", let changedAt = minimumChangedAt, Date.now.timeIntervalSince(changedAt) < 5 else { return }
+		minimumChangedAt = nil
+		AccessibilityNotification.Announcement("\(collection.groupBy.capitalized.pluralize(count)) shown").post()
+	}
+}
+
+private extension View {
+	/// Jumps straight to each favorite, from VoiceOver's rotor
+	func favoritesRotor(_ favorites: [MediaEntry], in namespace: Namespace.ID) -> some View {
+		accessibilityRotor("Favorites") {
+			ForEach(favorites) { entry in
+				AccessibilityRotorEntry(Text(entry.id), id: entry.id, in: namespace)
+			}
+		}
+	}
+}
+
+/// Puts VoiceOver back on the entry that was played, rather than the top of the screen, once the app is back from Music.
+func restoreFocus(to id: String?, focus: AccessibilityFocusState<String?>.Binding) {
+	guard let id else { return }
+	Task {
+		// VoiceOver picks its own element as the app comes back, so this follows it
+		try? await Task.sleep(for: .seconds(0.5))
+		focus.wrappedValue = id
 	}
 }
 
@@ -77,6 +126,8 @@ struct GridView: View {
 	let largeTitles: Bool
 	let allEntriesGroups: [ListGroupEntry]
 	@Binding var activeSelection: MediaEntry?
+	var focusedEntry: AccessibilityFocusState<String?>.Binding
+	let rotorNamespace: Namespace.ID
 	let play: (MediaEntry, Bool) -> Void
 
 	/// Also how far a header is inset to line up with the first column's artwork
@@ -96,8 +147,8 @@ struct GridView: View {
 		GeometryReader { geometry in
 			let (columnCount, columnSize) = sizeColumns(in: geometry, spacing: Self.spacing)
 			ScrollView {
-				LazyVGrid(columns: Array(repeating: GridItem(.fixed(columnSize), spacing: Self.spacing), count: columnCount), spacing: Self.spacing * 1.5) {
-					EntriesView(groupBy: groupBy, listViewMode: "grid", largeTitles: largeTitles, imageWidth: columnSize - Self.spacing, showHeaders: showHeaders, allEntriesGroups: allEntriesGroups, activeSelection: $activeSelection, play: play)
+				LazyVGrid(columns: Array(repeating: GridItem(.fixed(columnSize), spacing: Self.spacing, alignment: .top), count: columnCount), spacing: Self.spacing * 1.5) {
+					EntriesView(groupBy: groupBy, listViewMode: "grid", largeTitles: largeTitles, imageWidth: columnSize - Self.spacing, showHeaders: showHeaders, allEntriesGroups: allEntriesGroups, activeSelection: $activeSelection, focusedEntry: focusedEntry, rotorNamespace: rotorNamespace, play: play)
 				}
 					.padding(.vertical, Self.spacing / 2)
 			}
@@ -111,6 +162,8 @@ private struct ListView: View {
 	let showHeaders: Bool
 	let allEntriesGroups: [ListGroupEntry]
 	@Binding var activeSelection: MediaEntry?
+	var focusedEntry: AccessibilityFocusState<String?>.Binding
+	let rotorNamespace: Namespace.ID
 	let play: (MediaEntry, Bool) -> Void
 
 	/// Keeps each song count near its name on wide screens and windows, with blank sides beyond it
@@ -129,7 +182,7 @@ private struct ListView: View {
 
 	var body: some View {
 		List(selection: $activeSelection) {
-			EntriesView(groupBy: groupBy, listViewMode: "list", largeTitles: false, imageWidth: 128, showHeaders: showHeaders, allEntriesGroups: allEntriesGroups, activeSelection: $activeSelection, play: play)
+			EntriesView(groupBy: groupBy, listViewMode: "list", largeTitles: false, imageWidth: 128, showHeaders: showHeaders, allEntriesGroups: allEntriesGroups, activeSelection: $activeSelection, focusedEntry: focusedEntry, rotorNamespace: rotorNamespace, play: play)
 		}
 			.listStyle(.plain)
 			// Margins rather than a frame, so the list still scrolls from anywhere across the screen
@@ -147,6 +200,8 @@ private struct EntriesView: View {
 	let showHeaders: Bool
 	let allEntriesGroups: [ListGroupEntry]
 	@Binding var activeSelection: MediaEntry?
+	var focusedEntry: AccessibilityFocusState<String?>.Binding
+	let rotorNamespace: Namespace.ID
 	let play: (MediaEntry, Bool) -> Void
 
 	var body: some View {
@@ -167,9 +222,13 @@ private struct EntriesView: View {
 							MediaListEntry(groupBy: groupBy, listViewMode: listViewMode, largeTitles: largeTitles, entry: entry, imageWidth: imageWidth, inFavorites: inFavorites, play: play)
 						}
 							.buttonStyle(.plain)
+							.accessibilityFocused(focusedEntry, equals: entry.id)
+							.accessibilityRotorEntry(id: entry.id, in: rotorNamespace)
 					} else {
 						MediaListEntry(groupBy: groupBy, listViewMode: listViewMode, largeTitles: largeTitles, entry: entry, imageWidth: imageWidth, inFavorites: inFavorites, play: play)
 							.tag(entry)
+							.accessibilityFocused(focusedEntry, equals: entry.id)
+							.accessibilityRotorEntry(id: entry.id, in: rotorNamespace)
 					}
 				}
 			} header: {
@@ -191,6 +250,7 @@ private struct SectionHeader: View {
 		Text(title)
 			.font(.headline)
 			.frame(maxWidth: .infinity, alignment: .leading)
+			.accessibilityAddTraits(.isHeader)
 	}
 }
 

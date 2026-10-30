@@ -26,6 +26,10 @@ struct EmptyMediaList: View {
 				}
 			}
 				.redacted(reason: .placeholder)
+				// The placeholder rows are sample names, so VoiceOver hears that it's loading instead
+				.accessibilityRepresentation {
+					Text("Loading your library…")
+				}
 				.navigationTitle("… \(collection.groupBy.capitalized)s")
 		} else {
 			List {
@@ -37,15 +41,20 @@ struct EmptyMediaList: View {
 						.padding(.horizontal)
 				}
 
-				Section("Step 1: Ensure star ratings are enabled") {
+				Section {
 					Link(destination: URL(string: "App-prefs:MUSIC")!) {
 						Label("Settings > Music >\nEnable \"Show Star Ratings\"", systemImage: "gear.circle.fill")
 					}
+						.accessibilityLabel("Open Settings, then Music, and turn on Show Star Ratings")
+				} header: {
+					SectionTitle("Step 1: Ensure star ratings are enabled")
 				}
-				Section("Step 2: Rate songs in Music app") {
+				Section {
 					Link(destination: URL(string: "audio-player-event:")!) {
 						Label("Open Music App to rate", systemImage: "music.note.house.fill")
 					}
+				} header: {
+					SectionTitle("Step 2: Rate songs in Music app")
 				}
 			}
 		}

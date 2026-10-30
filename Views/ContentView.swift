@@ -3,6 +3,7 @@ import SwiftUI
 
 struct ContentView: View {
 	@AppStorage(UserDefaults.Key.selectedTab) private var selectedTab = "artists"
+	@AppStorage(UserDefaults.Key.listViewMode) private var listViewMode = UserDefaults.standard.listViewMode
 
 	@Environment(\.scenePhase) private var scenePhase
 
@@ -82,6 +83,12 @@ struct ContentView: View {
 					}
 				}
 			}
+#if !targetEnvironment(macCatalyst)
+			// The Mac has these in its menu bar instead
+			.background {
+				KeyboardShortcuts(tabs: tabs, selection: selectionTabDisabled, listViewMode: $listViewMode)
+			}
+#endif
 			.environment(\.usesFloatingTabBar, usesFloatingTabBar)
 			.environment(\.showsMinimumInNavigationBar, hasSideColumn && !usesFloatingTabBar)
 			.onGeometryChange(for: CGFloat.self) { $0.size.width } action: { width = $0 }
@@ -126,6 +133,8 @@ private struct NavigationContentView<Content: View>: View {
 	}
 
 	@State private var showSettings = false
+	/// Whether this tab is showing, so the menu bar's Settings opens one sheet, not one per tab
+	@State private var isVisible = false
 
 	@Environment(\.usesFloatingTabBar) private var usesFloatingTabBar
 	@Environment(\.showsMinimumInNavigationBar) private var showsMinimumInNavigationBar
@@ -163,11 +172,12 @@ private struct NavigationContentView<Content: View>: View {
 //#endif
 						if canToggle {
 							ToolbarItem {
-								Button("Show as \(listViewMode)", systemImage: listViewMode == "grid" ? "list.triangle" : "square.grid.2x2") {
+								Button("Show as \(listViewMode == "grid" ? "list" : "grid")", systemImage: listViewMode == "grid" ? "list.triangle" : "square.grid.2x2") {
 									withAnimation {
 										listViewMode = listViewMode == "grid" ? "list" : "grid"
 									}
 								}
+									.accessibilityInputLabels([listViewMode == "grid" ? "List" : "Grid", "Show as \(listViewMode == "grid" ? "list" : "grid")", "Toggle view"])
 #if targetEnvironment(macCatalyst)
 								.buttonStyle(.borderless)
 #endif
@@ -178,6 +188,10 @@ private struct NavigationContentView<Content: View>: View {
 							Button("Settings", systemImage: "gearshape") {
 								showSettings = true
 							}
+#if !targetEnvironment(macCatalyst)
+								// The Mac's comes from the Settings menu item
+								.keyboardShortcut(",", modifiers: .command)
+#endif
 #if targetEnvironment(macCatalyst)
 								.buttonStyle(.borderless)
 #endif
@@ -192,6 +206,13 @@ private struct NavigationContentView<Content: View>: View {
 					}
 				}
 #endif
+				.onAppear { isVisible = true }
+				.onDisappear { isVisible = false }
+				.task {
+					for await _ in NotificationCenter.default.notifications(named: .showSettings) where isVisible {
+						showSettings = true
+					}
+				}
 				.sheet(isPresented: $showSettings) {
 					SettingsView()
 				}
@@ -295,6 +316,46 @@ private struct FloatingTab: Identifiable {
 	var id: String { value }
 }
 
+/// Hardware keyboard shortcuts, listed when ⌘ is held on iPad: ⌘1–3 for the tabs, ⌘L for grid or list, and ⌘= / ⌘− for the minimum. Invisible buttons, so they work whichever tab bar is showing.
+private struct KeyboardShortcuts: View {
+	let tabs: [FloatingTab]
+	@Binding var selection: String
+	@Binding var listViewMode: String
+
+	var body: some View {
+		let usesMinimum = selection != "years"
+		Group {
+			ForEach(Array(tabs.enumerated()), id: \.element.id) { index, tab in
+				Button(tab.title) {
+					selection = tab.value
+				}
+					.keyboardShortcut(KeyEquivalent(Character(String(index + 1))), modifiers: .command)
+			}
+			Button("Show as \(listViewMode == "grid" ? "List" : "Grid")") {
+				withAnimation {
+					listViewMode = listViewMode == "grid" ? "list" : "grid"
+				}
+			}
+				.keyboardShortcut("l", modifiers: .command)
+				.disabled(!usesMinimum)
+			Button("More Songs Required") {
+				stepMinimum(by: 1)
+			}
+				.keyboardShortcut("=", modifiers: .command)
+				.disabled(!usesMinimum)
+			Button("Fewer Songs Required") {
+				stepMinimum(by: -1)
+			}
+				.keyboardShortcut("-", modifiers: .command)
+				.disabled(!usesMinimum)
+		}
+			.opacity(0)
+			.frame(width: 0, height: 0)
+			.allowsHitTesting(false)
+			.accessibilityHidden(true)
+	}
+}
+
 /// A glass tab bar sized and placed like the system one, which never collapses and has the minimum songs button floating beside it.
 private struct FloatingTabBar: View {
 	let tabs: [FloatingTab]
@@ -302,6 +363,8 @@ private struct FloatingTabBar: View {
 	let reselect: (String) -> Void
 
 	@Namespace private var namespace
+	@Environment(\.accessibilityReduceMotion) private var reduceMotion
+	@Environment(\.accessibilityDifferentiateWithoutColor) private var differentiateWithoutColor
 
 	// Measured from the iOS 27 system tab bar
 	static let margin: CGFloat = 20
@@ -328,7 +391,8 @@ private struct FloatingTabBar: View {
 							if isSelected {
 								reselect(tab.value)
 							} else {
-								withAnimation(.snappy) {
+								// With Reduce Motion the pill jumps to the new tab instead of sliding
+								withAnimation(reduceMotion ? nil : .snappy) {
 									selection = tab.value
 								}
 							}
@@ -338,8 +402,9 @@ private struct FloatingTabBar: View {
 									.font(.system(size: 24))
 									.symbolVariant(.fill)
 									.frame(height: 28)
+								// A fixed size like the system bar's, since the bar's height is fixed; a long press shows it enlarged instead
 								Text(tab.title)
-									.font(.system(size: 10, weight: .semibold))
+									.font(.system(size: 10, weight: isSelected && differentiateWithoutColor ? .heavy : .semibold))
 									.lineLimit(1)
 							}
 								.frame(width: itemSpacing, height: barHeight - inset * 2)
@@ -348,6 +413,13 @@ private struct FloatingTabBar: View {
 									if isSelected {
 										Capsule()
 											.fill(.quaternary)
+											// Differentiate Without Color: an outline and heavier title mark the selected tab, not just the tint
+											.overlay {
+												if differentiateWithoutColor {
+													Capsule()
+														.strokeBorder(.primary, lineWidth: 1.5)
+												}
+											}
 											.frame(width: selectionWidth)
 											.matchedGeometryEffect(id: "selection", in: namespace)
 									}
@@ -355,7 +427,12 @@ private struct FloatingTabBar: View {
 								.contentShape(.capsule)
 						}
 							.buttonStyle(.plain)
+							.accessibilityLabel(tab.title)
 							.accessibilityAddTraits(isSelected ? [.isSelected] : [])
+							// Its text is fixed-size like the system bar's, so a long press at large text sizes shows it enlarged the same way
+							.accessibilityShowsLargeContentViewer {
+								Label(tab.title, systemImage: tab.systemImage)
+							}
 					}
 				}
 					.padding(.vertical, inset)

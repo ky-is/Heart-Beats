@@ -8,14 +8,15 @@ struct CombineGroupings: View {
 
 	var body: some View {
 		List {
-			Section("Existing combinations:") {
+			Section {
 				if combined.isEmpty {
 					Text("No entries")
-						.foregroundStyle(.secondary)
+						.foregroundStyle(Color.secondaryText)
 				} else {
 					ForEach(combined, id: \.self) { combineEntries in
 						if combineEntries.count == 2 {
-							Text("\(combineEntries[0])\(Text(" ← \(combineEntries[1])").foregroundStyle(.secondary))")
+							Text("\(combineEntries[0])\(Text(" ← \(combineEntries[1])").foregroundStyle(Color.secondaryText))")
+								.accessibilityLabel("\(combineEntries[1]), combined into \(combineEntries[0])")
 						}
 					}
 						.onDelete { offsets in
@@ -26,6 +27,8 @@ struct CombineGroupings: View {
 							UserDefaults.standard.setCombined(combined, for: type)
 						}
 				}
+			} header: {
+				SectionTitle("Existing combinations:")
 			}
 			Section {
 				NavigationLink("Create new") {
