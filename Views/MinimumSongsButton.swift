@@ -214,7 +214,7 @@ struct MinimumSongsButton: View {
 				}
 			}
 			.popover(isPresented: $showSongMinimum, arrowEdge: Self.popoverArrowEdge) {
-				MinimumSongsStepper()
+				MinimumSongsStepper(showsValue: isInNavigationBar)
 #if DEBUG
 					.onAppear { Self.openedDebugPopover = true }
 #endif
@@ -357,6 +357,12 @@ private struct MinimumSongsStepButton: View {
 }
 
 struct MinimumSongsStepper: View {
+	/// The number between the buttons, for when the popover covers the button that shows it (a side column's)
+	var showsValue = false
+
+	@AppStorage(UserDefaults.Key.minimum) private var minimum = UserDefaults.standard.minimum
+	@AppStorage(UserDefaults.Key.selectedTab) private var selectedTab = "artists"
+
 	var body: some View {
 		HStack {
 			MinimumSongsExplanation()
@@ -364,6 +370,18 @@ struct MinimumSongsStepper: View {
 				.padding([.leading, .vertical])
 			MinimumSongsStepButton(step: -1)
 				.frame(width: 40, height: 40)
+			if showsValue {
+				let value = effectiveMinimum(minimum, selectedTab: selectedTab)
+				Text(String(value))
+					.font(.title2.bold())
+					.monospacedDigit()
+					.foregroundStyle(.tint)
+					.frame(minWidth: 36)
+					.contentTransition(.numericText(value: Double(value)))
+					.animation(.snappy, value: value)
+					.accessibilityLabel("Minimum songs")
+					.accessibilityValue("song".pluralize(value))
+			}
 			MinimumSongsStepButton(step: 1)
 				.frame(width: 40, height: 40)
 		}
