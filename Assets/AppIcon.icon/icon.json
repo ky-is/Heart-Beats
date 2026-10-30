@@ -7,10 +7,29 @@
 			"layers": [
 				{
 					"glass": true,
-					"image-name": "heart.png",
-					"name": "heart"
+					"image-name": "caps.svg",
+					"name": "caps"
 				}
 			],
+			"name": "Caps",
+			"shadow": {
+				"kind": "neutral",
+				"opacity": 0.5
+			},
+			"translucency": {
+				"enabled": true,
+				"value": 0.5
+			}
+		},
+		{
+			"layers": [
+				{
+					"glass": true,
+					"image-name": "bars.svg",
+					"name": "bars"
+				}
+			],
+			"name": "Bars",
 			"shadow": {
 				"kind": "neutral",
 				"opacity": 0.5
