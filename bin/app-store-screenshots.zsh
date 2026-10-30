@@ -20,7 +20,8 @@ project="$root/Heart Beats.xcodeproj"
 scheme='Heart Beats'
 bundle_id=is.ky.Heart-Beats
 out=$root/fastlane/screenshots/en-US
-derived=$root/fastlane/build/ScreenshotsDerivedData
+# The products folder of Xcode's own DerivedData, the same one a normal build uses
+products_dir() { xcodebuild -project $project -scheme $1 -configuration $2 -destination $3 -showBuildSettings 2>/dev/null | awk '$1 == "BUILD_DIR" { print substr($0, index($0, "=") + 2); exit }' }
 work=$(mktemp -d)
 device=
 appearance=
@@ -82,8 +83,8 @@ shots=(
 
 if wants iPhone || wants iPad; then
 echo 'Building…'
-xcodebuild -project $project -scheme $scheme -configuration Debug -destination 'generic/platform=iOS Simulator' -derivedDataPath $derived -quiet build
-app=$derived/Build/Products/Debug-iphonesimulator/Heart\ Beats.app
+xcodebuild -project $project -scheme $scheme -configuration Debug -destination 'generic/platform=iOS Simulator' -quiet build
+app=$(products_dir "$scheme" Debug 'generic/platform=iOS Simulator')/Debug-iphonesimulator/Heart\ Beats.app
 
 # launch_ready SCREEN [ARGS…]: launches the app and waits for its console line saying SCREEN is drawn ("[screenshot] ready
 # SCREEN", printed in sample mode), instead of a fixed delay. Relaunches if it doesn't come: right after a boot the home
@@ -193,9 +194,8 @@ if wants Mac; then
 	echo 'Mac: building…'
 	set -a; source $root/fastlane/.env; set +a
 	key_path=${~ASC_KEY_PATH}
-	mac_derived=$root/fastlane/build/MacDerivedData
-	xcodebuild -project $project -scheme $scheme -configuration Debug -destination 'platform=macOS,variant=Mac Catalyst' -derivedDataPath $mac_derived -allowProvisioningUpdates -authenticationKeyPath $key_path -authenticationKeyID $ASC_KEY_ID -authenticationKeyIssuerID $ASC_ISSUER_ID -quiet build
-	mac_app=$mac_derived/Build/Products/Debug-maccatalyst/Heart\ Beats.app
+	xcodebuild -project $project -scheme $scheme -configuration Debug -destination 'platform=macOS,variant=Mac Catalyst' -allowProvisioningUpdates -authenticationKeyPath $key_path -authenticationKeyID $ASC_KEY_ID -authenticationKeyIssuerID $ASC_ISSUER_ID -quiet build
+	mac_app=$(products_dir "$scheme" Debug 'platform=macOS,variant=Mac Catalyst')/Debug-maccatalyst/Heart\ Beats.app
 	# The app's main window: its id, origin and size in points, found by process, so another copy of the app can't be picked up
 	cat > $work/window.swift <<'SWIFT'
 import CoreGraphics
