@@ -41,13 +41,7 @@ nonisolated enum LibraryGrouping {
 
 	/// Groups 5-star songs by artist or genre. Names match regardless of case, and `combined` entries are `[into, from...]`.
 	static func group<Song: LibrarySong>(_ songs: [Song], groupBy: String, combined: [[String]]) -> [Group<Song>] {
-		var combineInto: [String: String] = [:]
-		for combination in combined where combination.count >= 2 {
-			for from in combination.dropFirst() {
-				combineInto[from.normalized()] = combination[0]
-			}
-		}
-
+		let combineInto = combineInto(combined)
 		var groups: [String: Group<Song>] = [:]
 		for song in songs where song.rating >= 5 {
 			var seenKeys = Set<String>()
@@ -64,6 +58,41 @@ nonisolated enum LibraryGrouping {
 			}
 		}
 		return Array(groups.values)
+	}
+
+	/// Each combined-away name (normalized) mapped to the name it's combined into.
+	private static func combineInto(_ combined: [[String]]) -> [String: String] {
+		var combineInto: [String: String] = [:]
+		for combination in combined where combination.count >= 2 {
+			for from in combination.dropFirst() {
+				combineInto[from.normalized()] = combination[0]
+			}
+		}
+		return combineInto
+	}
+
+	/// How many times Music has played each artist's or genre's songs, all ratings included, keyed by normalized name after combinations.
+	static func playCounts(_ songs: [some LibrarySong], groupBy: String, combined: [[String]]) -> [String: Int] {
+		let combineInto = combineInto(combined)
+		var counts: [String: Int] = [:]
+		for song in songs where song.playCount > 0 {
+			var seenKeys = Set<String>()
+			for rawName in names(for: song, groupBy: groupBy) {
+				let key = (combineInto[rawName.normalized()] ?? rawName).normalized()
+				guard seenKeys.insert(key).inserted else { continue }
+				counts[key, default: 0] += song.playCount
+			}
+		}
+		return counts
+	}
+
+	/// How many times Music has played the songs added each year, keyed by year.
+	static func yearPlayCounts(_ songs: [some LibrarySong], calendar: Calendar) -> [String: Int] {
+		var counts: [String: Int] = [:]
+		for song in songs where song.playCount > 0 {
+			counts[calendar.component(.year, from: song.dateAdded).description, default: 0] += song.playCount
+		}
+		return counts
 	}
 
 	/// Keeps groups with at least `minimum` songs (capped to the largest group) plus favorites, sorted ignoring a leading "The".

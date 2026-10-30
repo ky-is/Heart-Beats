@@ -15,13 +15,14 @@ struct YearsList: View {
 
 	@AppStorage(UserDefaults.Key.listViewMode) private var listViewMode = UserDefaults.standard.listViewMode
 
-	// Years don't count toward artist or genre play history and favorites
+	// Years don't count toward artist or genre favorites, only the widget's most played
 	private func play(entry: MediaEntry, addToQueue: Bool) {
 		lastPlayedID = entry.id
 		guard let songs = entry.songs else {
 			pendingPlay = PendingPlay(id: entry.id, addToQueue: addToQueue)
 			return
 		}
+		recordPlay(of: entry.id, kind: .year)
 		playSongs(songs, addToQueue: addToQueue)
 	}
 

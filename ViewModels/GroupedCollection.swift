@@ -167,6 +167,7 @@ final class GroupedCollection {
 			hasLoaded = true
 		}
 		(groupBy == "genre" ? ListCache.genres : ListCache.artists).save(entries)
+		TopPlaysWriter.scheduleUpdate()
 	}
 
 	/// Groups the library's 5-star songs and keeps those the list shows, reusing an earlier grouping of the same library and combinations. Only reads song details, so it runs on any background thread.

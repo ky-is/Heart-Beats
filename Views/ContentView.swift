@@ -100,7 +100,7 @@ struct ContentView: View {
 				// Picks up ratings changed in Music; skipped when the library is unchanged
 				if newPhase == .active {
 					GroupedCollection.updateAllIfLibraryChanged()
-					YearsCollection.shared.updateIfLibraryChanged(onlyIfScanned: true)
+					YearsCollection.shared.updateIfLibraryChanged()
 				}
 			}
 #if DEBUG
@@ -153,6 +153,9 @@ private struct NavigationContentView<Content: View>: View {
 	var body: some View {
 		NavigationStack {
 			content()
+				.safeAreaInset(edge: .top) {
+					FeatureTipsView()
+				}
 				.scrollEdgeEffectStyle(.soft, for: .top)
 				.toolbarVisibility(usesFloatingTabBar ? .hidden : .automatic, for: .tabBar)
 				.toolbar {

@@ -87,6 +87,8 @@ private func handleAuthorization(status: MPMediaLibraryAuthorizationStatus) {
 		}
 	case .authorized:
 		GroupedCollection.updateAll(withAnimation: true)
+		// After the lists, so the widget has years too without the Years tab being opened
+		YearsCollection.shared.updateIfLibraryChanged(after: .seconds(2))
 		observeLibraryChanges()
 #if targetEnvironment(macCatalyst)
 		MacPlayback.prewarm()
@@ -118,7 +120,7 @@ private func observeLibraryChanges() {
 		for await _ in NotificationCenter.default.notifications(named: .MPMediaLibraryDidChange) {
 			// Delayed so a burst of changes causes one rescan
 			GroupedCollection.updateAllIfLibraryChanged(after: .seconds(1))
-			YearsCollection.shared.updateIfLibraryChanged(onlyIfScanned: true, after: .seconds(1))
+			YearsCollection.shared.updateIfLibraryChanged(after: .seconds(1))
 		}
 	}
 }

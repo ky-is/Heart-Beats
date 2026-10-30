@@ -28,11 +28,11 @@ final class YearsCollection {
 		}
 	}
 
-	/// Rescans only if the library changed since the last scan. With `onlyIfScanned`, skips a Years tab that was never opened.
-	func updateIfLibraryChanged(onlyIfScanned: Bool = false, after delay: Duration = .zero) {
+	/// Rescans only if the library changed since the last scan.
+	func updateIfLibraryChanged(after delay: Duration = .zero) {
 		guard !SampleLibrary.isOn else { return }
 		let modifiedDate = MusicLibrary.modifiedDate
-		guard !(onlyIfScanned && scannedModifiedDate == nil), modifiedDate != scannedModifiedDate, modifiedDate != requestedModifiedDate else { return }
+		guard modifiedDate != scannedModifiedDate, modifiedDate != requestedModifiedDate else { return }
 		scheduleUpdate(withAnimation: false, after: delay)
 	}
 
@@ -56,6 +56,7 @@ final class YearsCollection {
 			self.entries = entries
 		}
 		ListCache.years.save(entries)
+		TopPlaysWriter.scheduleUpdate()
 	}
 
 	/// Picks each year's most played songs. Only reads song details, so it runs on any background thread.

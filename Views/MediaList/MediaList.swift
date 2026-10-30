@@ -28,16 +28,7 @@ struct MediaList: View {
 		}
 
 		lastPlayedID = entry.id
-		let groupBy = collection.groupBy
-		let defaults = UserDefaults.standard
-		let played = defaults.played(for: groupBy)
-		if !played.containsNormalized(entry.id) {
-			let favorites = defaults.favorites(for: groupBy)
-			if favorites.count < 3 {
-				defaults.setFavorites(favorites + [entry.id], for: groupBy)
-			}
-			defaults.setPlayed(played + [entry.id], for: groupBy)
-		}
+		recordPlay(of: entry.id, kind: collection.groupBy == "genre" ? .genre : .artist)
 		playSongs(songs, addToQueue: addToQueue)
 	}
 
@@ -271,8 +262,8 @@ extension View {
 	}
 }
 
-/// Plays the songs shuffled in the system player, then opens Music.
-func playSongs(_ songs: [MPMediaItem], addToQueue: Bool) {
+/// Plays the songs shuffled in the system player, then opens Music (on iPhone and iPad only when `opensMusic`).
+func playSongs(_ songs: [MPMediaItem], addToQueue: Bool, opensMusic: Bool = true) {
 	let songCollection = MPMediaItemCollection(items: songs.shuffled())
 #if targetEnvironment(macCatalyst)
 	MacPlayback.play(songCollection, addToQueue: addToQueue)
@@ -280,6 +271,7 @@ func playSongs(_ songs: [MPMediaItem], addToQueue: Bool) {
 	let player = MPMusicPlayerController.systemMusicPlayer
 	enqueue(songCollection, on: player, addToQueue: addToQueue)
 	player.play()
+	guard opensMusic else { return }
 	Task {
 		guard let url = URL(string: "audio-player-event:"), await UIApplication.shared.open(url) else {
 			log.error("Unable to open Music.app")
