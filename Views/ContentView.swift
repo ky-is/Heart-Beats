@@ -13,6 +13,8 @@ struct ContentView: View {
 	@State private var width: CGFloat = 0
 	@State private var leadingInset: CGFloat = 0
 	@State private var trailingInset: CGFloat = 0
+	/// How far the floating tab bar reaches above the bottom safe area, which each tab's content is padded by
+	@State private var floatingTabBarHeight: CGFloat = 0
 	/// Counts retaps of each tab, which scroll it to the top
 	@State private var scrollToTopRequests: [String: Int] = [:]
 
@@ -75,12 +77,13 @@ struct ContentView: View {
 						.alignedWithSystemTabBar()
 				}
 			}
-			// The system bottom tab bar can't make room for a separate button beside it, so it's replaced
-			.safeAreaInset(edge: .bottom, spacing: 0) {
+			// The system bottom tab bar can't make room for a separate button beside it, so it's replaced. An overlay, since the tabs don't get a safe area inset set on the TabView; they're padded by its height instead.
+			.overlay(alignment: .bottom) {
 				if usesFloatingTabBar {
 					FloatingTabBar(tabs: tabs, selection: selectionTabDisabled) {
 						scrollToTopRequests[$0, default: 0] += 1
 					}
+						.onGeometryChange(for: CGFloat.self) { $0.size.height } action: { floatingTabBarHeight = $0 }
 				}
 			}
 #if !targetEnvironment(macCatalyst)
@@ -90,6 +93,7 @@ struct ContentView: View {
 			}
 #endif
 			.environment(\.usesFloatingTabBar, usesFloatingTabBar)
+			.environment(\.floatingTabBarHeight, usesFloatingTabBar ? floatingTabBarHeight : 0)
 			.environment(\.showsMinimumInNavigationBar, hasSideColumn && !usesFloatingTabBar)
 			.onGeometryChange(for: CGFloat.self) { $0.size.width } action: { width = $0 }
 			.onGeometryChange(for: EdgeInsets.self) { $0.safeAreaInsets } action: {
@@ -137,6 +141,7 @@ private struct NavigationContentView<Content: View>: View {
 	@State private var isVisible = false
 
 	@Environment(\.usesFloatingTabBar) private var usesFloatingTabBar
+	@Environment(\.floatingTabBarHeight) private var floatingTabBarHeight
 	@Environment(\.showsMinimumInNavigationBar) private var showsMinimumInNavigationBar
 
 	@AppStorage(UserDefaults.Key.listViewMode) private var listViewMode = UserDefaults.standard.listViewMode
@@ -157,6 +162,8 @@ private struct NavigationContentView<Content: View>: View {
 					FeatureTipsView()
 				}
 				.scrollEdgeEffectStyle(.soft, for: .top)
+				// Room for the floating tab bar, so the end of the list scrolls clear of it
+				.safeAreaPadding(.bottom, floatingTabBarHeight)
 				.toolbarVisibility(usesFloatingTabBar ? .hidden : .automatic, for: .tabBar)
 				.toolbar {
 #if !targetEnvironment(macCatalyst)
@@ -225,6 +232,7 @@ private struct NavigationContentView<Content: View>: View {
 
 private extension EnvironmentValues {
 	@Entry var usesFloatingTabBar = false
+	@Entry var floatingTabBarHeight: CGFloat = 0
 	@Entry var showsMinimumInNavigationBar = false
 }
 
