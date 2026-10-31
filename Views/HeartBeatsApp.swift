@@ -12,11 +12,12 @@ struct HeartBeatsApp: App {
 //		try? FileManager.default.removeItem(at: ListCache.genres.url)
 
 		ListCache.migrateLegacyDefaults()
+		// First, so the lists load with the favorites and settings from other devices
+		UserDefaults.keepSynced()
 		// The sample library needs no access (and the simulator has no library to ask for)
 		if !SampleLibrary.isOn {
 			handleAuthorization(status: MPMediaLibrary.authorizationStatus())
 		}
-		UserDefaults.keepSynced()
 		observeMemoryWarnings()
 		MinimumSongsTip.configure()
 	}
