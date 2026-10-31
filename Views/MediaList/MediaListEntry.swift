@@ -14,7 +14,7 @@ struct MediaListEntry: View {
 	@ViewBuilder
 	private var favoriteButton: some View {
 		if let groupBy {
-			Button(inFavorites ? "Unfavorite" : "Favorite", systemImage: inFavorites ? "star" : "star.fill") {
+			Button(inFavorites ? "Unfavorite" : "Favorite", systemImage: inFavorites ? "star.slash" : "star") {
 				var favorites = UserDefaults.standard.favorites(for: groupBy)
 				if inFavorites {
 					favorites.removeAll { $0.normalized() == entry.id.normalized() }
@@ -28,7 +28,8 @@ struct MediaListEntry: View {
 	}
 
 	private var addToQueueButton: some View {
-		Button("Add to queue", systemImage: "text.line.first.and.arrowtriangle.forward") {
+		// Queued after the current song, like the Play Next action
+		Button("Play Next", systemImage: "text.line.first.and.arrowtriangle.forward") {
 			play(entry, true)
 		}
 	}
@@ -146,15 +147,18 @@ struct MediaListEntry: View {
 				favoriteButton
 			}))
 			.contextMenu {
-				addToQueueButton
-				Button("Play", systemImage: "shuffle") {
+				Button("Shuffle", systemImage: "shuffle") {
 					play(entry, false)
 				}
-				favoriteButton
+				addToQueueButton
+				if groupBy != nil {
+					Divider()
+					favoriteButton
+				}
 			} preview: {
 				if let songs = entry.songs {
-					// Its own view, so the album grouping only runs when the preview opens
-					SongsPreview(songs: songs)
+					// Its own view, so the album grouping only runs when the preview opens. An artist's songs don't each need its name.
+					SongsPreview(songs: songs, showsArtist: groupBy != "artist")
 				}
 			}
 			.swipeActions {
@@ -182,32 +186,83 @@ private struct EntryAccessibilityActions<Actions: View>: ViewModifier {
 	}
 }
 
-/// The long-press preview: the entry's songs beside one cover per album.
+/// The long-press preview: the entry's songs by album, the albums with the most songs first. A preview can't scroll, so each album's songs run together beside its cover, and albums past what fits are counted instead.
 private struct SongsPreview: View {
 	let songs: [MPMediaItem]
+	/// Genres and years mix artists, so each album names its own
+	let showsArtist: Bool
 
-	private let previewSize: CGFloat = 80
+	private struct Album: Identifiable {
+		let id: MPMediaEntityPersistentID
+		let title: String
+		let artist: String?
+		let artwork: ArtworkCache.Artwork?
+		let songs: [MPMediaItem]
+	}
+
+	private let coverSize: CGFloat = 56
+	private let maximumAlbums = 8
+
+	/// How many songs, how long they run and how often Music has played them
+	private var summary: String {
+		let seconds = songs.reduce(0) { $0 + $1.playbackDuration }
+		let plays = songs.reduce(0) { $0 + $1.playCount }
+		let length = seconds >= 60 ? Duration.seconds(seconds).formatted(.units(allowed: [.hours, .minutes], width: .abbreviated)) : nil
+		let played: String? = switch plays {
+		case 0: nil
+		case 1: "played once"
+		default: "played \(plays.formatted()) times"
+		}
+		return ["song".pluralize(songs.count), length, played].compactMap { $0 }.joined(separator: " · ")
+	}
+
+	private var albums: [Album] {
+		Dictionary(grouping: songs, by: \.artworkID).map { id, songs in
+			let songs = songs.sorted { ($0.discNumber, $0.albumTrackNumber) < ($1.discNumber, $1.albumTrackNumber) }
+			let first = songs[0]
+			return Album(id: id, title: first.albumTitle?.nonEmpty ?? first.title ?? "", artist: first.albumArtist?.nonEmpty ?? first.artist, artwork: songs.lazy.compactMap { ArtworkCache.Artwork(song: $0) }.first, songs: songs)
+		}
+			.sorted { ($0.songs.count, $1.title) > ($1.songs.count, $0.title) }
+	}
 
 	var body: some View {
-		let albumArtworks = Dictionary(grouping: songs, by: \.artworkID).values.compactMap { songs in songs.lazy.compactMap { ArtworkCache.Artwork(song: $0) }.first }
-		List(songs, id: \.self) {
-			if let title = $0.title {
-				Text(title)
-					.padding(.leading, previewSize)
-					.lineLimit(1)
-			}
-		}
-			.listStyle(.plain)
-			.overlay(alignment: .leading) {
-				VStack(spacing: 0) {
-					Spacer()
-					ForEach(albumArtworks, id: \.self) {
-						AlbumArt(artist: "", artwork: $0, displayWidth: previewSize)
-							.padding(.horizontal, 8)
-						Spacer()
+		let albums = albums
+		VStack(alignment: .leading, spacing: 14) {
+			Text(summary)
+				.font(.subheadline.weight(.semibold))
+				.foregroundStyle(Color.secondaryText)
+			ForEach(albums.prefix(maximumAlbums)) { album in
+				HStack(alignment: .top, spacing: 12) {
+					AlbumArt(artist: "", artwork: album.artwork, displayWidth: coverSize)
+					VStack(alignment: .leading, spacing: 2) {
+						Text(showsArtist ? [album.title, album.artist].compactMap { $0 }.joined(separator: " · ") : album.title)
+							.font(.headline)
+							.lineLimit(1)
+						Text(album.songs.map { $0.title?.nonEmpty ?? "Untitled" }.joined(separator: " · "))
+							.font(.subheadline)
+							.foregroundStyle(Color.secondaryText)
+							.lineLimit(4)
 					}
+						.frame(maxWidth: .infinity, alignment: .leading)
 				}
 			}
+			if albums.count > maximumAlbums {
+				let rest = albums.dropFirst(maximumAlbums)
+				Text("\("more album".pluralize(rest.count)), \("song".pluralize(rest.reduce(0) { $0 + $1.songs.count }))")
+					.font(.subheadline)
+					.foregroundStyle(Color.secondaryText)
+					.padding(.leading, coverSize + 12)
+			}
+		}
+			.padding(16)
+			.frame(width: 360, alignment: .leading)
+			.fixedSize(horizontal: false, vertical: true)
+	}
+}
+
+private extension String {
+	var nonEmpty: String? {
+		isEmpty ? nil : self
 	}
 }
 
