@@ -44,6 +44,7 @@ struct PlayCountTests {
 		var albumArtist: String?
 		var genre: String?
 		var rating = 0
+		var isFavoriteSong = false
 		var playCount: Int
 		var dateAdded = Date(timeIntervalSince1970: 0)
 	}

@@ -1,4 +1,5 @@
 Heart Beats 2.0
+• Favorites: songs you've favorited in Apple Music now fill your playlists, along with 5-star songs. Favorite your most played songs right in the app.
 • Years in Review: a new tab with the songs you’ve played most from each year.
 • Now on Mac, and redesigned for iOS 27.
 • Faster: your library loads in the background and opens instantly next time.

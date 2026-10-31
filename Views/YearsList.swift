@@ -49,7 +49,7 @@ struct YearsList: View {
 					}
 
 					Section {
-						Link(destination: URL(string: "audio-player-event:")!) {
+						Link(destination: .musicApp) {
 							Label("Open Music App", systemImage: "music.note.house.fill")
 						}
 					} header: {

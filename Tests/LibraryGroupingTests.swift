@@ -8,6 +8,7 @@ struct FakeSong: LibrarySong, Equatable {
 	var albumArtist: String?
 	var genre: String?
 	var rating = 5
+	var isFavoriteSong = false
 	var playCount = 0
 	var dateAdded = Date(timeIntervalSince1970: 0)
 }
@@ -52,6 +53,15 @@ struct ArtistGroupingTests {
 			FakeSong(artist: "Yelle", rating: 0),
 		]
 		#expect(LibraryGrouping.group(songs, groupBy: "artist", combined: []).isEmpty)
+	}
+
+	@Test func countsFavoritedSongsBelowFiveStars() {
+		let songs = [
+			FakeSong(artist: "Yelle", rating: 0, isFavoriteSong: true),
+			FakeSong(artist: "Yelle", rating: 3, isFavoriteSong: true),
+			FakeSong(artist: "Yelle", rating: 3),
+		]
+		#expect(counts(LibraryGrouping.group(songs, groupBy: "artist", combined: [])) == ["Yelle": 2])
 	}
 
 	@Test func combinesIntoTheTargetName() {
@@ -128,21 +138,22 @@ struct YearsInReviewTests {
 		return calendar
 	}()
 
-	private func song(_ title: String, year: Int, plays: Int, rating: Int = 0) -> FakeSong {
-		FakeSong(title: title, rating: rating, playCount: plays, dateAdded: calendar.date(from: DateComponents(year: year, month: 6, day: 1))!)
+	private func song(_ title: String, year: Int, plays: Int, rating: Int = 0, favorite: Bool = false) -> FakeSong {
+		FakeSong(title: title, rating: rating, isFavoriteSong: favorite, playCount: plays, dateAdded: calendar.date(from: DateComponents(year: year, month: 6, day: 1))!)
 	}
 
 	@Test func keepsEachYearsMostPlayedSongs() {
 		var songs = (1...5).map { song("hit \($0)", year: 2024, plays: 60 + $0) }
 		songs += [
-			song("rated", year: 2024, plays: 20, rating: 5),
+			song("rated", year: 2024, plays: 21, rating: 5),
+			song("favorited", year: 2024, plays: 20, favorite: true),
 			song("unrated", year: 2024, plays: 20),
 			song("rarely played", year: 2024, plays: 5, rating: 5),
 			song("played once", year: 2024, plays: 1, rating: 5),
 		]
 		let years = LibraryGrouping.yearsInReview(songs, calendar: calendar)
 		#expect(years.map(\.year) == [2024])
-		#expect(years[0].songs.map(\.title) == ["hit 5", "hit 4", "hit 3", "hit 2", "hit 1", "rated"])
+		#expect(years[0].songs.map(\.title) == ["hit 5", "hit 4", "hit 3", "hit 2", "hit 1", "rated", "favorited"])
 	}
 
 	@Test func skipsYearsWithFewerThanFiveSongs() {

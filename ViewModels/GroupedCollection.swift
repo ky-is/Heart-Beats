@@ -19,8 +19,33 @@ final class GroupedCollection {
 	private(set) var sections: [ListGroupEntry]
 	/// Whether a scan has ever finished, on this launch or a previous one
 	private(set) var hasLoaded = true
-	/// The most 5-star songs any entry has (capped at 99), which bounds the minimum stepper.
+	/// The most 5-star and favorited songs any entry has (capped at 99), which bounds the minimum stepper.
 	var maximumSongsLimit = LibraryGrouping.minimumSongsCap
+	/// How many songs are 5 stars or favorited, from the last scan (saved, so Getting Started shows from launch)
+	private(set) var topRatedCount: Int? = UserDefaults.standard.object(forKey: GroupedCollection.topRatedCountKey) as? Int
+	/// How many played songs don't count yet, the ones Favorite Songs suggests, from the last scan (saved too)
+	private(set) var suggestionCount: Int? = UserDefaults.standard.object(forKey: GroupedCollection.suggestionCountKey) as? Int
+
+	private static let topRatedCountKey = "topRatedCount"
+	private static let suggestionCountKey = "favoriteSuggestionCount"
+
+	/// Getting Started when too few songs count for the lists to work well, so it tops them; nil otherwise
+	var gettingStarted: GettingStarted? {
+#if DEBUG
+		// Lets screenshot runs show it over the sample library with launch arguments giving the counts
+		let debugCount = UserDefaults.standard.integer(forKey: "debugGettingStarted")
+		if debugCount > 0 {
+			return GettingStarted(topRatedCount: debugCount, suggestionCount: UserDefaults.standard.integer(forKey: "debugSuggestions"))
+		}
+#endif
+		guard !SampleLibrary.isOn, let topRatedCount, topRatedCount < AppleMusicFavorites.enoughSongs else { return nil }
+		return GettingStarted(topRatedCount: topRatedCount, suggestionCount: suggestionCount)
+	}
+
+	/// What Getting Started shows: either way, the library as of the last scan
+	var gettingStartedState: GettingStarted {
+		GettingStarted(topRatedCount: topRatedCount, suggestionCount: suggestionCount)
+	}
 
 	init(groupBy: String) {
 		self.groupBy = groupBy
@@ -152,6 +177,9 @@ final class GroupedCollection {
 			Self.entries(for: selected.value, favorites: inputs.favorites)
 		}
 		let (entries, sections) = (built.entries, built.sections)
+		let topRatedCount = songs.details.count { $0.isTopRated }
+		// The scan keeps only 5-star, favorited and played songs, so the rest are the played ones that don't count yet
+		let suggestionCount = songs.details.count - topRatedCount
 		// A newer scan replaced this one while it ran, so its result wins
 		guard !Task.isCancelled else { return }
 
@@ -164,13 +192,17 @@ final class GroupedCollection {
 			maximumSongsLimit = mostSongsLimit
 			self.entries = entries
 			self.sections = sections
+			self.topRatedCount = topRatedCount
+			self.suggestionCount = suggestionCount
 			hasLoaded = true
 		}
+		UserDefaults.standard.set(topRatedCount, forKey: Self.topRatedCountKey)
+		UserDefaults.standard.set(suggestionCount, forKey: Self.suggestionCountKey)
 		(groupBy == "genre" ? ListCache.genres : ListCache.artists).save(entries)
 		TopPlaysWriter.scheduleUpdate()
 	}
 
-	/// Groups the library's 5-star songs and keeps those the list shows, reusing an earlier grouping of the same library and combinations. Only reads song details, so it runs on any background thread.
+	/// Groups the library's 5-star and favorited songs and keeps those the list shows, reusing an earlier grouping of the same library and combinations. Only reads song details, so it runs on any background thread.
 	@concurrent
 	private nonisolated static func select(_ songs: LibrarySongs, inputs: Inputs, grouped: Grouped?) async -> (selected: MediaPlayerValue<[LibraryGrouping.Group<MPMediaItem>]>, mostSongsLimit: Int, grouped: Grouped) {
 		let scanning = signposter.beginInterval("Group list", id: signposter.makeSignpostID(), "\(inputs.groupBy, privacy: .public), regroup: \(grouped == nil)")

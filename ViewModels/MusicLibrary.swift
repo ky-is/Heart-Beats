@@ -19,7 +19,7 @@ nonisolated struct MediaPlayerValue<Value>: @unchecked Sendable {
 	let value: Value
 }
 
-/// A song's fields for grouping, read once per library change. Only songs some list can show are kept: 5-star songs, and songs played more than once for Years.
+/// A song's fields for grouping, read once per library change. Only songs some list can show are kept: 5-star and favorited songs, and songs played more than once for Years.
 nonisolated struct SongDetails: LibrarySong, Sendable, Codable {
 	/// Its position in `LibrarySongs.items`; not saved, since positions change between reads
 	var index = 0
@@ -28,34 +28,38 @@ nonisolated struct SongDetails: LibrarySong, Sendable, Codable {
 	let albumArtist: String?
 	let genre: String?
 	let rating: Int
+	let isFavoriteSong: Bool
 	let playCount: Int
 	let dateAdded: Date
 
+	// isFavoriteSong is required, so a cache saved before it existed (which left out favorited songs below 5 stars) fails to decode and the library is read again
 	private enum CodingKeys: CodingKey {
-		case id, artist, albumArtist, genre, rating, playCount, dateAdded
+		case id, artist, albumArtist, genre, rating, isFavoriteSong, playCount, dateAdded
 	}
 
-	init(index: Int, id: MPMediaEntityPersistentID, artist: String?, albumArtist: String?, genre: String?, rating: Int, playCount: Int, dateAdded: Date) {
+	init(index: Int, id: MPMediaEntityPersistentID, artist: String?, albumArtist: String?, genre: String?, rating: Int, isFavoriteSong: Bool, playCount: Int, dateAdded: Date) {
 		self.index = index
 		self.id = id
 		self.artist = artist
 		self.albumArtist = albumArtist
 		self.genre = genre
 		self.rating = rating
+		self.isFavoriteSong = isFavoriteSong
 		self.playCount = playCount
 		self.dateAdded = dateAdded
 	}
 
-	// One request for every field measured faster than a cheap request for all songs plus a second for the 5-star ones' names
-	private static let properties: Set<String> = [MPMediaItemPropertyPersistentID, MPMediaItemPropertyRating, MPMediaItemPropertyPlayCount, MPMediaItemPropertyDateAdded, MPMediaItemPropertyArtist, MPMediaItemPropertyAlbumArtist, MPMediaItemPropertyGenre]
+	// One request for every field measured faster than a cheap request for all songs plus a second for the 5-star and favorited ones' names
+	private static let properties: Set<String> = [MPMediaItemPropertyPersistentID, MPMediaItemPropertyRating, MPMediaItem.likedStateProperty, MPMediaItemPropertyPlayCount, MPMediaItemPropertyDateAdded, MPMediaItemPropertyArtist, MPMediaItemPropertyAlbumArtist, MPMediaItemPropertyGenre]
 
 	/// Reads a song in one request, or nil when no list can include it.
 	init?(index: Int, item: MPMediaItem) {
 		let values = Self.values(of: item, for: Self.properties)
 		let rating = (values[MPMediaItemPropertyRating] as? NSNumber)?.intValue ?? 0
+		let isFavoriteSong = (values[MPMediaItem.likedStateProperty] as? NSNumber)?.intValue == 2
 		let playCount = (values[MPMediaItemPropertyPlayCount] as? NSNumber)?.intValue ?? 0
-		guard rating >= 5 || playCount > 1 else { return nil }
-		self.init(index: index, id: (values[MPMediaItemPropertyPersistentID] as? NSNumber)?.uint64Value ?? 0, artist: values[MPMediaItemPropertyArtist] as? String, albumArtist: values[MPMediaItemPropertyAlbumArtist] as? String, genre: values[MPMediaItemPropertyGenre] as? String, rating: rating, playCount: playCount, dateAdded: values[MPMediaItemPropertyDateAdded] as? Date ?? .distantPast)
+		guard rating >= 5 || isFavoriteSong || playCount > 1 else { return nil }
+		self.init(index: index, id: (values[MPMediaItemPropertyPersistentID] as? NSNumber)?.uint64Value ?? 0, artist: values[MPMediaItemPropertyArtist] as? String, albumArtist: values[MPMediaItemPropertyAlbumArtist] as? String, genre: values[MPMediaItemPropertyGenre] as? String, rating: rating, isFavoriteSong: isFavoriteSong, playCount: playCount, dateAdded: values[MPMediaItemPropertyDateAdded] as? Date ?? .distantPast)
 	}
 
 	private typealias EnumerateBlock = @convention(block) (NSString, AnyObject?, UnsafeMutablePointer<ObjCBool>) -> Void

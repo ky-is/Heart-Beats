@@ -8,6 +8,20 @@ struct SettingsView: View {
 			List {
 				Section {
 					NavigationLink {
+						FavoriteSongsView()
+					} label: {
+						Label("Favorite Songs", systemImage: "heart")
+					}
+					NavigationLink {
+						GettingStartedPage()
+					} label: {
+						Label("Getting Started", systemImage: "questionmark.circle")
+					}
+				} header: {
+					SectionTitle("Grow your playlists")
+				}
+				Section {
+					NavigationLink {
 						CombineGroupings(type: "artist")
 					} label: {
 						Label("Combine Artists", systemImage: "music.mic")

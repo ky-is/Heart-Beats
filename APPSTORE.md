@@ -4,7 +4,7 @@
 
 ### Commitment
 
-Heart Beats does not and never will collect any information, whether that be personal information, how you use the app, or otherwise. Playlists and album art are generated based on your device's local library, and nothing in the app ever leaves your device.
+Heart Beats does not and never will collect any information, whether that be personal information, how you use the app, or otherwise. Playlists and album art are generated based on your device's local library, and nothing in the app ever leaves your device. The one exception is a song you choose to favorite in Heart Beats, which is sent directly to your Apple Music account, the same as favoriting it in the Music app.
 
 ### Apple
 

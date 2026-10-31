@@ -1,1 +1,1 @@
-music,playlist,favorite,star,five,love,favorite,hearted,song,playlists,songs,mix
+music,playlist,favorite,favorites,star,love,loved,hearted,shuffle,artist,genre,songs,mix,library

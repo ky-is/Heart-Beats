@@ -7,11 +7,27 @@ nonisolated protocol LibrarySong {
 	var albumArtist: String? { get }
 	var genre: String? { get }
 	var rating: Int { get }
+	/// Favorited in Music (the heart, later a star)
+	var isFavoriteSong: Bool { get }
 	var playCount: Int { get }
 	var dateAdded: Date { get }
 }
 
-nonisolated extension MPMediaItem: LibrarySong {}
+nonisolated extension LibrarySong {
+	/// Rated 5 stars or favorited in Music, the songs the Artists and Genres lists play
+	var isTopRated: Bool {
+		rating >= 5 || isFavoriteSong
+	}
+}
+
+nonisolated extension MPMediaItem: LibrarySong {
+	/// MediaPlayer's undocumented favorite state: 2 is favorited, 3 disliked, 0 or 1 neither
+	static let likedStateProperty = "likedState"
+
+	var isFavoriteSong: Bool {
+		(value(forProperty: Self.likedStateProperty) as? NSNumber)?.intValue == 2
+	}
+}
 
 /// Pure grouping rules for the Artists, Genres and Years lists.
 nonisolated enum LibraryGrouping {
@@ -39,11 +55,11 @@ nonisolated enum LibraryGrouping {
 		return []
 	}
 
-	/// Groups 5-star songs by artist or genre. Names match regardless of case, and `combined` entries are `[into, from...]`.
+	/// Groups 5-star and favorited songs by artist or genre. Names match regardless of case, and `combined` entries are `[into, from...]`.
 	static func group<Song: LibrarySong>(_ songs: [Song], groupBy: String, combined: [[String]]) -> [Group<Song>] {
 		let combineInto = combineInto(combined)
 		var groups: [String: Group<Song>] = [:]
-		for song in songs where song.rating >= 5 {
+		for song in songs where song.isTopRated {
 			var seenKeys = Set<String>()
 			for rawName in names(for: song, groupBy: groupBy) {
 				let combinedName = combineInto[rawName.normalized()]
@@ -125,7 +141,7 @@ nonisolated enum LibraryGrouping {
 			let halfPlayCount = Int(Double(maxPlayCount) * 0.5)
 			let minPlayCount = Int(Double(maxPlayCount) * 0.1)
 			let songs = entries
-				.filter { $0.playCount >= minPlayCount && ($0.playCount > halfPlayCount || $0.rating >= 5) }
+				.filter { $0.playCount >= minPlayCount && ($0.playCount > halfPlayCount || $0.isTopRated) }
 				.sorted { $0.playCount > $1.playCount }
 			if songs.count >= 5 {
 				result.append((year, songs))

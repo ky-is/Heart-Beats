@@ -90,7 +90,7 @@ struct ListCacheTests {
 
 struct SongDetailsCacheTests {
 	@Test func savesDetailsWithoutTheirPosition() throws {
-		let song = SongDetails(index: 42, id: 7, artist: "Toe", albumArtist: nil, genre: "Post-Rock", rating: 5, playCount: 3, dateAdded: Date(timeIntervalSince1970: 100))
+		let song = SongDetails(index: 42, id: 7, artist: "Toe", albumArtist: nil, genre: "Post-Rock", rating: 5, isFavoriteSong: true, playCount: 3, dateAdded: Date(timeIntervalSince1970: 100))
 		let data = try PropertyListEncoder().encode(SongDetailsCache(modifiedDate: .distantPast, savedDate: .now, songs: [song]))
 		let decoded = try PropertyListDecoder().decode(SongDetailsCache.self, from: data).songs[0]
 		#expect(decoded.index == 0)
@@ -98,6 +98,18 @@ struct SongDetailsCacheTests {
 		#expect(decoded.artist == "Toe")
 		#expect(decoded.albumArtist == nil)
 		#expect(decoded.genre == "Post-Rock")
+		#expect(decoded.isFavoriteSong)
 		#expect(decoded.playCount == 3)
+	}
+
+	@Test func dropsACacheSavedWithoutFavorites() throws {
+		struct OldSong: Codable {
+			var id: UInt64 = 7, rating = 5, playCount = 3, dateAdded = Date(timeIntervalSince1970: 100)
+		}
+		struct OldCache: Codable {
+			var modifiedDate = Date.distantPast, savedDate = Date.now, songs = [OldSong()]
+		}
+		let data = try PropertyListEncoder().encode(OldCache())
+		#expect(throws: DecodingError.self) { try PropertyListDecoder().decode(SongDetailsCache.self, from: data) }
 	}
 }

@@ -1,3 +1,9 @@
-Heart Beats automatically organizes your favorite songs into the perfect playlist by artist, genre or year, playable with just a tap.
+Heart Beats turns your favorite songs into playlists by artist, genre or year, ready to shuffle with a tap.
 
-*Requires 5-star rated songs in your system Music library.*
+• Built from your favorites: songs you've favorited in Apple Music are grouped by artist and genre automatically. Songs rated 5 stars count too.
+• Find more to love: favorite your most played songs right in the app, and your playlists grow with them.
+• Years in Review: the songs you've played most from each year.
+• Shuffle anywhere: ask Siri, use Shortcuts, or add the Most Played widget.
+• Private: everything is built from the music library on your device, with no accounts or tracking.
+
+Requires at least 100 favorited or 5-star songs in your Music library.

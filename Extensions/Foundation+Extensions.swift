@@ -5,6 +5,16 @@ nonisolated let log = Logger(subsystem: "is.ky.Heart-Beats", category: "app")
 /// Marks library scans and artwork decoding as Points of Interest in Instruments.
 nonisolated let signposter = OSSignposter(subsystem: "is.ky.Heart-Beats", category: .pointsOfInterest)
 
+extension URL {
+#if targetEnvironment(macCatalyst)
+	/// Opens the Music app. The Mac's Music only answers its music: link.
+	static let musicApp = URL(string: "music://")!
+#else
+	/// Opens the Music app
+	static let musicApp = URL(string: "audio-player-event:")!
+#endif
+}
+
 extension Bundle {
 	var version: String {
 		return infoDictionary!["CFBundleShortVersionString"] as! String

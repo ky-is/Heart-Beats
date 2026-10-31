@@ -48,15 +48,17 @@ struct MediaList: View {
 		let hasEntries = !collection.entries.isEmpty
 		let showHeaders = SampleLibrary.isOn ? false : allEntriesGroups.count > 1
 		let entryCount = SampleLibrary.isOn ? 42 : collection.entries.count
+		let gettingStarted = collection.gettingStarted
 		Group {
 			if !hasEntries {
 				EmptyMediaList(collection: collection, listViewMode: listViewMode, imageWidth: 88)
 			} else if listViewMode == "grid" {
-				GridView(groupBy: collection.groupBy, showHeaders: showHeaders, largeTitles: false, allEntriesGroups: allEntriesGroups, activeSelection: activeSelection, focusedEntry: $focusedEntry, rotorNamespace: rotorNamespace, play: play)
+				GridView(groupBy: collection.groupBy, showHeaders: showHeaders, largeTitles: false, gettingStarted: gettingStarted, allEntriesGroups: allEntriesGroups, activeSelection: activeSelection, focusedEntry: $focusedEntry, rotorNamespace: rotorNamespace, play: play)
 			} else {
-				ListView(groupBy: collection.groupBy, showHeaders: showHeaders, allEntriesGroups: allEntriesGroups, activeSelection: activeSelection, focusedEntry: $focusedEntry, rotorNamespace: rotorNamespace, play: play)
+				ListView(groupBy: collection.groupBy, showHeaders: showHeaders, gettingStarted: gettingStarted, allEntriesGroups: allEntriesGroups, activeSelection: activeSelection, focusedEntry: $focusedEntry, rotorNamespace: rotorNamespace, play: play)
 			}
 		}
+			.opensFavoriteSongs()
 			.favoritesRotor(allEntriesGroups.first { $0.label == FavoritesLabel }?.entries ?? [], in: rotorNamespace)
 			.navigationTitle(collection.groupBy.capitalized.pluralize(entryCount))
 			.playWhenLoaded($pendingPlay, entries: collection.entries, play: play)
@@ -115,6 +117,8 @@ struct GridView: View {
 	let groupBy: String?
 	let showHeaders: Bool
 	let largeTitles: Bool
+	/// Shows Getting Started above the entries
+	var gettingStarted: GettingStarted? = nil
 	let allEntriesGroups: [ListGroupEntry]
 	@Binding var activeSelection: MediaEntry?
 	var focusedEntry: AccessibilityFocusState<String?>.Binding
@@ -138,6 +142,11 @@ struct GridView: View {
 		GeometryReader { geometry in
 			let (columnCount, columnSize) = sizeColumns(in: geometry, spacing: Self.spacing)
 			ScrollView {
+				if let gettingStarted {
+					GettingStartedCard(state: gettingStarted)
+						.padding(.horizontal, Self.spacing * 2)
+						.padding(.top, Self.spacing)
+				}
 				LazyVGrid(columns: Array(repeating: GridItem(.fixed(columnSize), spacing: Self.spacing, alignment: .top), count: columnCount), spacing: Self.spacing * 1.5) {
 					EntriesView(groupBy: groupBy, listViewMode: "grid", largeTitles: largeTitles, imageWidth: columnSize - Self.spacing, showHeaders: showHeaders, allEntriesGroups: allEntriesGroups, activeSelection: $activeSelection, focusedEntry: focusedEntry, rotorNamespace: rotorNamespace, play: play)
 				}
@@ -151,6 +160,7 @@ struct GridView: View {
 private struct ListView: View {
 	let groupBy: String
 	let showHeaders: Bool
+	let gettingStarted: GettingStarted?
 	let allEntriesGroups: [ListGroupEntry]
 	@Binding var activeSelection: MediaEntry?
 	var focusedEntry: AccessibilityFocusState<String?>.Binding
@@ -173,6 +183,12 @@ private struct ListView: View {
 
 	var body: some View {
 		List(selection: $activeSelection) {
+			if let gettingStarted {
+				GettingStartedCard(state: gettingStarted)
+					.listRowSeparator(.hidden)
+					.listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 16, trailing: 16))
+					.selectionDisabled()
+			}
 			EntriesView(groupBy: groupBy, listViewMode: "list", largeTitles: false, imageWidth: 128, showHeaders: showHeaders, allEntriesGroups: allEntriesGroups, activeSelection: $activeSelection, focusedEntry: focusedEntry, rotorNamespace: rotorNamespace, play: play)
 		}
 			.listStyle(.plain)
