@@ -22,6 +22,7 @@ struct SettingsView: View {
 				}
 				Section {
 					ExternalLink(title: "Review Heart Beats", systemImage: "star.circle.fill", urlPath: "itms-apps://itunes.apple.com/app/id1415282075?action=write-review")
+					ExternalLink(title: "Send Feedback", systemImage: "envelope.circle.fill", urlPath: "mailto:feedback@ky.is?subject=" + "Heart Beats v\(Bundle.main.version) Feedback".addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!)
 					ExternalLink(title: "View Source", systemImage: "cat.circle.fill", urlPath: "https://github.com/ky-is/Heart-Beats")
 				} header: {
 					SectionTitle("Heart Beats")
