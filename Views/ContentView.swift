@@ -101,7 +101,7 @@ struct ContentView: View {
 				trailingInset = $0.trailing
 			}
 			.onChange(of: scenePhase) { _, newPhase in
-				// Picks up ratings changed in Music; skipped when the library is unchanged
+				// Picks up ratings and favorites changed in Music; skipped when the library is unchanged
 				if newPhase == .active {
 					GroupedCollection.updateAllIfLibraryChanged()
 					YearsCollection.shared.updateIfLibraryChanged()
@@ -373,7 +373,6 @@ private struct FloatingTabBar: View {
 	@Binding var selection: String
 	let reselect: (String) -> Void
 
-	@Namespace private var namespace
 	@Environment(\.accessibilityReduceMotion) private var reduceMotion
 	@Environment(\.accessibilityDifferentiateWithoutColor) private var differentiateWithoutColor
 
@@ -392,13 +391,86 @@ private struct FloatingTabBar: View {
 	private let selectionWidth: CGFloat = 98
 	private let inset: CGFloat = 4
 
+	/// Where a finger dragging the pill is, along the tabs
+	@State private var dragX: CGFloat?
+	/// Where a finger is pressing, before it has picked up the pill
+	@State private var pressX: CGFloat?
+	/// Just after a drag, so the tab button under the finger doesn't also count it as a tap
+	@State private var justDragged = false
+	/// Counts tabs picked by dragging, for a firmer tap on release than the ticks along the way
+	@State private var dragPicks = 0
+
+	/// How long a press waits before picking up the pill without moving
+	private let holdDuration: Duration = .milliseconds(300)
+
+	private var selectedIndex: Int {
+		tabs.firstIndex { $0.value == selection } ?? 0
+	}
+
+	/// The tab under a dragging finger
+	private var hoveredIndex: Int? {
+		dragX.map { min(tabs.count - 1, max(0, Int(floor($0 / itemSpacing)))) }
+	}
+
+	/// Like the system bar, the pill can be dragged across the tabs, picked up by moving or by holding still, and the tab under it is picked on release.
+	private var drag: some Gesture {
+		DragGesture(minimumDistance: 0)
+			.onChanged { value in
+				if dragX != nil || abs(value.translation.width) >= 8 {
+					dragX = value.location.x
+				} else if pressX == nil {
+					pressX = value.location.x
+					Task {
+						try? await Task.sleep(for: holdDuration)
+						if dragX == nil, let pressX {
+							withAnimation(reduceMotion ? nil : .snappy) {
+								dragX = pressX
+							}
+						}
+					}
+				} else {
+					pressX = value.location.x
+				}
+			}
+			.onEnded { _ in
+				pressX = nil
+				guard dragX != nil else { return }
+				if let index = hoveredIndex, tabs[index].value != selection {
+					dragPicks += 1
+					withAnimation(reduceMotion ? nil : .snappy) {
+						selection = tabs[index].value
+					}
+				}
+				withAnimation(reduceMotion ? nil : .snappy) {
+					dragX = nil
+				}
+				justDragged = true
+				DispatchQueue.main.async {
+					justDragged = false
+				}
+			}
+	}
+
+	/// How far the pill moves past an end for a finger that far past it: less and less, up to 16 pt
+	private static func resisted(_ overshoot: CGFloat) -> CGFloat {
+		16 * (1 - 1 / (1 + overshoot / 40))
+	}
+
 	var body: some View {
+		// While dragging, the pill is centered on the finger, and past the end tabs it only follows a little, as if stretched
+		let pillCenter = dragX.map { x in
+			let first = itemSpacing / 2, last = CGFloat(tabs.count) * itemSpacing - itemSpacing / 2
+			return x < first ? first - Self.resisted(first - x) : x > last ? last + Self.resisted(x - last) : x
+		} ?? (CGFloat(selectedIndex) + 0.5) * itemSpacing
+		let highlighted = hoveredIndex ?? selectedIndex
 		GlassEffectContainer(spacing: 0) {
 			HStack(spacing: Self.spacing) {
 				HStack(spacing: 0) {
-					ForEach(tabs) { tab in
+					ForEach(Array(tabs.enumerated()), id: \.element.id) { index, tab in
 						let isSelected = tab.value == selection
+						let isHighlighted = index == highlighted
 						Button {
+							guard dragX == nil && !justDragged else { return }
 							if isSelected {
 								reselect(tab.value)
 							} else {
@@ -415,26 +487,11 @@ private struct FloatingTabBar: View {
 									.frame(height: 28)
 								// A fixed size like the system bar's, since the bar's height is fixed; a long press shows it enlarged instead
 								Text(tab.title)
-									.font(.system(size: 10, weight: isSelected && differentiateWithoutColor ? .heavy : .semibold))
+									.font(.system(size: 10, weight: isHighlighted && differentiateWithoutColor ? .heavy : .semibold))
 									.lineLimit(1)
 							}
 								.frame(width: itemSpacing, height: barHeight - inset * 2)
-								.foregroundStyle(isSelected ? AnyShapeStyle(.tint) : AnyShapeStyle(.primary))
-								.background {
-									if isSelected {
-										Capsule()
-											.fill(.quaternary)
-											// Differentiate Without Color: an outline and heavier title mark the selected tab, not just the tint
-											.overlay {
-												if differentiateWithoutColor {
-													Capsule()
-														.strokeBorder(.primary, lineWidth: 1.5)
-												}
-											}
-											.frame(width: selectionWidth)
-											.matchedGeometryEffect(id: "selection", in: namespace)
-									}
-								}
+								.foregroundStyle(isHighlighted ? AnyShapeStyle(.tint) : AnyShapeStyle(.primary))
 								.contentShape(.capsule)
 						}
 							.buttonStyle(.plain)
@@ -444,8 +501,35 @@ private struct FloatingTabBar: View {
 							.accessibilityShowsLargeContentViewer {
 								Label(tab.title, systemImage: tab.systemImage)
 							}
+							// VoiceOver: swiping up or down moves to the next or previous tab
+							.accessibilityAdjustableAction { direction in
+								let next = switch direction {
+								case .increment: min(tabs.count - 1, selectedIndex + 1)
+								case .decrement: max(0, selectedIndex - 1)
+								@unknown default: selectedIndex
+								}
+								selection = tabs[next].value
+							}
 					}
 				}
+					.background(alignment: .leading) {
+						Capsule()
+							.fill(.quaternary)
+							// Differentiate Without Color: an outline and heavier title mark the selected tab, not just the tint
+							.overlay {
+								if differentiateWithoutColor {
+									Capsule()
+										.strokeBorder(.primary, lineWidth: 1.5)
+								}
+							}
+							.frame(width: selectionWidth, height: barHeight - inset * 2)
+							// Grows a little while held, like the system pill
+							.scaleEffect(dragX == nil ? 1 : 1.08)
+							.offset(x: pillCenter - selectionWidth / 2)
+					}
+					.simultaneousGesture(drag)
+					.sensoryFeedback(.selection, trigger: hoveredIndex) { old, new in old != nil && new != nil }
+					.sensoryFeedback(.impact(weight: .medium), trigger: dragPicks)
 					.padding(.vertical, inset)
 					.padding(.horizontal, inset + (selectionWidth - itemSpacing) / 2)
 					.glassEffect(.regular.interactive(), in: .capsule)
