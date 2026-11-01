@@ -76,6 +76,9 @@ final class AppDelegate: NSObject, UIApplicationDelegate {
 		UITabBarItem.appearance().setTitleTextAttributes([.font: UIFont.rounded(style: .caption2, bold: false)], for: .normal)
 
 		UIView.appearance(whenContainedInInstancesOf: [UIAlertController.self]).tintColor = .accentColor
+#if targetEnvironment(macCatalyst)
+		MenuBar.start()
+#endif
 		return true
 	}
 }

@@ -17,6 +17,7 @@
     { "kind": "folder", "path": "Assets", "target-membership": [ "Heart Beats" ] },
     { "kind": "folder", "path": "Shared", "target-membership": [ "Heart Beats", "Heart Beats Widget" ] },
     { "kind": "folder", "path": "Widget", "target-membership": [ "Heart Beats Widget" ] },
+    { "kind": "folder", "path": "MenuBar", "target-membership": [ "Heart Beats Menu Bar" ] },
     { "kind": "folder", "path": "Tests", "target-membership": [ "Heart Beats Tests" ] },
     { "kind": "folder", "path": "UITests", "target-membership": [ "Heart Beats UI Tests" ] },
     {
@@ -27,6 +28,7 @@
         { "path": "<PRODUCTS>/Heart Beats Tests.xctest", "id": "249BF6A52AE3683C00A3E2F2", "type": "wrapper.cfbundle", "index": false },
         { "path": "<PRODUCTS>/Heart Beats UI Tests.xctest", "id": "249BF6A52AE3683C00A3E2F3", "type": "wrapper.cfbundle", "index": false },
         { "path": "<PRODUCTS>/Heart Beats Widget.appex", "id": "24E1B69730943F4E0021C457", "type": "wrapper.app-extension", "index": false, "target-membership": [ { "build-phase": "Heart Beats/copy/Embed Foundation Extensions", "header-preservation": "remove-on-copy" } ] },
+        { "path": "<PRODUCTS>/Heart Beats Menu Bar.bundle", "id": "24E1B69730943F4E0021C458", "type": "wrapper.cfbundle", "index": false, "target-membership": [ { "build-phase": "Heart Beats/copy/Embed Foundation Extensions", "platforms": [ "maccatalyst" ], "header-preservation": "remove-on-copy" } ] },
       ],
     },
   ],
@@ -38,6 +40,7 @@
       "product-type": "application",
       "dependencies": [
         "Heart Beats Widget",
+        { "target": "Heart Beats Menu Bar", "platforms": [ "maccatalyst" ] },
       ],
       "build-phases": [
         "compile-sources",
@@ -129,6 +132,28 @@
         ],
         "PRODUCT_BUNDLE_IDENTIFIER": "is.ky.Heart-Beats.Widget",
         "SKIP_INSTALL": "YES",
+      },
+    },
+    {
+      "name": "Heart Beats Menu Bar",
+      "id": "24E1B69630943F4E0021C458",
+      "product": "Products/Heart Beats Menu Bar.bundle",
+      "product-type": "bundle",
+      "build-phases": [
+        "compile-sources",
+        "frameworks",
+        "resources",
+      ],
+      "build-settings": {
+        "GENERATE_INFOPLIST_FILE": "YES",
+        "INFOPLIST_KEY_NSPrincipalClass": "HBMenuBarPlugin",
+        "MACOSX_DEPLOYMENT_TARGET": "27.0",
+        "PRODUCT_BUNDLE_IDENTIFIER": "is.ky.Heart-Beats.MenuBar",
+        "SDKROOT": "macosx",
+        "SKIP_INSTALL": "YES",
+        "SUPPORTED_PLATFORMS": "macosx",
+        "SUPPORTS_MACCATALYST": "NO",
+        "WRAPPER_EXTENSION": "bundle",
       },
     },
   ],
