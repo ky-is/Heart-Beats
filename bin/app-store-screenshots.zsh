@@ -147,9 +147,11 @@ for entry in $devices; do
 	fresh=$work/$name
 	mkdir -p $fresh
 	index=1
-	# On iPad the minimum's steppers sit beside it, with no popover, so that shot would repeat the Artists one
+	# On iPad the minimum's steppers sit beside it, with no popover, so that shot would repeat the Artists one; on iPhone
+	# the minimum shot is the Artists list with the popover open, so Artists alone is left out
 	device_shots=($shots)
 	[[ $name == iPad ]] && device_shots=(${shots:#minimum:*})
+	[[ $name == iPhone ]] && device_shots=(${shots:#artists:*})
 	for shot in $device_shots; do
 		shot_name=${shot%%:*}
 		# The screen whose ready line to wait for: the artists list, or the minimum popover over it, or the years
