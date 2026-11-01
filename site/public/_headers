@@ -1,0 +1,17 @@
+# Vite's files have content hashes in their names, so they never change.
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Covers, screenshots and icons keep their names when regenerated, so cache them for a week.
+/covers/*
+  Cache-Control: public, max-age=604800
+/screens/*
+  Cache-Control: public, max-age=604800
+/icon.png
+  Cache-Control: public, max-age=604800
+/icon.svg
+  Cache-Control: public, max-age=604800
+/icon-192.png
+  Cache-Control: public, max-age=604800
+/og.png
+  Cache-Control: public, max-age=604800

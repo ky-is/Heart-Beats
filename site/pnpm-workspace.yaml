@@ -1,0 +1,30 @@
+allowBuilds:
+  esbuild: true
+  workerd: true
+catalog:
+  '@vitest/browser-playwright': 5.0.5
+  vite: npm:@voidzero-dev/vite-plus-core@1.4.0
+  vite-plus: 1.4.0
+  vitest: 5.0.5
+minimumReleaseAgeExclude:
+    - '@vue/compiler-core@3.6.0-rc.14'
+    - '@vue/compiler-dom@3.6.0-rc.14'
+    - '@vue/compiler-sfc@3.6.0-rc.14'
+    - '@vue/compiler-ssr@3.6.0-rc.14'
+    - '@vue/compiler-vapor@3.6.0-rc.14'
+    - '@vue/reactivity@3.6.0-rc.14'
+    - '@vue/runtime-core@3.6.0-rc.14'
+    - '@vue/runtime-dom@3.6.0-rc.14'
+    - '@vue/runtime-vapor@3.6.0-rc.14'
+    - '@vue/server-renderer@3.6.0-rc.14'
+    - '@vue/shared@3.6.0-rc.14'
+    - vue@3.6.0-rc.14
+overrides:
+  oxfmt: link:../../oxfmt-sanity/npm/oxfmt
+  vite@*: 'catalog:'
+  vitest@*: 'catalog:'
+peerDependencyRules:
+  allowAny:
+    - vite
+  allowedVersions:
+    vite: '*'
