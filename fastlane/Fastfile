@@ -193,6 +193,12 @@ platform :mac do
 		upload_to_testflight(api_key: key, apple_id: APP_ID, app_platform: 'osx', pkg: build_package(key, 'osx'), skip_waiting_for_build_processing: true)
 	end
 
+	desc 'Build the Mac Catalyst app and upload it to App Store Connect (does not submit for review)'
+	lane :release do
+		key = api_key
+		upload_to_app_store(api_key: key, platform: 'osx', pkg: build_package(key, 'osx'), app_version: versions[:version], skip_metadata: true, skip_screenshots: true, submit_for_review: false, precheck_include_in_app_purchases: false, force: true)
+	end
+
 	desc 'Upload the Mac screenshots that changed to the editable version on App Store Connect (dry_run:true only reports)'
 	lane :upload_screenshots do |options|
 		sync_screenshots(api_key, 'osx', dry_run: options[:dry_run].to_s == 'true')

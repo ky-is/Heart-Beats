@@ -84,6 +84,14 @@ Build and upload to App Store Connect (does not submit for review)
 
 Build the Mac Catalyst app and upload it to TestFlight (adds macOS to the same App Store record)
 
+### mac release
+
+```sh
+[bundle exec] fastlane mac release
+```
+
+Build the Mac Catalyst app and upload it to App Store Connect (does not submit for review)
+
 ### mac upload_screenshots
 
 ```sh

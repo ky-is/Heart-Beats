@@ -1,1 +1,1 @@
-shuffle,year,5-star,rated,love,loved,hearted,mix,library,siri,widget,shortcuts,top,played,mac,ipad
+shuffle,5-star,rated,loved,hearted,smart,auto,songs,mix,most,played,top,year,siri,widget,shortcuts
